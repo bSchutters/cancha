@@ -20,6 +20,20 @@ import type { ManageTournament } from '@/lib/tournament/manage-view'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
 function validateConfig(s: FormState): string | null {
+  if (!s.name.trim()) return 'Le nom du tournoi est obligatoire.'
+  // A cleared number input becomes NaN; catch it here with a clear message
+  // instead of letting the server reject it generically.
+  const numbers: Array<[number, string]> = [
+    [s.num_groups, 'Nombre de poules'],
+    [s.group_size, 'Équipes par poule'],
+    [s.qualifiers_per_group, 'Qualifiés par poule'],
+    [s.num_courts, 'Nombre de terrains'],
+    [s.match_duration_min, 'Durée d’un match'],
+    [s.gap_between_matches_min, 'Pause entre matchs'],
+  ]
+  for (const [value, label] of numbers) {
+    if (!Number.isFinite(value)) return `Le champ « ${label} » doit être un nombre.`
+  }
   if (s.num_groups < 1) return 'Il faut au moins 1 poule.'
   if (s.group_size < 2) return 'Une poule doit compter au moins 2 équipes.'
   if (s.qualifiers_per_group < 1) return 'Il faut au moins 1 qualifié par poule.'
@@ -200,7 +214,12 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         router.push(`/manage/${slug}`)
         router.refresh()
       } else {
-        toast.error(data?.errors?.[0]?.message ?? 'Erreur lors de l’enregistrement')
+        const msg =
+          data?.errors?.[0]?.data?.errors?.[0]?.message ??
+          data?.errors?.[0]?.message ??
+          data?.message ??
+          'Erreur lors de l’enregistrement'
+        toast.error(msg)
       }
     } catch {
       toast.error('Erreur réseau')
