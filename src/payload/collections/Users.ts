@@ -10,6 +10,9 @@ export const Users: CollectionConfig = {
     hidden: ({ user }) => user?.role !== 'admin',
   },
   access: {
+    // Only platform super-admins reach the Payload back-office. Organizers
+    // (role 'manager') authenticate and work entirely in the custom /manage UI.
+    admin: ({ req: { user } }) => (user as { role?: string } | undefined)?.role === 'admin',
     read: ({ req: { user } }) => {
       if (user?.role === 'admin') return true
       // Manager can only read their own account

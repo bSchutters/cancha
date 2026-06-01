@@ -46,8 +46,10 @@ export default function ManageLoginPage() {
         onSubmit={onSubmit}
         className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 p-8"
       >
-        <h1 className="text-2xl font-bold">Console UD Asturiana Cup</h1>
-        <p className="mt-1 text-sm text-white/60">Connexion gestionnaire</p>
+        <h1 className="text-2xl font-bold">
+          Cup <span className="text-spanish-accent-2">Generator</span>
+        </h1>
+        <p className="mt-1 text-sm text-white/60">Connexion organisateur</p>
 
         <div className="mt-6 space-y-4">
           <div className="space-y-1">
