@@ -53,7 +53,7 @@ function TeamLogo({ team, onUpload }: { team: ManageTeam; onUpload: (file: File)
       size="icon"
       title="Changer le logo"
       onClick={() => ref.current?.click()}
-      className="relative shrink-0 overflow-hidden rounded-md border border-white/15 bg-white/5 text-white/40 hover:border-white/30 hover:bg-white/5"
+      className="relative shrink-0 overflow-hidden rounded-md border border-border bg-card text-muted-foreground hover:border-border hover:bg-muted/50"
     >
       {team.logoUrl ? (
         <Image src={team.logoUrl} alt="" fill sizes="36px" unoptimized className="object-contain p-0.5" />
@@ -82,12 +82,12 @@ function SortHead({ label, active, asc, onClick }: { label: string; active: bool
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex cursor-pointer items-center gap-1 hover:text-white',
-        active ? 'text-white' : 'text-white/60',
+        'inline-flex cursor-pointer items-center gap-1 hover:text-foreground',
+        active ? 'text-foreground' : 'text-muted-foreground',
       )}
     >
       {label}
-      <ArrowUpDown className={cn('h-3 w-3', active ? (asc ? 'text-spanish-accent-2' : 'text-spanish-accent-2 rotate-180') : 'opacity-40')} />
+      <ArrowUpDown className={cn('h-3 w-3', active ? (asc ? 'text-primary' : 'text-primary rotate-180') : 'opacity-40')} />
     </button>
   )
 }
@@ -382,7 +382,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       </div>
 
       {adding && (
-        <form onSubmit={createTeam} className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <form onSubmit={createTeam} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1">
             <Label>Nom</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
@@ -403,7 +403,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
             <Button
               type="submit"
               disabled={busy === 'add'}
-              className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+              className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
             >
               {busy === 'add' && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
               Ajouter l’équipe
@@ -413,12 +413,12 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       )}
 
       {teams.length === 0 ? (
-        <p className="text-white/60">Aucune inscription pour le moment.</p>
+        <p className="text-muted-foreground">Aucune inscription pour le moment.</p>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative min-w-[14rem] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -438,14 +438,14 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <SelectItem value="rejected">Refusées</SelectItem>
               </SelectContent>
             </Select>
-            <Button size="sm" variant="ghost" onClick={exportCsv} className="gap-1 text-white/60 hover:text-white">
+            <Button size="sm" variant="ghost" onClick={exportCsv} className="gap-1 text-muted-foreground hover:text-foreground">
               <Download className="h-4 w-4" /> CSV
             </Button>
           </div>
 
           {selected.size > 0 && (
-            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-spanish-accent-2/30 bg-spanish-accent-2/10 p-2">
-              <span className="px-1 text-sm font-semibold text-spanish-accent-2">
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-2">
+              <span className="px-1 text-sm font-semibold text-primary">
                 {selected.size} sélectionnée(s)
               </span>
               <Button size="sm" variant="secondary" disabled={busy !== null}
@@ -469,16 +469,16 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 className="text-red-300 hover:bg-red-500/10 hover:text-red-300">
                 Supprimer
               </Button>
-              {busy === 'bulk' && <Loader2 className="h-4 w-4 animate-spin text-white/60" />}
+              {busy === 'bulk' && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
               <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}
-                className="ml-auto text-white/50 hover:text-white">
+                className="ml-auto text-muted-foreground hover:text-foreground">
                 Annuler
               </Button>
             </div>
           )}
 
           {view.length === 0 ? (
-            <p className="text-white/60">Aucune équipe ne correspond à la recherche.</p>
+            <p className="text-muted-foreground">Aucune équipe ne correspond à la recherche.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -520,11 +520,11 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                   <TeamLogo team={team} onUpload={(f) => uploadLogo(team.id, f)} />
                   <span>
                     {team.name}
-                    {team.groupLabel && <span className="ml-2 text-xs text-white/40">Poule {team.groupLabel}</span>}
+                    {team.groupLabel && <span className="ml-2 text-xs text-muted-foreground">Poule {team.groupLabel}</span>}
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="text-sm text-white/60">
+              <TableCell className="text-sm text-muted-foreground">
                 <div>{team.email}</div>
                 <div>{team.phone}</div>
               </TableCell>
@@ -598,7 +598,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       variant="link"
                       disabled={isBusy}
                       onClick={() => patchTeam(team.id, { registration_status: 'rejected' })}
-                      className="h-auto p-0 text-sm font-normal text-white/60 hover:text-white"
+                      className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                     >
                       Refuser
                     </Button>
@@ -607,7 +607,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     variant="link"
                     disabled={isBusy}
                     onClick={() => openEdit(team)}
-                    className="h-auto p-0 text-sm font-normal text-white/60 hover:text-white"
+                    className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                   >
                     Éditer
                   </Button>
@@ -662,7 +662,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <Button
                   type="submit"
                   disabled={busy === String(editing.id)}
-                  className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+                  className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   {busy === String(editing.id) && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
                   Enregistrer

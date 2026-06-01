@@ -94,7 +94,7 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-white/50">{referees.length} arbitre(s)</p>
+        <p className="text-sm text-muted-foreground">{referees.length} arbitre(s)</p>
         <Button
           size="sm"
           variant="secondary"
@@ -108,7 +108,7 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
       </div>
 
       {adding && (
-        <form onSubmit={create} className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-3">
+        <form onSubmit={create} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-3">
           <div className="space-y-1">
             <Label>Nom</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
@@ -118,7 +118,7 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
             <Input value={draft.contact} onChange={(e) => setDraft({ ...draft, contact: e.target.value })} />
           </div>
           <div className="flex items-end">
-            <Button type="submit" disabled={busy} className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light">
+            <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
               {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
               Ajouter
             </Button>
@@ -127,20 +127,20 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
       )}
 
       {referees.length === 0 ? (
-        <p className="text-white/60">Aucun arbitre. L’affectation aux matchs se fait sur l’écran Saisie scores.</p>
+        <p className="text-muted-foreground">Aucun arbitre. L’affectation aux matchs se fait sur l’écran Saisie scores.</p>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {referees.map((r) => (
-            <li key={String(r.id)} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+            <li key={String(r.id)} className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
               <div>
                 <p className="font-medium">{r.name}</p>
-                {r.contact && <p className="text-sm text-white/50">{r.contact}</p>}
+                {r.contact && <p className="text-sm text-muted-foreground">{r.contact}</p>}
               </div>
               <div className="flex items-center gap-3">
                 <Button
                   variant="link"
                   onClick={() => openEdit(r)}
-                  className="h-auto p-0 text-sm font-normal text-white/60 hover:text-white"
+                  className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                 >
                   Éditer
                 </Button>
@@ -178,7 +178,7 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
                 <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={busy} className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light">
+                <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
                   {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
                   Enregistrer
                 </Button>

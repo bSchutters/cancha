@@ -88,7 +88,7 @@ export function MyTeamTab({
   return (
     <div className="space-y-6">
       {/* Team header */}
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
         <span className="flex items-center gap-3">
           {team.logoUrl && (
             <span className="relative h-10 w-10 shrink-0">
@@ -100,7 +100,7 @@ export function MyTeamTab({
         <Button
           variant="link"
           onClick={onChange}
-          className="h-auto shrink-0 p-0 text-sm font-normal text-white/50 hover:text-white"
+          className="h-auto shrink-0 p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
         >
           Changer
         </Button>
@@ -108,21 +108,21 @@ export function MyTeamTab({
 
       {/* Next match */}
       <section>
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/50">Prochain match</h3>
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Prochain match</h3>
         {next ? (
           (() => {
             const v = myView(next, teamId)
             return (
-              <div className="rounded-xl border border-spanish-accent-2/30 bg-spanish-accent-2/5 p-4">
-                <div className="mb-3 flex items-center justify-between text-sm text-white/60">
-                  <span className="font-semibold text-spanish-accent-2">
+              <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <div className="mb-3 flex items-center justify-between text-sm text-muted-foreground">
+                  <span className="font-semibold text-primary">
                     {next.scheduledTime ?? ''}
                     {next.court != null ? ` · Terrain ${next.court}` : ''}
                   </span>
                   <span>{next.groupLabel ? `Poule ${next.groupLabel}` : next.bracketLabel}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/60">vs</span>
+                  <span className="text-muted-foreground">vs</span>
                   <TeamBadge logo={v.oppLogo} name={v.oppName} size={28} />
                 </div>
               </div>
@@ -141,7 +141,7 @@ export function MyTeamTab({
       {/* Standing */}
       {poolsRevealed && group && myStanding && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/50">Classement</h3>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Classement</h3>
           <GroupStandings
             groups={[group]}
             qualifiersPerGroup={data.format.qualifiersPerGroup}
@@ -153,18 +153,18 @@ export function MyTeamTab({
       {/* Results */}
       {results.length > 0 && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/50">Résultats</h3>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Résultats</h3>
           <div className="space-y-2">
             {results.map((m) => {
               const v = myView(m, teamId)
               return (
-                <div key={String(m.id)} className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                <div key={String(m.id)} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
                   <span
                     className={cn(
                       'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold',
                       v.result === 'V' && 'bg-emerald-500/20 text-emerald-300',
                       v.result === 'D' && 'bg-red-500/20 text-red-300',
-                      v.result === 'N' && 'bg-white/10 text-white/60',
+                      v.result === 'N' && 'bg-muted text-muted-foreground',
                     )}
                   >
                     {v.result}

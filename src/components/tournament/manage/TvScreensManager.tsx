@@ -81,13 +81,13 @@ export function TvScreensManager({
       </div>
 
       {screens.length === 0 ? (
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-muted-foreground">
           Aucun écran. Ajoute une TV et choisis les vues à afficher (rotation si tu en coches plusieurs).
         </p>
       ) : (
         <div className="space-y-2">
           {screens.map((s, i) => (
-            <div key={i} className="rounded-lg border border-white/10 bg-white/5 p-3">
+            <div key={i} className="rounded-lg border border-border bg-card p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Input
                   value={s.name}
@@ -108,8 +108,8 @@ export function TvScreensManager({
                         className={cn(
                           'rounded-full border px-2.5 py-1 text-xs transition-colors',
                           on
-                            ? 'border-spanish-accent-2 bg-spanish-accent-2/20 text-spanish-accent-2'
-                            : 'border-white/15 text-white/50 hover:text-white',
+                            ? 'border-primary bg-primary/20 text-primary'
+                            : 'border-border text-muted-foreground hover:text-foreground',
                         )}
                       >
                         {p.label}

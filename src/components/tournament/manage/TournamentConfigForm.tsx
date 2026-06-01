@@ -230,7 +230,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
   return (
     <form onSubmit={onSubmit} className="space-y-8">
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Général</h2>
         <div className="space-y-1">
           <Label>Nom du tournoi</Label>
@@ -248,7 +248,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Format</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <Num label="Nombre de poules (pair)" value={s.num_groups} onChange={(n) => set('num_groups', n)} max={16} />
@@ -268,7 +268,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
                 <SelectItem value="qualifiers_only">Seulement les qualifiés</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-muted-foreground">
               « Tout classer » donne une place exacte à chaque équipe (plus de matchs de placement).
             </p>
           </div>
@@ -281,7 +281,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           <div
             className={cn(
               'rounded-lg border p-3 text-sm',
-              tooLate ? 'border-red-500/40 bg-red-500/10 text-red-200' : 'border-white/10 bg-white/5 text-white/70',
+              tooLate ? 'border-red-500/40 bg-red-500/10 text-red-200' : 'border-border bg-card text-muted-foreground',
             )}
           >
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -305,7 +305,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         )}
       </section>
 
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Terrains</h2>
         <div className="max-w-sm">
           <Switch label="Plusieurs terrains" checked={s.multi_court} onChange={(v) => set('multi_court', v)} />
@@ -332,11 +332,11 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         )}
       </section>
 
-      <section className="space-y-5 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-5 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Calendrier</h2>
 
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-white/60">Durées des matchs</p>
+          <p className="text-sm font-semibold text-muted-foreground">Durées des matchs</p>
           <div className="grid items-end gap-x-4 gap-y-5 sm:grid-cols-3">
             <Num label="Durée match (min)" value={s.match_duration_min} onChange={(n) => set('match_duration_min', n)} max={120} />
             <Num label="Durée match - phase finale (min)" value={s.finals_match_duration_min} onChange={(n) => set('finals_match_duration_min', n)} max={120} />
@@ -344,18 +344,18 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           </div>
         </div>
 
-        <div className="space-y-3 border-t border-white/10 pt-4">
-          <p className="text-sm font-semibold text-white/60">Horaires</p>
+        <div className="space-y-3 border-t border-border pt-4">
+          <p className="text-sm font-semibold text-muted-foreground">Horaires</p>
           <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
             <div className="space-y-1">
               <Label>Heure de début</Label>
               <Input type="time" value={s.start_time} onChange={(e) => set('start_time', e.target.value)} />
-              <p className="text-xs text-white/40">Coup d’envoi du 1er match de poule.</p>
+              <p className="text-xs text-muted-foreground">Coup d’envoi du 1er match de poule.</p>
             </div>
             <div className="space-y-1">
               <Label>Reprise phase finale (déjeuner)</Label>
               <Input type="time" value={s.finals_start_time} onChange={(e) => set('finals_start_time', e.target.value)} />
-              <p className="text-xs text-white/40">
+              <p className="text-xs text-muted-foreground">
                 Heure des quarts après la pause déjeuner (ex. 13:30). Vide = enchaîne directement après les poules.
               </p>
             </div>
@@ -363,7 +363,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Paiement</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
@@ -391,7 +391,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Lieu & infos pratiques</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -416,7 +416,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           <Label>Plan du complexe</Label>
           <div className="flex items-center gap-4">
             {(mapFile || initial?.venue.mapUrl) && (
-              <span className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+              <span className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md border border-border bg-card">
                 <Image
                   src={mapFile ? URL.createObjectURL(mapFile) : (initial?.venue.mapUrl as string)}
                   alt="Plan"
@@ -445,7 +445,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">Arbitres & options</h2>
         <div className="space-y-1">
           <Label>Affectation des arbitres</Label>
@@ -461,7 +461,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
               <SelectItem value="random">Aléatoire (auto à la génération)</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-white/40">Reste modifiable par match dans la saisie des scores.</p>
+          <p className="text-xs text-muted-foreground">Reste modifiable par match dans la saisie des scores.</p>
         </div>
         {isOwner && (
           <div className="max-w-md">
@@ -478,7 +478,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       <Button
         type="submit"
         disabled={saving}
-        className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+        className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
       >
         {saving && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
         {initial ? 'Enregistrer' : 'Créer le tournoi'}

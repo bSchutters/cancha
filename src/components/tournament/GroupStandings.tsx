@@ -18,7 +18,7 @@ export function GroupStandings({
   return (
     <div className={cn('grid gap-6', compact ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2')}>
       {groups.map((group) => (
-        <div key={group.label} className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-4">
+        <div key={group.label} className="rounded-xl border border-border bg-card p-3 sm:p-4">
           <h3 className={cn('mb-3 font-bold', compact ? 'text-lg' : 'text-xl')}>Poule {group.label}</h3>
           <div className="-mx-1 overflow-x-auto">
             <Table className="min-w-[20rem]">
@@ -33,7 +33,7 @@ export function GroupStandings({
                   <TableHead className="px-1 text-center" title="Buts pour">BP</TableHead>
                   <TableHead className="px-1 text-center" title="Buts contre">BC</TableHead>
                   <TableHead className="px-1 text-center" title="Différence">Diff</TableHead>
-                  <TableHead className="px-1 text-center font-bold text-white">Pts</TableHead>
+                  <TableHead className="px-1 text-center font-bold text-foreground">Pts</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -41,12 +41,12 @@ export function GroupStandings({
                   const qualified = s.rank <= qualifiersPerGroup
                   const me = highlightTeamId != null && String(s.teamId) === highlightTeamId
                   return (
-                    <TableRow key={String(s.teamId)} className={cn(me && 'bg-spanish-accent-2/10')}>
+                    <TableRow key={String(s.teamId)} className={cn(me && 'bg-primary/10')}>
                       <TableCell className="px-1">
                         <span
                           className={cn(
                             'inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-semibold',
-                            qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-white/40',
+                            qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-muted-foreground',
                           )}
                         >
                           {s.rank}
@@ -62,13 +62,13 @@ export function GroupStandings({
                           <span className="truncate">{s.teamName}</span>
                         </span>
                       </TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.played}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.wins}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.draws}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.losses}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.goalsFor}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">{s.goalsAgainst}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-white/70">
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.played}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.wins}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.draws}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.losses}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.goalsFor}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.goalsAgainst}</TableCell>
+                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">
                         {s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference}
                       </TableCell>
                       <TableCell className="px-1 text-center font-bold tabular-nums">{s.points}</TableCell>

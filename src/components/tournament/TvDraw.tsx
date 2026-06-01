@@ -227,27 +227,27 @@ export function TvDraw({
     phase === 'running' && mode === 'manual' && activeIndex === null && landed < order.length
 
   return (
-    <main className="relative flex h-screen flex-col overflow-hidden bg-spanish-bg p-10 text-white">
+    <main className="relative flex h-screen flex-col overflow-hidden bg-background p-10 text-foreground">
       <header className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-lg font-semibold uppercase tracking-widest text-spanish-accent-2">Tirage au sort</p>
+          <p className="text-lg font-semibold uppercase tracking-widest text-primary">Tirage au sort</p>
           <h1 className="text-4xl font-bold">{data.name}</h1>
         </div>
         {phase === 'running' && (
-          <div className="text-2xl font-bold tabular-nums text-white/60">
-            {landed} <span className="text-white/30">/ {order.length}</span>
+          <div className="text-2xl font-bold tabular-nums text-muted-foreground">
+            {landed} <span className="text-muted-foreground">/ {order.length}</span>
           </div>
         )}
       </header>
 
       {/* Center stage */}
       <div className="relative mb-8 flex h-44 items-center justify-center">
-        {!drawn && <p className="text-3xl text-white/50">En attente du tirage des poules…</p>}
+        {!drawn && <p className="text-3xl text-muted-foreground">En attente du tirage des poules…</p>}
 
         {drawn && phase === 'idle' && (
           <Button
             onClick={start}
-            className="h-auto gap-3 rounded-2xl bg-spanish-accent-2 px-8 py-4 text-2xl font-bold text-spanish-bg-dark shadow-lg transition-transform hover:scale-105 hover:bg-spanish-accent-2-light"
+            className="h-auto gap-3 rounded-2xl bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105 hover:bg-primary/90"
           >
             <Dices className="size-7" /> Lancer le tirage
           </Button>
@@ -256,7 +256,7 @@ export function TvDraw({
         {waitingForManual && (
           <Button
             onClick={advance}
-            className="h-auto animate-pulse gap-3 rounded-2xl bg-spanish-accent-2 px-8 py-4 text-2xl font-bold text-spanish-bg-dark shadow-lg hover:scale-105 hover:bg-spanish-accent-2-light"
+            className="h-auto animate-pulse gap-3 rounded-2xl bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg hover:scale-105 hover:bg-primary/90"
           >
             <ChevronRight className="size-7" /> {landed === 0 ? 'Premier tirage' : 'Équipe suivante'}
           </Button>
@@ -266,8 +266,8 @@ export function TvDraw({
           <div
             className={`flex items-center gap-6 rounded-3xl border px-12 py-6 transition-all duration-200 ${
               settled
-                ? 'animate-in border-spanish-accent-2 bg-spanish-accent-2/20 zoom-in-95 duration-300'
-                : 'border-spanish-accent-2/30 bg-spanish-accent-2/5'
+                ? 'animate-in border-primary bg-primary/20 zoom-in-95 duration-300'
+                : 'border-primary/30 bg-primary/5'
             }`}
           >
             <TeamLogo team={displayTeam} size={120} />
@@ -275,7 +275,7 @@ export function TvDraw({
               <p className={`text-5xl font-bold transition-opacity ${settled ? 'opacity-100' : 'opacity-70'}`}>
                 {displayTeam.name}
               </p>
-              <p className="mt-1 text-2xl font-semibold text-spanish-accent-2">
+              <p className="mt-1 text-2xl font-semibold text-primary">
                 {settled && activeEntry ? `Poule ${pools[activeEntry.poolIndex].label}` : '…'}
               </p>
             </div>
@@ -284,20 +284,20 @@ export function TvDraw({
 
         {phase === 'done' && (
           <div className="flex animate-in flex-col items-center gap-4 fade-in zoom-in-95 duration-700">
-            <p className="flex items-center gap-3 text-5xl font-bold text-spanish-accent-2">
+            <p className="flex items-center gap-3 text-5xl font-bold text-primary">
               <Trophy className="h-12 w-12" /> Tirage terminé !
             </p>
             <div className="flex gap-3">
               <Button
                 onClick={revealAndShow}
-                className="h-auto rounded-full bg-spanish-accent-2 px-6 py-3 text-lg font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+                className="h-auto rounded-full bg-primary px-6 py-3 text-lg font-bold text-primary-foreground hover:bg-primary/90"
               >
                 Dévoiler les poules &amp; afficher
               </Button>
               <Button
                 variant="outline"
                 onClick={start}
-                className="h-auto gap-2 rounded-full border-white/20 bg-transparent px-6 py-3 text-lg font-semibold text-white/70 hover:bg-white/10 hover:text-white"
+                className="h-auto gap-2 rounded-full border-border bg-transparent px-6 py-3 text-lg font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <RotateCcw className="size-5" /> Rejouer
               </Button>
@@ -315,8 +315,8 @@ export function TvDraw({
             return (
               <div
                 key={pool.label}
-                className={`flex flex-col rounded-2xl border bg-white/5 p-4 transition-all duration-300 ${
-                  incoming ? 'border-spanish-accent-2 ring-2 ring-spanish-accent-2/50' : 'border-white/10'
+                className={`flex flex-col rounded-2xl border bg-card p-4 transition-all duration-300 ${
+                  incoming ? 'border-primary ring-2 ring-ring/50' : 'border-border'
                 }`}
               >
                 <h3 className="mb-3 text-2xl font-bold">Poule {pool.label}</h3>
@@ -328,18 +328,18 @@ export function TvDraw({
                         key={team.id}
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xl ${
                           isPlaced
-                            ? 'animate-in bg-white/10 fade-in slide-in-from-bottom-2 duration-500'
+                            ? 'animate-in bg-muted fade-in slide-in-from-bottom-2 duration-500'
                             : 'opacity-25'
                         }`}
                       >
-                        <span className="w-5 shrink-0 text-base font-semibold text-white/40">{slot + 1}</span>
+                        <span className="w-5 shrink-0 text-base font-semibold text-muted-foreground">{slot + 1}</span>
                         {isPlaced ? (
                           <>
                             <TeamLogo team={team} size={32} />
                             <span className="truncate font-medium">{team.name}</span>
                           </>
                         ) : (
-                          <span className="h-8 flex-1 rounded bg-white/5" />
+                          <span className="h-8 flex-1 rounded bg-card" />
                         )}
                       </li>
                     )
@@ -355,7 +355,7 @@ export function TvDraw({
           {data.teams.map((team) => (
             <div
               key={String(team.id)}
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-xl"
+              className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 text-xl"
             >
               <TeamLogo team={{ id: String(team.id), name: team.name, logoUrl: team.logoUrl }} size={32} />
               <span className="truncate font-medium">{team.name}</span>

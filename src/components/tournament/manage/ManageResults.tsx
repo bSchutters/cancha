@@ -63,8 +63,8 @@ function Tabs<T extends string>({
           className={cn(
             'rounded-md',
             active === x.key
-              ? 'bg-spanish-accent-2/20 font-semibold text-white hover:bg-spanish-accent-2/20 hover:text-white'
-              : 'text-white/50 hover:bg-white/5 hover:text-white',
+              ? 'bg-primary/20 font-semibold text-foreground hover:bg-primary/20 hover:text-foreground'
+              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
           )}
         >
           {x.label}
@@ -112,20 +112,20 @@ function FairplayContent({ t }: { t: ManageTournament }) {
         <TableBody>
           {t.fairplayRanking.map((e) => (
             <TableRow key={String(e.teamId)}>
-              <TableCell className="text-white/40">{e.rank}</TableCell>
+              <TableCell className="text-muted-foreground">{e.rank}</TableCell>
               <TableCell className="font-medium">
                 <NameWithLogo logo={e.logoUrl} name={e.teamName} />
               </TableCell>
-              <TableCell className="text-right font-bold text-spanish-accent-2">{e.fairplayPoints}</TableCell>
+              <TableCell className="text-right font-bold text-primary">{e.fairplayPoints}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <p className="mt-3 text-xs text-white/40">Privé - révélé publiquement seulement à la fin.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Privé - révélé publiquement seulement à la fin.</p>
       {finished && (
         <div className="mt-4">
-          <p className="mb-1 flex items-center gap-1 text-xs text-white/50">
-            <Award className="h-3.5 w-3.5 text-spanish-accent-2" /> Vainqueur du trophée fair-play
+          <p className="mb-1 flex items-center gap-1 text-xs text-muted-foreground">
+            <Award className="h-3.5 w-3.5 text-primary" /> Vainqueur du trophée fair-play
           </p>
           <Select
             defaultValue={t.fairplayWinnerId ? String(t.fairplayWinnerId) : undefined}
@@ -152,7 +152,7 @@ function FairplayContent({ t }: { t: ManageTournament }) {
 
 function FinalRankingContent({ t }: { t: ManageTournament }) {
   if (t.finalRanking.length === 0) {
-    return <p className="text-xs text-white/40">Disponible une fois la phase finale générée.</p>
+    return <p className="text-xs text-muted-foreground">Disponible une fois la phase finale générée.</p>
   }
   return (
     <Table>
@@ -176,7 +176,7 @@ function FinalRankingContent({ t }: { t: ManageTournament }) {
                       ? 'bg-zinc-300/20 text-zinc-200'
                       : e.position === 3
                         ? 'bg-orange-700/30 text-orange-300'
-                        : 'text-white/40',
+                        : 'text-muted-foreground',
                 )}
               >
                 {e.positionLabel}
@@ -185,7 +185,7 @@ function FinalRankingContent({ t }: { t: ManageTournament }) {
             <TableCell className="font-medium">
               <NameWithLogo logo={e.logoUrl} name={e.teamName} />
             </TableCell>
-            <TableCell className="text-right text-xs text-white/50">{e.note}</TableCell>
+            <TableCell className="text-right text-xs text-muted-foreground">{e.note}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -216,7 +216,7 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
                 <span
                   className={cn(
                     'inline-flex h-5 w-5 items-center justify-center rounded text-xs font-semibold',
-                    qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-white/40',
+                    qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-muted-foreground',
                   )}
                 >
                   {s.rank}
@@ -225,8 +225,8 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
               <TableCell className="font-medium">
                 <NameWithLogo logo={s.logoUrl} name={s.teamName} />
               </TableCell>
-              <TableCell className="text-center text-white/60">{s.played}</TableCell>
-              <TableCell className="text-center text-white/60">
+              <TableCell className="text-center text-muted-foreground">{s.played}</TableCell>
+              <TableCell className="text-center text-muted-foreground">
                 {s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference}
               </TableCell>
               <TableCell className="text-center font-bold">{s.points}</TableCell>
@@ -254,7 +254,7 @@ export function ManageResults({ t }: { t: ManageTournament }) {
   return (
     <section className="grid items-start gap-6 lg:grid-cols-3">
       {/* Classements (fair-play / final) - 1/3 */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <Tabs
           tabs={[
             { key: 'fairplay', label: 'Fair-play' },
@@ -267,15 +267,15 @@ export function ManageResults({ t }: { t: ManageTournament }) {
       </div>
 
       {/* Poules / Arbre - 2/3 */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 lg:col-span-2">
+      <div className="rounded-xl border border-border bg-card p-4 lg:col-span-2">
         <Tabs tabs={rightTabs} active={activeRight} onChange={setRightTab} />
         {activeRight === 'bracket' ? (
           <BracketView matches={t.matches.filter((m) => m.phase === 'knockout').map(toBracketView)} size="sm" className="pb-2" />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {t.groups.map((g) => (
-              <div key={g.label} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-                <h4 className="mb-2 text-sm font-bold text-white/80">Poule {g.label}</h4>
+              <div key={g.label} className="rounded-lg border border-border bg-white/[0.03] p-3">
+                <h4 className="mb-2 text-sm font-bold text-foreground">Poule {g.label}</h4>
                 <GroupTable t={t} label={g.label} />
               </div>
             ))}

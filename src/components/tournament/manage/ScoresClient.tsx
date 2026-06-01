@@ -37,7 +37,7 @@ function IconBtn({
       className={cn(
         'rounded-md border disabled:opacity-25',
         tone === 'danger' && 'border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-300',
-        tone === 'edit' && 'border-white/60 bg-white/10 text-white hover:bg-white/20 hover:text-white',
+        tone === 'edit' && 'border-border bg-muted text-foreground hover:bg-white/20 hover:text-foreground',
         tone === 'save' &&
           'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-300',
       )}
@@ -131,13 +131,13 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
     <div
       className={cn(
         'rounded-xl border p-4 transition-colors',
-        locked ? 'border-white/10 bg-black/20 text-white/50' : 'border-white/15 bg-white/5',
+        locked ? 'border-border bg-black/20 text-muted-foreground' : 'border-border bg-card',
       )}
     >
-      <div className="mb-3 flex items-center justify-between text-xs text-white/50">
+      <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
         <span className="flex items-center gap-2">
           {match.code && (
-            <span className="rounded bg-white/10 px-1.5 py-0.5 font-bold text-white/80">{match.code}</span>
+            <span className="rounded bg-muted px-1.5 py-0.5 font-bold text-foreground">{match.code}</span>
           )}
           {match.scheduledTime ?? ''}
           {match.court != null ? ` · Terrain ${match.court}` : ''}
@@ -147,13 +147,13 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-white/40')}>
+          <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
             {match.homeName ?? 'À déterminer'}
           </span>
           <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-white/40')}>
+          <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-muted-foreground')}>
             {match.awayName ?? 'À déterminer'}
           </span>
           <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
@@ -162,7 +162,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
 
       {/* Fair-play - labelled with team names */}
       <div className="mt-3">
-        <p className="mb-1 text-xs text-white/50">Point fair-play</p>
+        <p className="mb-1 text-xs text-muted-foreground">Point fair-play</p>
         <div className="flex gap-1">
           {(['home', 'none', 'away'] as Fairplay[]).map((v) => (
             <Button
@@ -174,8 +174,8 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
               className={cn(
                 'h-auto flex-1 truncate rounded-md border px-2 py-1 text-xs font-normal',
                 fairplay === v
-                  ? 'border-spanish-accent-2 bg-spanish-accent-2/15 text-white hover:bg-spanish-accent-2/15 hover:text-white'
-                  : 'border-white/10 text-white/50 hover:bg-transparent hover:text-white',
+                  ? 'border-primary bg-primary/15 text-foreground hover:bg-primary/15 hover:text-foreground'
+                  : 'border-border text-muted-foreground hover:bg-transparent hover:text-foreground',
                 locked && 'opacity-60',
               )}
             >
@@ -188,7 +188,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       {/* Penalty shootout score for KO draws */}
       {needsPenalty && (
         <div className="mt-3">
-          <p className="mb-1 text-xs text-white/50">Tirs au but</p>
+          <p className="mb-1 text-xs text-muted-foreground">Tirs au but</p>
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-sm">{match.homeName}</span>
             <NumberStepper value={penHome} onChange={setPenHome} disabled={locked} size="sm" />
@@ -251,7 +251,7 @@ function SectionBlock({ section, referees }: { section: Section; referees: Manag
         <span
           className={cn(
             'rounded-full px-2 py-0.5 text-xs font-semibold',
-            complete ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60',
+            complete ? 'bg-emerald-400/20 text-emerald-300' : 'bg-muted text-muted-foreground',
           )}
         >
           {done}/{total}
@@ -319,7 +319,7 @@ export function ScoresClient({
   const allSections = orderSections([...groupSections, ...koSections, ...clSections])
 
   if (matches.length === 0) {
-    return <p className="text-white/60">Aucun match généré. Lancez le tirage puis le calendrier.</p>
+    return <p className="text-muted-foreground">Aucun match généré. Lancez le tirage puis le calendrier.</p>
   }
 
   return (

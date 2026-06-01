@@ -42,8 +42,8 @@ function TeamRow({
   tab: boolean
 }) {
   return (
-    <div className={cn('flex items-center justify-between gap-2', winner && 'font-bold', loser && 'text-white/40')}>
-      <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-white/40')}>
+    <div className={cn('flex items-center justify-between gap-2', winner && 'font-bold', loser && 'text-muted-foreground')}>
+      <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-muted-foreground')}>
         {logo && name && (
           <span className="relative h-4 w-4 shrink-0">
             <Image src={logo} alt="" fill sizes="16px" unoptimized className="object-contain" />
@@ -58,7 +58,7 @@ function TeamRow({
       </span>
       <span className="shrink-0 tabular-nums">
         {score ?? '–'}
-        {penalty != null && <span className="ml-1 text-white/50">({penalty})</span>}
+        {penalty != null && <span className="ml-1 text-muted-foreground">({penalty})</span>}
       </span>
     </div>
   )
@@ -99,7 +99,7 @@ export function BracketView({
     const homeWin = decided && (m.scoreHome! > m.scoreAway! || m.penaltyWinner === 'home')
     const awayWin = decided && (m.scoreAway! > m.scoreHome! || m.penaltyWinner === 'away')
     return (
-      <div key={String(m.id)} className={cn('rounded-lg border border-white/10 bg-white/5', s.card)}>
+      <div key={String(m.id)} className={cn('rounded-lg border border-border bg-card', s.card)}>
         <TeamRow
           name={m.homeName}
           logo={m.homeLogoUrl}
@@ -127,7 +127,7 @@ export function BracketView({
       <div className="flex items-stretch gap-4 overflow-x-auto">
         {columns.map((col) => (
           <div key={col.key} className={cn('flex flex-col', s.col)}>
-            <h4 className={cn('mb-2 text-center font-bold uppercase tracking-wide text-white/55', s.head)}>
+            <h4 className={cn('mb-2 text-center font-bold uppercase tracking-wide text-muted-foreground', s.head)}>
               {col.label}
             </h4>
             <div className={cn('flex flex-1 flex-col justify-around', s.gap)}>{col.matches.map(matchBox)}</div>
@@ -137,7 +137,7 @@ export function BracketView({
 
       {/* Petite finale shown below the bracket so it never widens the columns. */}
       {petite.length > 0 && (
-        <div className="border-t border-white/10 pt-3">
+        <div className="border-t border-border pt-3">
           <h4 className={cn('mb-2 font-bold uppercase tracking-wide text-orange-300/70', s.head)}>
             {petite[0]?.bracketLabel ?? 'Petite finale (3e place)'}
           </h4>

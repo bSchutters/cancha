@@ -35,11 +35,11 @@ export default async function CupHomePage() {
           </span>
         )}
         <h1 className="text-5xl font-bold">{title}</h1>
-        <p className="mt-3 text-white/60">Tournois de futsal - inscriptions, classements et résultats en direct.</p>
+        <p className="mt-3 text-muted-foreground">Tournois de futsal - inscriptions, classements et résultats en direct.</p>
       </header>
 
       {tournaments.length === 0 && (
-        <p className="mt-16 text-center text-white/60">Aucun tournoi pour le moment. Revenez bientôt !</p>
+        <p className="mt-16 text-center text-muted-foreground">Aucun tournoi pour le moment. Revenez bientôt !</p>
       )}
 
       {active.length > 0 && (
@@ -79,8 +79,8 @@ function TournamentCard({
       href={`/${t.slug}`}
       className={`block rounded-xl border p-6 transition-colors ${
         highlighted
-          ? 'border-spanish-accent-2/40 bg-spanish-accent-2/10 hover:bg-spanish-accent-2/20'
-          : 'border-white/10 bg-white/5 hover:bg-white/10'
+          ? 'border-primary/40 bg-primary/10 hover:bg-primary/20'
+          : 'border-border bg-card hover:bg-muted'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -88,7 +88,7 @@ function TournamentCard({
         <Badge variant="secondary">{STATUS_LABEL[t.status] ?? t.status}</Badge>
       </div>
       {t.editionDate && (
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-muted-foreground">
           {new Date(t.editionDate).toLocaleDateString('fr-BE', {
             day: 'numeric',
             month: 'long',

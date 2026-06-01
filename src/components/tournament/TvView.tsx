@@ -15,13 +15,13 @@ const ROTATE_MS = 12000
 function PanelHeader({ title, meta }: { title: string; meta?: string[] }) {
   return (
     <div className="mb-6 text-center">
-      <h2 className="text-3xl font-bold uppercase tracking-[0.2em] text-spanish-accent-2">{title}</h2>
+      <h2 className="text-3xl font-bold uppercase tracking-[0.2em] text-primary">{title}</h2>
       {meta && meta.length > 0 && (
         <div className="mt-3 flex items-center justify-center gap-3">
           {meta.map((m) => (
             <span
               key={m}
-              className="rounded-full border border-spanish-accent-2/40 bg-spanish-accent-2/15 px-5 py-1.5 text-2xl font-bold text-spanish-accent-2"
+              className="rounded-full border border-primary/40 bg-primary/15 px-5 py-1.5 text-2xl font-bold text-primary"
             >
               {m}
             </span>
@@ -67,7 +67,7 @@ function ScoreboardTeam({
       className={cn(
         'flex min-w-0 items-center gap-4',
         side === 'home' ? 'flex-row-reverse text-right' : '',
-        winner ? 'text-white' : 'text-white/90',
+        winner ? 'text-foreground' : 'text-foreground',
       )}
     >
       <span className={cn('relative shrink-0', logoSize)}>
@@ -107,26 +107,26 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
           return (
             <div
               key={String(m.id)}
-              className="grid grid-cols-[7rem_1fr_auto_1fr] items-center gap-6 rounded-2xl border border-white/10 bg-white/5 px-8 py-6"
+              className="grid grid-cols-[7rem_1fr_auto_1fr] items-center gap-6 rounded-2xl border border-border bg-card px-8 py-6"
             >
               {/* Code + court + time block */}
-              <div className="border-r border-white/10 pr-6">
-                {m.code && <p className="text-sm font-bold uppercase text-white/45">{m.code}</p>}
-                <p className="text-2xl font-extrabold text-spanish-accent-2">
+              <div className="border-r border-border pr-6">
+                {m.code && <p className="text-sm font-bold uppercase text-muted-foreground">{m.code}</p>}
+                <p className="text-2xl font-extrabold text-primary">
                   {m.court != null ? `T${m.court}` : ''}
                 </p>
-                <p className="text-base text-white/40">{m.scheduledTime ?? slot.time}</p>
+                <p className="text-base text-muted-foreground">{m.scheduledTime ?? slot.time}</p>
               </div>
               <ScoreboardTeam name={m.homeName} logo={m.homeLogoUrl} side="home" nameSize={nameSize} logoSize={logoSize} winner={homeWin} />
               {/* Center: score (played) or VS */}
               {decided ? (
                 <span className={cn('flex shrink-0 items-center gap-3 font-extrabold tabular-nums', midSize)}>
-                  <span className={homeWin ? 'text-spanish-accent-2' : 'text-white'}>{m.scoreHome}</span>
-                  <span className="text-white/25">–</span>
-                  <span className={awayWin ? 'text-spanish-accent-2' : 'text-white'}>{m.scoreAway}</span>
+                  <span className={homeWin ? 'text-primary' : 'text-foreground'}>{m.scoreHome}</span>
+                  <span className="text-muted-foreground">–</span>
+                  <span className={awayWin ? 'text-primary' : 'text-foreground'}>{m.scoreAway}</span>
                 </span>
               ) : (
-                <span className="shrink-0 rounded-full border border-white/15 px-4 py-1 text-xl font-bold text-white/30">
+                <span className="shrink-0 rounded-full border border-border px-4 py-1 text-xl font-bold text-muted-foreground">
                   VS
                 </span>
               )}
@@ -156,11 +156,11 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
   return (
     <div className={`grid ${columns} items-start gap-4`}>
       {data.groups.map((g) => (
-        <div key={g.label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div key={g.label} className="rounded-2xl border border-border bg-card p-4">
           <h3 className="mb-2 text-2xl font-bold">Poule {g.label}</h3>
           <Table>
             <TableHeader>
-              <TableRow className="border-0 text-sm font-semibold text-white/40 hover:bg-transparent">
+              <TableRow className="border-0 text-sm font-semibold text-muted-foreground hover:bg-transparent">
                 <TableHead className="h-auto w-6 p-0" />
                 <TableHead className="h-auto p-0" />
                 {stats.map((c) => (
@@ -168,7 +168,7 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
                     {c.label}
                   </TableHead>
                 ))}
-                <TableHead className={cn('h-auto p-0 text-white', statCols)}>Pts</TableHead>
+                <TableHead className={cn('h-auto p-0 text-foreground', statCols)}>Pts</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -179,7 +179,7 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
                     <TableCell className="p-0 py-0.5 pr-3">
                       <span
                         className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-sm font-semibold ${
-                          qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-white/40'
+                          qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-muted-foreground'
                         }`}
                       >
                         {s.rank}
@@ -196,7 +196,7 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
                       </span>
                     </TableCell>
                     {stats.map((c) => (
-                      <TableCell key={c.label} className={cn('p-0 py-0.5 text-white/70', statCols)}>
+                      <TableCell key={c.label} className={cn('p-0 py-0.5 text-muted-foreground', statCols)}>
                         {c.value(s)}
                       </TableCell>
                     ))}
@@ -270,7 +270,7 @@ function ScheduleTeam({ name, logo, align }: { name: string | null; logo: string
           className="object-contain"
         />
       </span>
-      <span className={cn('min-w-0 truncate', known ? 'font-medium' : 'italic text-white/40')}>
+      <span className={cn('min-w-0 truncate', known ? 'font-medium' : 'italic text-muted-foreground')}>
         {name ?? 'À déterminer'}
       </span>
     </span>
@@ -288,24 +288,24 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
   return (
     <div className="flex min-w-0 items-center gap-1.5 text-base">
       {m.code && (
-        <span className="w-10 shrink-0 text-xs font-bold uppercase text-white/45">{m.code}</span>
+        <span className="w-10 shrink-0 text-xs font-bold uppercase text-muted-foreground">{m.code}</span>
       )}
       {showLabel && m.phase !== 'group' && (
-        <span className="shrink-0 rounded bg-spanish-accent-2/15 px-1.5 py-0.5 text-[11px] font-semibold text-spanish-accent-2">
+        <span className="shrink-0 rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
           {matchRoundLabel(m)}
         </span>
       )}
       <ScheduleTeam name={m.homeName} logo={m.homeLogoUrl} align="right" />
       {decided ? (
-        <span className="shrink-0 rounded bg-white/10 px-2 py-0.5 text-sm font-bold tabular-nums">
+        <span className="shrink-0 rounded bg-muted px-2 py-0.5 text-sm font-bold tabular-nums">
           {m.scoreHome}-{m.scoreAway}
         </span>
       ) : (
-        <span className="shrink-0 text-sm text-white/30">vs</span>
+        <span className="shrink-0 text-sm text-muted-foreground">vs</span>
       )}
       <ScheduleTeam name={m.awayName} logo={m.awayLogoUrl} align="left" />
       {m.court != null && (
-        <span className="w-7 shrink-0 text-right text-xs font-semibold text-white/35">T{m.court}</span>
+        <span className="w-7 shrink-0 text-right text-xs font-semibold text-muted-foreground">T{m.court}</span>
       )}
     </div>
   )
@@ -338,16 +338,16 @@ function SchedulePanel({ data }: { data: PublicTournament }) {
           const single = labels.size === 1 ? [...labels][0] : null
           const sorted = [...ms].sort((a, b) => (a.court ?? 99) - (b.court ?? 99))
           return (
-            <div key={time} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="mb-2 flex items-baseline justify-between border-b border-white/10 pb-2">
+            <div key={time} className="rounded-2xl border border-border bg-card p-4">
+              <div className="mb-2 flex items-baseline justify-between border-b border-border pb-2">
                 <span className="flex items-baseline gap-2">
                   {offset > 0 && time !== '-' && (
-                    <span className="text-sm font-normal text-white/30 line-through">{subtractMinutes(time, offset)}</span>
+                    <span className="text-sm font-normal text-muted-foreground line-through">{subtractMinutes(time, offset)}</span>
                   )}
-                  <span className="text-2xl font-bold text-spanish-accent-2">{time}</span>
+                  <span className="text-2xl font-bold text-primary">{time}</span>
                 </span>
                 {single && (
-                  <span className="text-sm font-semibold uppercase tracking-wide text-white/50">{single}</span>
+                  <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{single}</span>
                 )}
               </div>
               <div className="space-y-1.5">
@@ -424,7 +424,7 @@ export function TvView({
   }
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-spanish-bg p-10 text-white">
+    <main className="flex h-screen flex-col overflow-hidden bg-background p-10 text-foreground">
       <header className="mb-3 text-center">
         <h1 className="text-5xl font-extrabold uppercase tracking-[0.15em]">{data.name}</h1>
       </header>
@@ -447,7 +447,7 @@ export function TvView({
               {i === safeIndex && (
                 <span
                   key={`${safeIndex}-${cycleKey}`}
-                  className="block h-full rounded-full bg-spanish-accent-2"
+                  className="block h-full rounded-full bg-primary"
                   style={{ animation: `tvDotFill ${ROTATE_MS}ms linear forwards` }}
                 />
               )}
@@ -457,8 +457,8 @@ export function TvView({
       )}
 
       {data.sponsors.length > 0 && (
-        <footer className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-center">
-          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-spanish-accent-2">
+        <footer className="mt-6 rounded-2xl border border-border bg-card px-8 py-4 text-center">
+          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
             Sponsors &amp; partenaires
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
@@ -468,7 +468,7 @@ export function TvView({
                   <Image src={sp.logoUrl} alt={sp.name} fill sizes="128px" unoptimized className="object-contain" />
                 </div>
               ) : (
-                <span key={String(sp.id)} className="text-xl font-semibold text-white/70">
+                <span key={String(sp.id)} className="text-xl font-semibold text-muted-foreground">
                   {sp.name}
                 </span>
               ),

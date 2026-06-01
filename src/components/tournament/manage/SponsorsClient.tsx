@@ -149,7 +149,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-white/50">{sponsors.length} sponsor(s) · affichés en bandeau sur la TV</p>
+        <p className="text-sm text-muted-foreground">{sponsors.length} sponsor(s) · affichés en bandeau sur la TV</p>
         <Button
           size="sm"
           variant="secondary"
@@ -164,7 +164,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
       </div>
 
       {adding && (
-        <form onSubmit={create} className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-3">
+        <form onSubmit={create} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-3">
           <div className="space-y-1">
             <Label>Nom</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
@@ -178,7 +178,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
             <Input ref={fileRef} type="file" accept="image/*" onChange={(e) => pickImage(e.target.files?.[0], setFile)} />
           </div>
           <div>
-            <Button type="submit" disabled={busy} className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light">
+            <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
               {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
               Ajouter
             </Button>
@@ -187,18 +187,18 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
       )}
 
       {sponsors.length === 0 ? (
-        <p className="text-white/60">Aucun sponsor.</p>
+        <p className="text-muted-foreground">Aucun sponsor.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {sponsors.map((sp) => (
-            <div key={String(sp.id)} className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+            <div key={String(sp.id)} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
               <div className="flex min-w-0 items-center gap-3">
                 {sp.logoUrl ? (
                   <div className="relative h-12 w-20 shrink-0">
                     <Image src={sp.logoUrl} alt={sp.name} fill sizes="80px" unoptimized className="object-contain" />
                   </div>
                 ) : (
-                  <span className="text-sm text-white/40">(pas de logo)</span>
+                  <span className="text-sm text-muted-foreground">(pas de logo)</span>
                 )}
                 <span className="truncate font-medium">{sp.name}</span>
               </div>
@@ -206,7 +206,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
                 <Button
                   variant="link"
                   onClick={() => { setEditing(sp); setEditDraft({ name: sp.name, url: sp.url ?? '' }); setEditFile(null) }}
-                  className="h-auto p-0 text-sm font-normal text-white/60 hover:text-white"
+                  className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                 >
                   Éditer
                 </Button>
@@ -248,7 +248,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
                 <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
                   Annuler
                 </Button>
-                <Button type="submit" disabled={busy} className="bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light">
+                <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
                   {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
                   Enregistrer
                 </Button>

@@ -40,7 +40,7 @@ export function NumberStepper({
         onClick={() => onChange(clamp(current - 1))}
         className={cn(
           btn,
-          'rounded-md border border-white/30 bg-white/5 text-white hover:border-white/50 hover:bg-white/15 hover:text-white disabled:opacity-30',
+          'rounded-md border border-border bg-card text-foreground hover:border-border hover:bg-white/15 hover:text-foreground disabled:opacity-30',
         )}
         aria-label="Diminuer"
       >
@@ -58,8 +58,8 @@ export function NumberStepper({
         }}
         className={cn(
           field,
-          'rounded-md border border-white/25 bg-transparent text-center font-semibold tabular-nums text-white outline-none focus:border-white/50',
-          'placeholder:text-white/30 disabled:opacity-40',
+          'rounded-md border border-border bg-transparent text-center font-semibold tabular-nums text-foreground outline-none focus:border-border',
+          'placeholder:text-muted-foreground disabled:opacity-40',
         )}
         aria-label="Valeur"
       />
@@ -71,7 +71,7 @@ export function NumberStepper({
         onClick={() => onChange(clamp(current + 1))}
         className={cn(
           btn,
-          'rounded-md border border-white/30 bg-white/5 text-white hover:border-white/50 hover:bg-white/15 hover:text-white disabled:opacity-30',
+          'rounded-md border border-border bg-card text-foreground hover:border-border hover:bg-white/15 hover:text-foreground disabled:opacity-30',
         )}
         aria-label="Augmenter"
       >

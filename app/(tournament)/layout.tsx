@@ -33,7 +33,7 @@ export default async function TournamentLayout({
     <html lang="fr" suppressHydrationWarning>
       <body className={cn('tournament-scope antialiased min-h-screen bg-background text-foreground font-nugros')}>
         {accent && (
-          <style>{`.tournament-scope{--spanish-accent-2:${accent};--spanish-accent-2-light:color-mix(in srgb, ${accent} 70%, #fff);--spanish-accent-2-dark:color-mix(in srgb, ${accent} 65%, #000);}`}</style>
+          <style>{`.tournament-scope{--primary:${accent};--ring:${accent};}`}</style>
         )}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}

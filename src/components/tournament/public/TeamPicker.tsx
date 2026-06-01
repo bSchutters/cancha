@@ -26,8 +26,8 @@ export function TeamPicker({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="top-auto bottom-0 flex h-[80vh] max-w-md translate-y-0 flex-col gap-0 overflow-hidden rounded-t-2xl rounded-b-none border-white/10 p-0 sm:top-1/2 sm:bottom-auto sm:h-[34rem] sm:-translate-y-1/2 sm:rounded-b-2xl">
-        <DialogHeader className="border-b border-white/10 p-4 text-left">
+      <DialogContent className="top-auto bottom-0 flex h-[80vh] max-w-md translate-y-0 flex-col gap-0 overflow-hidden rounded-t-2xl rounded-b-none border-border p-0 sm:top-1/2 sm:bottom-auto sm:h-[34rem] sm:-translate-y-1/2 sm:rounded-b-2xl">
+        <DialogHeader className="border-b border-border p-4 text-left">
           <DialogTitle>Suivre une équipe</DialogTitle>
         </DialogHeader>
         <div className="p-4">
@@ -39,7 +39,7 @@ export function TeamPicker({
               <Button
                 variant="ghost"
                 onClick={() => onSelect(null)}
-                className="mb-2 h-auto w-full justify-start rounded-lg px-3 py-2 text-left text-sm font-normal text-red-300 hover:bg-white/5 hover:text-red-300"
+                className="mb-2 h-auto w-full justify-start rounded-lg px-3 py-2 text-left text-sm font-normal text-red-300 hover:bg-muted/50 hover:text-red-300"
               >
                 Ne plus suivre d’équipe
               </Button>
@@ -51,8 +51,8 @@ export function TeamPicker({
                 variant="ghost"
                 onClick={() => onSelect(String(t.id))}
                 className={cn(
-                  'h-auto w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-left font-normal hover:bg-white/5 hover:text-white',
-                  current === String(t.id) && 'bg-spanish-accent-2/10',
+                  'h-auto w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-left font-normal hover:bg-muted/50 hover:text-foreground',
+                  current === String(t.id) && 'bg-primary/10',
                 )}
               >
                 {t.logoUrl && (
@@ -64,7 +64,7 @@ export function TeamPicker({
               </Button>
             </li>
           ))}
-          {filtered.length === 0 && <li className="px-3 py-6 text-center text-sm text-white/40">Aucune équipe</li>}
+          {filtered.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-foreground">Aucune équipe</li>}
         </ul>
       </DialogContent>
     </Dialog>

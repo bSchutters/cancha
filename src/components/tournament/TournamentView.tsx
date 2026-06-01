@@ -82,20 +82,20 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
   return (
     <main className="mx-auto max-w-5xl px-4 pb-16">
       {/* Sticky header (+ tabs) */}
-      <div className="sticky top-0 z-30 -mx-4 border-b border-white/10 bg-spanish-bg/95 px-4 backdrop-blur">
+      <div className="sticky top-0 z-30 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur">
         <div className="py-3">
-          <Link href="/" className="mb-1 inline-flex items-center text-xs text-white/50 hover:text-white">
+          <Link href="/" className="mb-1 inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-3.5 w-3.5" /> Tous les tournois
           </Link>
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="truncate text-xl font-bold sm:text-2xl">{data.name}</h1>
-              <div className="mt-0.5 flex items-center gap-2 text-xs text-white/50">
+              <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                 {data.status === 'live' && (
-                  <span className="flex items-center gap-1 text-spanish-accent-2">
+                  <span className="flex items-center gap-1 text-primary">
                     <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-spanish-accent-2 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-spanish-accent-2" />
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                     </span>
                     Direct
                   </span>
@@ -106,7 +106,7 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
             <Button
               variant="ghost"
               onClick={() => (followedTeam ? selectTab('mine') : setPickerOpen(true))}
-              className="h-auto shrink-0 rounded-full border border-spanish-accent-2/40 bg-spanish-accent-2/10 px-3 py-1.5 text-sm font-medium text-spanish-accent-2 hover:bg-spanish-accent-2/20 hover:text-spanish-accent-2"
+              className="h-auto shrink-0 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary"
             >
               {followedTeam ? (
                 <>
@@ -136,8 +136,8 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
                 className={cn(
                   'h-auto whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-normal',
                   activeTab === t.key
-                    ? 'bg-spanish-accent-2 font-semibold text-spanish-bg-dark hover:bg-spanish-accent-2 hover:text-spanish-bg-dark'
-                    : 'text-white/60 hover:bg-white/5 hover:text-white',
+                    ? 'bg-primary font-semibold text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                 )}
               >
                 {t.label}
@@ -150,7 +150,7 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
       {/* Registration landing */}
       {isLanding ? (
         <div className="mt-6 space-y-8">
-          {data.description && <p className="text-white/70">{data.description}</p>}
+          {data.description && <p className="text-muted-foreground">{data.description}</p>}
           <RegistrationForm
             slug={slug}
             payment={data.payment}
@@ -171,15 +171,15 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
             (followed ? (
               <MyTeamTab data={data} teamId={followed} poolsRevealed={poolsRevealed} onChange={() => setPickerOpen(true)} />
             ) : (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-8 text-center">
-                <Star className="mx-auto mb-3 h-8 w-8 text-spanish-accent-2" />
+              <div className="rounded-xl border border-border bg-card p-8 text-center">
+                <Star className="mx-auto mb-3 h-8 w-8 text-primary" />
                 <p className="font-semibold">Suivez votre équipe</p>
-                <p className="mt-1 text-sm text-white/50">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Choisissez une équipe pour voir son prochain match, son classement et ses résultats en un coup d&apos;œil.
                 </p>
                 <Button
                   onClick={() => setPickerOpen(true)}
-                  className="mt-4 rounded-full bg-spanish-accent-2 text-sm font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+                  className="mt-4 rounded-full bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   Choisir mon équipe
                 </Button>
@@ -213,12 +213,12 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
                 {finalsCalendar.length > 0 && <MatchesByLabel matches={finalsCalendar} />}
               </div>
             ) : (
-              <p className="text-white/60">Le calendrier sera publié prochainement.</p>
+              <p className="text-muted-foreground">Le calendrier sera publié prochainement.</p>
             ))}
 
           {activeTab === 'teams' && (
             <div>
-              <p className="mb-3 text-sm text-white/50">{data.teams.length} équipe(s) inscrite(s)</p>
+              <p className="mb-3 text-sm text-muted-foreground">{data.teams.length} équipe(s) inscrite(s)</p>
               <TeamGrid teams={data.teams} />
             </div>
           )}
@@ -267,12 +267,12 @@ function TeamGrid({
             key={String(t.id)}
             variant="ghost"
             onClick={() => onPick(String(t.id))}
-            className="h-auto justify-start gap-2 rounded-lg border border-white/10 bg-white/5 p-2 text-left font-normal hover:bg-white/10 hover:text-white"
+            className="h-auto justify-start gap-2 rounded-lg border border-border bg-card p-2 text-left font-normal hover:bg-muted hover:text-foreground"
           >
             {inner}
           </Button>
         ) : (
-          <div key={String(t.id)} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2">
+          <div key={String(t.id)} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2">
             {inner}
           </div>
         )

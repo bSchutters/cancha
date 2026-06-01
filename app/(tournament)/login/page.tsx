@@ -44,12 +44,12 @@ export default function ManageLoginPage() {
     <main className="flex min-h-screen items-center justify-center px-4">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 p-8"
+        className="w-full max-w-sm rounded-xl border border-border bg-card p-8"
       >
         <h1 className="text-2xl font-bold">
-          Cup <span className="text-spanish-accent-2">Generator</span>
+          Cup <span className="text-primary">Generator</span>
         </h1>
-        <p className="mt-1 text-sm text-white/60">Connexion organisateur</p>
+        <p className="mt-1 text-sm text-muted-foreground">Connexion organisateur</p>
 
         <div className="mt-6 space-y-4">
           <div className="space-y-1">
@@ -70,7 +70,7 @@ export default function ManageLoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+            className="w-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
           >
             {loading && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
             {loading ? 'Connexion…' : 'Se connecter'}

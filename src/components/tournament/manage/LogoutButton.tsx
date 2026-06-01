@@ -14,7 +14,7 @@ export function LogoutButton() {
     <Button
       variant="link"
       onClick={onLogout}
-      className="h-auto p-0 text-sm font-normal text-white/50 hover:text-white"
+      className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
     >
       Déconnexion
     </Button>

@@ -17,7 +17,7 @@ export default async function TeamsPage({ params }: { params: Promise<{ slug: st
       <TournamentNav slug={slug} active="teams" />
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Inscriptions</h1>
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-muted-foreground">
           {t.counts.confirmed}/{t.counts.registered} confirmées · {t.counts.paid} payées
         </p>
       </div>

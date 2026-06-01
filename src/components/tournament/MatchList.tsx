@@ -17,7 +17,7 @@ function TeamLine({
 }) {
   return (
     <div className={cn('flex items-center justify-between gap-3', winner && 'font-bold')}>
-      <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-white/40')}>
+      <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-muted-foreground')}>
         {logo && name && (
           <span className="relative h-5 w-5 shrink-0">
             <Image src={logo} alt={name} fill sizes="20px" unoptimized className="object-contain" />
@@ -42,12 +42,12 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
   const awayWin = decided && (match.scoreAway! > match.scoreHome! || match.penaltyWinner === 'away')
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+    <div className="rounded-lg border border-border bg-card p-3">
       {showMeta && (
-        <div className="mb-2 flex items-center justify-between text-xs text-white/50">
+        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             {match.code && (
-              <span className="rounded bg-white/10 px-1.5 py-0.5 font-bold text-white/70">{match.code}</span>
+              <span className="rounded bg-muted px-1.5 py-0.5 font-bold text-muted-foreground">{match.code}</span>
             )}
             {match.scheduledTime ?? ''}
             {match.court != null ? ` · Terrain ${match.court}` : ''}
@@ -74,7 +74,7 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
           penaltyWin={match.penaltyWinner === 'away'}
         />
       </div>
-      {match.refereeName && <p className="mt-1 text-xs text-white/40">Arbitre : {match.refereeName}</p>}
+      {match.refereeName && <p className="mt-1 text-xs text-muted-foreground">Arbitre : {match.refereeName}</p>}
     </div>
   )
 }
@@ -96,7 +96,7 @@ export function MatchesByRound({ matches }: { matches: PublicMatch[] }) {
           <h3 className="mb-2 flex items-baseline gap-2 text-lg font-bold">
             Round {round}
             {list[0]?.scheduledTime && (
-              <span className="text-sm font-normal text-white/50">{list[0].scheduledTime}</span>
+              <span className="text-sm font-normal text-muted-foreground">{list[0].scheduledTime}</span>
             )}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -131,7 +131,7 @@ export function MatchesByLabel({ matches }: { matches: PublicMatch[] }) {
           <h3 className="mb-2 flex items-baseline gap-2 text-lg font-bold">
             {label}
             {list[0]?.scheduledTime && (
-              <span className="text-sm font-normal text-white/50">{list[0].scheduledTime}</span>
+              <span className="text-sm font-normal text-muted-foreground">{list[0].scheduledTime}</span>
             )}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

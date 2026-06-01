@@ -52,7 +52,7 @@ export function Podium({ data }: { data: PublicTournament }) {
   const third = top3.find((e) => e.position === 3)
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-5">
+    <section className="rounded-2xl border border-border bg-gradient-to-b from-white/[0.06] to-transparent p-5">
       <h2 className="mb-5 flex items-center justify-center gap-2 text-xl font-bold">
         <Trophy className="h-5 w-5 text-amber-300" /> Podium
       </h2>
@@ -78,28 +78,28 @@ export function Podium({ data }: { data: PublicTournament }) {
       </div>
 
       {data.fairplayWinnerName && (
-        <div className="mt-5 rounded-xl border border-spanish-accent-2/30 bg-spanish-accent-2/10 p-4 text-center">
-          <p className="flex items-center justify-center gap-1 text-xs uppercase tracking-wide text-white/60">
-            <Award className="h-3.5 w-3.5 text-spanish-accent-2" /> Trophée Fair-Play
+        <div className="mt-5 rounded-xl border border-primary/30 bg-primary/10 p-4 text-center">
+          <p className="flex items-center justify-center gap-1 text-xs uppercase tracking-wide text-muted-foreground">
+            <Award className="h-3.5 w-3.5 text-primary" /> Trophée Fair-Play
           </p>
-          <p className="mt-1 text-lg font-bold text-spanish-accent-2">{data.fairplayWinnerName}</p>
+          <p className="mt-1 text-lg font-bold text-primary">{data.fairplayWinnerName}</p>
         </div>
       )}
 
       {rest.length > 0 && (
         <details className="mt-5">
-          <summary className="cursor-pointer text-center text-sm text-white/50 hover:text-white">
+          <summary className="cursor-pointer text-center text-sm text-muted-foreground hover:text-foreground">
             Voir le classement complet
           </summary>
           <ol className="mt-3 space-y-1">
             {data.finalRanking.map((e) => (
               <li key={String(e.teamId)} className="flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm odd:bg-white/[0.03]">
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="w-8 shrink-0 text-white/40">{e.positionLabel}</span>
+                  <span className="w-8 shrink-0 text-muted-foreground">{e.positionLabel}</span>
                   <Logo url={e.logoUrl} size={18} />
                   <span className="truncate font-medium">{e.teamName}</span>
                 </span>
-                <span className="shrink-0 text-xs text-white/40">{e.note}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{e.note}</span>
               </li>
             ))}
           </ol>

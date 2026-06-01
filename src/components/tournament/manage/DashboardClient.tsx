@@ -25,21 +25,21 @@ import type { ManageTournament } from '@/lib/tournament/manage-view'
  * progress (data present) and the explicit registration/finished/archived flags.
  */
 function statusTag(t: ManageTournament): { label: string; tone: string } {
-  if (t.status === 'archived') return { label: 'Archivé', tone: 'bg-white/10 text-white/60' }
+  if (t.status === 'archived') return { label: 'Archivé', tone: 'bg-muted text-muted-foreground' }
   if (t.status === 'finished') return { label: 'Terminé', tone: 'bg-emerald-500/15 text-emerald-300' }
-  if (t.matches.some((m) => m.phase === 'knockout')) return { label: 'Phase finale', tone: 'bg-spanish-accent-2/20 text-spanish-accent-2' }
-  if (t.matches.some((m) => m.phase === 'group')) return { label: 'En cours', tone: 'bg-spanish-accent-2/20 text-spanish-accent-2' }
+  if (t.matches.some((m) => m.phase === 'knockout')) return { label: 'Phase finale', tone: 'bg-primary/20 text-primary' }
+  if (t.matches.some((m) => m.phase === 'group')) return { label: 'En cours', tone: 'bg-primary/20 text-primary' }
   if (t.groups.length > 0) return { label: 'Tirage effectué', tone: 'bg-sky-500/15 text-sky-300' }
   if (t.status === 'registration_closed') return { label: 'Inscriptions fermées', tone: 'bg-amber-500/15 text-amber-300' }
   if (t.status === 'registration') return { label: 'Inscriptions ouvertes', tone: 'bg-amber-500/15 text-amber-300' }
-  return { label: 'Brouillon', tone: 'bg-white/10 text-white/60' }
+  return { label: 'Brouillon', tone: 'bg-muted text-muted-foreground' }
 }
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="rounded-xl border border-border bg-card p-4">
       <p className="text-3xl font-bold">{value}</p>
-      <p className="text-sm text-white/50">{label}</p>
+      <p className="text-sm text-muted-foreground">{label}</p>
     </div>
   )
 }
@@ -125,13 +125,13 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             <h1 className="text-3xl font-bold">{t.name}</h1>
             <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', tag.tone)}>{tag.label}</span>
           </div>
-          <p className="text-sm text-white/40">/{t.slug}</p>
+          <p className="text-sm text-muted-foreground">/{t.slug}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href={`/${t.slug}/tv`} target="_blank" className="text-sm text-white/60 underline hover:text-white">
+          <Link href={`/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             Vue TV ↗
           </Link>
-          <Link href={`/${t.slug}`} target="_blank" className="text-sm text-white/60 underline hover:text-white">
+          <Link href={`/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             Page publique ↗
           </Link>
         </div>
@@ -148,9 +148,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       </div>
 
       {/* Control zone */}
-      <section className="rounded-xl border border-spanish-accent-2/30 bg-spanish-accent-2/5 p-5">
-        <h2 className="mb-1 flex items-center gap-2 font-bold text-spanish-accent-2">Centre de contrôle</h2>
-        <p className="mb-4 text-xs text-white/50">
+      <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+        <h2 className="mb-1 flex items-center gap-2 font-bold text-primary">Centre de contrôle</h2>
+        <p className="mb-4 text-xs text-muted-foreground">
           Déroulez le tournoi étape par étape. Chaque étape se verrouille une fois faite - réinitialisez pour
           recommencer.
         </p>
@@ -205,7 +205,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
         {/* Phase actions - status follows automatically; these are the explicit gates. */}
         {['draft', 'registration', 'registration_closed', 'finished', 'archived'].includes(t.status) && (
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
           {t.status === 'draft' && (
             <Button size="sm" variant="secondary" disabled={busy !== null}
               onClick={() => patchTournament({ status: 'registration' }, 'Inscriptions ouvertes')}>
@@ -246,10 +246,10 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         )}
 
         {/* Live delay control - the field shows the total currently applied. */}
-        <div className="mt-4 border-t border-white/10 pt-4">
-          <p className="mb-2 text-sm text-white/60">
-            Retard total appliqué : <span className="font-semibold text-white">+{t.schedule.globalOffsetMin} min</span>
-            <span className="text-white/40"> - décale toutes les heures affichées (TV + public). N’affecte pas la saisie.</span>
+        <div className="mt-4 border-t border-border pt-4">
+          <p className="mb-2 text-sm text-muted-foreground">
+            Retard total appliqué : <span className="font-semibold text-foreground">+{t.schedule.globalOffsetMin} min</span>
+            <span className="text-muted-foreground"> - décale toutes les heures affichées (TV + public). N’affecte pas la saisie.</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {[5, 10, 15].map((d) => (
@@ -267,29 +267,29 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
               Appliquer
             </Button>
             {offset !== t.schedule.globalOffsetMin && (
-              <span className="text-xs text-white/40">→ deviendra +{offset} min</span>
+              <span className="text-xs text-muted-foreground">→ deviendra +{offset} min</span>
             )}
           </div>
         </div>
       </section>
 
       {/* TV broadcast & public display */}
-      <section className="rounded-xl border border-white/10 bg-white/5 p-5">
+      <section className="rounded-xl border border-border bg-card p-5">
         <h2 className="mb-1 flex items-center gap-2 font-bold">
-          <Tv className="h-4 w-4 text-spanish-accent-2" /> Diffusion TV & affichage public
+          <Tv className="h-4 w-4 text-primary" /> Diffusion TV & affichage public
         </h2>
-        <p className="mb-4 text-xs text-white/50">
+        <p className="mb-4 text-xs text-muted-foreground">
           Gère les écrans/TV de la salle et choisis les vues affichées sur chacun ; plus le tirage animé et le
           dévoilement des poules au public.
         </p>
 
         <TvScreensManager tournamentId={t.id} slug={t.slug} initial={t.tvScreens} />
 
-        <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-white/10 pt-5">
+        <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-border pt-5">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-white/60">Tirage au sort (TV)</p>
+            <p className="text-sm font-semibold text-muted-foreground">Tirage au sort (TV)</p>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 rounded-md border border-white/15 bg-white/5 p-0.5">
+              <div className="flex items-center gap-1 rounded-md border border-border bg-card p-0.5">
                 {(['auto', 'manual'] as const).map((m) => (
                   <Button
                     key={m}
@@ -299,8 +299,8 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                     className={cn(
                       'h-7 rounded px-3 text-xs',
                       drawMode === m
-                        ? 'bg-spanish-accent-2 text-spanish-bg-dark hover:bg-spanish-accent-2'
-                        : 'text-white/50 hover:bg-white/10 hover:text-white',
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
                   >
                     {m === 'auto' ? 'Auto' : 'Manuel'}
@@ -317,11 +317,11 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
           {drawDone && (
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-white/60">Poules sur la page publique</p>
+              <p className="text-sm font-semibold text-muted-foreground">Poules sur la page publique</p>
               {!t.drawRevealed ? (
                 <Button
                   size="sm"
-                  className="gap-1 bg-spanish-accent-2 font-semibold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+                  className="gap-1 bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
                   disabled={busy !== null}
                   title="Affiche les poules sur la page publique (après l’animation TV)"
                   onClick={() => patchTournament({ draw_revealed: true }, 'Poules dévoilées')}
@@ -350,7 +350,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
           <h2 className="mb-1 flex items-center gap-2 font-bold text-fuchsia-300">
             <FlaskConical className="h-4 w-4" /> Centre de contrôle dev
           </h2>
-          <p className="mb-4 text-xs text-white/50">
+          <p className="mb-4 text-xs text-muted-foreground">
             Outils de test (mode développeur). À désactiver en production via la configuration.
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -407,7 +407,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
               Annuler
             </Button>
             <Button
-              className="bg-red-500 font-bold text-white hover:bg-red-600"
+              className="bg-red-500 font-bold text-foreground hover:bg-red-600"
               onClick={() => post('reset', 'Réinitialisation')}
               disabled={busy === 'reset'}
             >
@@ -464,8 +464,8 @@ function DevButton({
         done
           ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-300'
           : primary
-            ? 'border-fuchsia-400/60 bg-fuchsia-500/25 text-white hover:bg-fuchsia-500/35 hover:text-white'
-            : 'border-white/15 bg-spanish-bg-dark/60 text-white hover:bg-white/10 hover:text-white',
+            ? 'border-fuchsia-400/60 bg-fuchsia-500/25 text-foreground hover:bg-fuchsia-500/35 hover:text-foreground'
+            : 'border-border bg-card/60 text-foreground hover:bg-muted hover:text-foreground',
       )}
     >
       {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : icon}
@@ -503,7 +503,7 @@ function ControlButton({
         'h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border p-4 text-left',
         done
           ? 'border-emerald-400/30 bg-emerald-400/5 text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-300'
-          : 'border-white/15 bg-white/5 hover:bg-white/10 hover:text-white',
+          : 'border-border bg-card hover:bg-muted hover:text-foreground',
       )}
     >
       {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : icon}

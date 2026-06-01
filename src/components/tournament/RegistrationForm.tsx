@@ -72,12 +72,12 @@ export function RegistrationForm({
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-spanish-accent-2/30 bg-spanish-accent-2/10 p-6 text-center">
+      <div className="rounded-xl border border-primary/30 bg-primary/10 p-6 text-center">
         <h3 className="flex items-center justify-center gap-2 text-xl font-bold">
           <CheckCircle2 className="h-5 w-5 text-emerald-400" />
           {waitlisted ? 'Sur liste d’attente' : 'Inscription reçue'}
         </h3>
-        <p className="mt-2 text-white/70">
+        <p className="mt-2 text-muted-foreground">
           {waitlisted
             ? 'Le tournoi est complet. Votre équipe est sur la liste d’attente : nous vous contacterons si une place se libère.'
             : 'Votre inscription est en attente de validation. Elle sera confirmée dès réception du paiement.'}
@@ -87,21 +87,21 @@ export function RegistrationForm({
   }
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-xl border border-border bg-card p-6">
       <h2 className="text-2xl font-bold">{closed ? 'Liste d’attente' : 'Inscrire mon équipe'}</h2>
       {closed && (
-        <div className="mt-3 rounded-lg border border-spanish-accent-2/30 bg-spanish-accent-2/10 p-3 text-sm text-white/80">
+        <div className="mt-3 rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-foreground">
           Le tournoi est <span className="font-semibold">complet</span>. Vous pouvez vous inscrire sur la liste
           d’attente : votre équipe sera repêchée si une place se libère.
         </div>
       )}
       {payment && (payment.amount || payment.iban) && (
-        <div className="mt-4 rounded-lg bg-spanish-bg-dark/50 p-4 text-sm text-white/80">
-          <p className="font-semibold text-spanish-accent-2">Frais d’inscription</p>
+        <div className="mt-4 rounded-lg bg-card/50 p-4 text-sm text-foreground">
+          <p className="font-semibold text-primary">Frais d’inscription</p>
           {payment.amount && <p>Montant : {payment.amount} €</p>}
           {payment.iban && <p>IBAN : {payment.iban}</p>}
           {payment.communication && <p>Communication : {payment.communication}</p>}
-          <p className="mt-1 text-white/50">
+          <p className="mt-1 text-muted-foreground">
             L’inscription est validée manuellement après réception du paiement.
           </p>
         </div>
@@ -175,7 +175,7 @@ export function RegistrationForm({
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}
-            className="w-full bg-spanish-accent-2 font-bold text-spanish-bg-dark hover:bg-spanish-accent-2-light"
+            className="w-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
           >
             {form.formState.isSubmitting && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
             {form.formState.isSubmitting ? 'Envoi…' : closed ? 'Rejoindre la liste d’attente' : 'M’inscrire'}
