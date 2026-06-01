@@ -22,6 +22,12 @@ export interface ResolvedTenant {
   name: string
   slug: string
   accentColor: string | null
+  logoUrl: string | null
+}
+
+/** Only allow a valid hex colour to be injected into a <style> tag (no CSS injection). */
+export function safeHexColor(value: string | null | undefined): string | null {
+  return value && /^#[0-9a-fA-F]{3,8}$/.test(value.trim()) ? value.trim() : null
 }
 
 /**
@@ -33,11 +39,18 @@ export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | 
   const host = (await headers()).get('host')
   if (!host) return null
 
-  const toResolved = (doc: { id: string | number; name?: string; slug?: string; accent_color?: string }): ResolvedTenant => ({
+  const toResolved = (doc: {
+    id: string | number
+    name?: string
+    slug?: string
+    accent_color?: string
+    logo?: { url?: string } | string | null
+  }): ResolvedTenant => ({
     id: doc.id,
     name: doc.name ?? '',
     slug: doc.slug ?? '',
-    accentColor: doc.accent_color ?? null,
+    accentColor: safeHexColor(doc.accent_color),
+    logoUrl: doc.logo && typeof doc.logo === 'object' ? (doc.logo.url ?? null) : null,
   })
 
   const bare = host.split(':')[0].toLowerCase()
@@ -45,7 +58,7 @@ export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | 
     collection: 'organizations',
     where: { custom_domain: { equals: bare } },
     limit: 1,
-    depth: 0,
+    depth: 1,
   })
   if (byDomain.docs[0]) return toResolved(byDomain.docs[0] as never)
 
@@ -55,7 +68,7 @@ export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | 
       collection: 'organizations',
       where: { subdomain: { equals: sub } },
       limit: 1,
-      depth: 0,
+      depth: 1,
     })
     if (bySub.docs[0]) return toResolved(bySub.docs[0] as never)
   }

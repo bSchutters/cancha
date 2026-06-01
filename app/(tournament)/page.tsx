@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
@@ -27,7 +28,12 @@ export default async function CupHomePage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-16">
-      <header className="text-center">
+      <header className="flex flex-col items-center text-center">
+        {org?.logoUrl && (
+          <span className="relative mb-4 h-20 w-20">
+            <Image src={org.logoUrl} alt={title} fill sizes="80px" unoptimized className="object-contain" />
+          </span>
+        )}
         <h1 className="text-5xl font-bold">{title}</h1>
         <p className="mt-3 text-white/60">Tournois de futsal - inscriptions, classements et résultats en direct.</p>
       </header>
