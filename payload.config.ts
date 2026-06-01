@@ -67,6 +67,9 @@ export default buildConfig({
     // (role 'admin') bypass tenant scoping and manage every organization.
     multiTenantPlugin({
       tenantsSlug: 'organizations',
+      // debug: makes the `tenant` field visible on each document form so the
+      // organization can be assigned/verified directly (useful while building).
+      debug: true,
       userHasAccessToAllTenants: (user) => isSuperAdmin(user as { role?: string } | null),
       collections: {
         media: {},
