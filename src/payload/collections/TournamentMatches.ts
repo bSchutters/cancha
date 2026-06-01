@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
+import { setTenantFromTournament } from '../hooks/tenantFromTournament'
 
 const matchTags = (doc: Record<string, unknown>) => {
   const t = doc.tournament as { slug?: string } | string | undefined
@@ -29,6 +30,7 @@ export const TournamentMatches: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeValidate: [setTenantFromTournament],
     beforeChange: [
       ({ data, req }) => {
         // Stamp traceability + auto-finish when both scores are present.

@@ -83,7 +83,9 @@ export default buildConfig({
       },
       userHasAccessToAllTenants: (user) => isSuperAdmin(user as { role?: string } | null),
       collections: {
-        media: {},
+        // media is intentionally NOT tenant-scoped: logos (org/team/sponsor) are a
+        // shared pool, and uploads happen without a selected-tenant context
+        // (public registration, super-admin) - requiring a tenant would break them.
         tournaments: {},
         'tournament-teams': {},
         'tournament-matches': {},

@@ -89,6 +89,24 @@ describe('rankAll - exact ranking + configurable depth', () => {
     expect(pairs).toContainEqual(['A4', 'C3'])
   })
 
+  it('wires the 9-12 deciders back to the barrage matches (feeder names, not "À déterminer")', () => {
+    const all = rankAll(q8, nonQ8, 4, 2, 'full')
+    const barrageKeys = new Set(
+      all.filter((b) => b.bracketLabel === 'Barrage classement').map((b) => b.key),
+    )
+    // The 9-10 / 11-12 deciders are fed by barrage WINNERS; both source links must
+    // point back to a barrage match so the public view shows "Vainqueur BRn"
+    // instead of "À déterminer".
+    for (const label of ['Places 9-10', 'Places 11-12']) {
+      const decider = all.find((b) => b.bracketLabel === label)!
+      expect(decider).toBeTruthy()
+      expect(decider.homeSourceKey).not.toBeNull()
+      expect(decider.awaySourceKey).not.toBeNull()
+      expect(barrageKeys.has(decider.homeSourceKey!)).toBe(true)
+      expect(barrageKeys.has(decider.awaySourceKey!)).toBe(true)
+    }
+  })
+
   it('qualifiers_only → no consolation, no placement', () => {
     const all = rankAll(q8, nonQ8, 4, 2, 'qualifiers_only')
     expect(all.every((b) => b.phase === 'knockout')).toBe(true)

@@ -74,7 +74,7 @@ export function RegistrationForm({
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/10 p-6 text-center">
         <h3 className="flex items-center justify-center gap-2 text-xl font-bold">
-          <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+          <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           {waitlisted ? 'Sur liste d’attente' : 'Inscription reçue'}
         </h3>
         <p className="mt-2 text-muted-foreground">

@@ -466,7 +466,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
               </Button>
               <Button size="sm" variant="ghost" disabled={busy !== null}
                 onClick={() => setConfirmBulkDelete(true)}
-                className="text-red-300 hover:bg-red-500/10 hover:text-red-300">
+                className="text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300">
                 Supprimer
               </Button>
               {busy === 'bulk' && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
@@ -537,10 +537,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     patchTeam(team.id, { payment_status: team.paymentStatus === 'paid' ? 'unpaid' : 'paid' })
                   }
                   className={cn(
-                    'h-auto gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
+                    'h-auto gap-1 rounded-md px-2.5 py-1 text-xs font-medium',
                     team.paymentStatus === 'paid'
-                      ? 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 hover:text-emerald-300'
-                      : 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 hover:text-amber-300',
+                      ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/30 hover:text-emerald-300'
+                      : 'bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:bg-amber-500/30 hover:text-amber-300',
                   )}
                 >
                   {team.paymentStatus === 'paid' ? (
@@ -555,12 +555,12 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <Badge
                   className={
                     team.registrationStatus === 'confirmed'
-                      ? 'border-transparent bg-emerald-500/20 text-emerald-300'
+                      ? 'border-transparent bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
                       : team.registrationStatus === 'rejected'
-                        ? 'border-transparent bg-red-500/20 text-red-300'
+                        ? 'border-transparent bg-red-500/20 text-red-700 dark:text-red-300'
                         : team.registrationStatus === 'waitlist'
-                          ? 'border-transparent bg-sky-500/20 text-sky-300'
-                          : 'border-transparent bg-amber-500/20 text-amber-300'
+                          ? 'border-transparent bg-sky-500/20 text-sky-700 dark:text-sky-300'
+                          : 'border-transparent bg-amber-500/20 text-amber-700 dark:text-amber-300'
                   }
                 >
                   {team.registrationStatus === 'confirmed'
@@ -579,7 +579,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       variant="link"
                       disabled={isBusy}
                       onClick={() => patchTeam(team.id, { registration_status: 'pending' })}
-                      className="h-auto p-0 text-sm font-semibold text-amber-400 hover:text-amber-300"
+                      className="h-auto p-0 text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-300"
                     >
                       En attente
                     </Button>
@@ -588,7 +588,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       variant="link"
                       disabled={isBusy}
                       onClick={() => patchTeam(team.id, { registration_status: 'confirmed' })}
-                      className="h-auto p-0 text-sm font-semibold text-emerald-400 hover:text-emerald-300"
+                      className="h-auto p-0 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-300"
                     >
                       Confirmer
                     </Button>
@@ -615,7 +615,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     variant="link"
                     disabled={isBusy}
                     onClick={() => setConfirmDelete(team)}
-                    className="h-auto p-0 text-sm font-normal text-red-400 hover:text-red-300"
+                    className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-300"
                   >
                     Suppr.
                   </Button>

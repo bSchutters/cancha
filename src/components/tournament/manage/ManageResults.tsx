@@ -169,13 +169,13 @@ function FinalRankingContent({ t }: { t: ManageTournament }) {
             <TableCell>
               <span
                 className={cn(
-                  'inline-flex h-5 items-center justify-center rounded px-1.5 text-xs font-semibold',
+                  'inline-flex h-5 items-center justify-center rounded-sm px-1.5 text-xs font-semibold',
                   e.position === 1
-                    ? 'bg-amber-400/20 text-amber-300'
+                    ? 'bg-amber-400/20 text-amber-700 dark:text-amber-300'
                     : e.position === 2
-                      ? 'bg-zinc-300/20 text-zinc-200'
+                      ? 'bg-zinc-400/20 text-zinc-600 dark:text-zinc-300'
                       : e.position === 3
-                        ? 'bg-orange-700/30 text-orange-300'
+                        ? 'bg-orange-700/30 text-orange-700 dark:text-orange-300'
                         : 'text-muted-foreground',
                 )}
               >
@@ -215,8 +215,8 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
               <TableCell>
                 <span
                   className={cn(
-                    'inline-flex h-5 w-5 items-center justify-center rounded text-xs font-semibold',
-                    qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-muted-foreground',
+                    'inline-flex h-5 w-5 items-center justify-center rounded-sm text-xs font-semibold',
+                    qualified ? 'bg-emerald-400/20 text-emerald-700 dark:text-emerald-300' : 'text-muted-foreground',
                   )}
                 >
                   {s.rank}
@@ -274,7 +274,7 @@ export function ManageResults({ t }: { t: ManageTournament }) {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {t.groups.map((g) => (
-              <div key={g.label} className="rounded-lg border border-border bg-white/[0.03] p-3">
+              <div key={g.label} className="rounded-lg border border-border bg-muted/30 p-3">
                 <h4 className="mb-2 text-sm font-bold text-foreground">Poule {g.label}</h4>
                 <GroupTable t={t} label={g.label} />
               </div>

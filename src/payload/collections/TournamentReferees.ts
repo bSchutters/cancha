@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
+import { setTenantFromTournament } from '../hooks/tenantFromTournament'
 
 export const TournamentReferees: CollectionConfig = {
   slug: 'tournament-referees',
@@ -14,6 +15,9 @@ export const TournamentReferees: CollectionConfig = {
     create: isAdminOrManager,
     update: isAdminOrManager,
     delete: isAdmin,
+  },
+  hooks: {
+    beforeValidate: [setTenantFromTournament],
   },
   fields: [
     {

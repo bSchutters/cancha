@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
 import { buildPublicTournament } from '@/lib/tournament/public-view'
+import { resolveTenant } from '@/lib/tournament/tenant'
 import { TvView, type TvPanelKey } from '@/components/tournament/TvView'
 
 export const dynamic = 'force-dynamic'
@@ -23,8 +24,16 @@ export default async function TournamentTvPage({
     .filter((v): v is TvPanelKey => PANELS.includes(v as TvPanelKey))
 
   const payload = await getPayloadClient()
-  const tournament = await buildPublicTournament(payload, slug)
+  const org = await resolveTenant(payload)
+  const tournament = await buildPublicTournament(payload, slug, org?.id ?? null)
   if (!tournament) notFound()
 
-  return <TvView slug={slug} initial={tournament} views={views.length ? views : undefined} />
+  return (
+    <TvView
+      slug={slug}
+      initial={tournament}
+      views={views.length ? views : undefined}
+      org={org ? { name: org.name, logoUrl: org.logoUrl } : undefined}
+    />
+  )
 }

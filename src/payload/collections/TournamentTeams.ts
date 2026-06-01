@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
 import { registrationCapacity } from '../hooks/registrationCapacity'
+import { setTenantFromTournament } from '../hooks/tenantFromTournament'
 
 // Revalidate the parent tournament's tag. `tournament` may be an id or a populated doc.
 const teamTags = (doc: Record<string, unknown>) => {
@@ -38,6 +39,7 @@ export const TournamentTeams: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeValidate: [setTenantFromTournament],
     afterChange: [registrationCapacity, revalidateAfterChangeDynamic(teamTags)],
     afterDelete: [revalidateAfterDeleteDynamic(teamTags)],
   },

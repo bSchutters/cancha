@@ -162,8 +162,8 @@ export function MyTeamTab({
                   <span
                     className={cn(
                       'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                      v.result === 'V' && 'bg-emerald-500/20 text-emerald-300',
-                      v.result === 'D' && 'bg-red-500/20 text-red-300',
+                      v.result === 'V' && 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+                      v.result === 'D' && 'bg-red-500/20 text-red-700 dark:text-red-300',
                       v.result === 'N' && 'bg-muted text-muted-foreground',
                     )}
                   >

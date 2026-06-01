@@ -2,7 +2,6 @@ import type { Payload } from 'payload'
 import { computeStandings } from './standings'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
-import { resolveTenantId } from './tenant'
 import { computeFinalRanking } from './final-ranking'
 import { rankAll, type RankingDepth } from './bracket'
 import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef } from './types'
@@ -120,9 +119,12 @@ function visualUrl(visual: unknown): string | null {
   return null
 }
 
-export async function listPublicTournaments(payload: Payload): Promise<PublicTournamentSummary[]> {
+export async function listPublicTournaments(
+  payload: Payload,
+  tenantId: string | number | null,
+): Promise<PublicTournamentSummary[]> {
   // Scope to the organization resolved from the host (apex/bare localhost -> all).
-  const tenantId = await resolveTenantId(payload)
+  // tenantId is resolved by the caller (host headers) so this stays cacheable.
   const notDraft = { status: { not_equals: 'draft' } }
   const res = await payload.find({
     collection: 'tournaments',
@@ -144,9 +146,10 @@ export async function listPublicTournaments(payload: Payload): Promise<PublicTou
 export async function buildPublicTournament(
   payload: Payload,
   slug: string,
+  tenantId: string | number | null,
 ): Promise<PublicTournament | null> {
   // A tournament is only reachable on its organization's host (apex -> unscoped).
-  const tenantId = await resolveTenantId(payload)
+  // tenantId is resolved by the caller (host headers) so this stays cacheable.
   const slugFilter = { slug: { equals: slug } }
   const res = await payload.find({
     collection: 'tournaments',

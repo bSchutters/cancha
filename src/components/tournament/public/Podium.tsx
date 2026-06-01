@@ -52,27 +52,27 @@ export function Podium({ data }: { data: PublicTournament }) {
   const third = top3.find((e) => e.position === 3)
 
   return (
-    <section className="rounded-2xl border border-border bg-gradient-to-b from-white/[0.06] to-transparent p-5">
+    <section className="rounded-lg border border-border bg-gradient-to-b from-foreground/[0.06] to-transparent p-5">
       <h2 className="mb-5 flex items-center justify-center gap-2 text-xl font-bold">
-        <Trophy className="h-5 w-5 text-amber-300" /> Podium
+        <Trophy className="h-5 w-5 text-amber-700 dark:text-amber-300" /> Podium
       </h2>
       <div className="mx-auto flex max-w-md items-end gap-2">
         <Step
           entry={second}
           height="h-20"
-          medal={<Medal className="h-6 w-6 text-zinc-200" />}
-          ring="border-zinc-300/50 bg-zinc-300/10"
+          medal={<Medal className="h-6 w-6 text-zinc-500 dark:text-zinc-300" />}
+          ring="border-zinc-400/50 bg-zinc-400/10"
         />
         <Step
           entry={champion}
           height="h-28"
-          medal={<Trophy className="h-7 w-7 text-amber-300" />}
+          medal={<Trophy className="h-7 w-7 text-amber-700 dark:text-amber-300" />}
           ring="border-amber-300/60 bg-amber-300/15"
         />
         <Step
           entry={third}
           height="h-16"
-          medal={<Medal className="h-6 w-6 text-orange-300" />}
+          medal={<Medal className="h-6 w-6 text-orange-700 dark:text-orange-300" />}
           ring="border-orange-400/50 bg-orange-400/10"
         />
       </div>

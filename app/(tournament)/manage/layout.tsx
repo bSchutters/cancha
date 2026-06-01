@@ -1,6 +1,9 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSessionUser, isManager } from '@/lib/tournament/session'
+import { getPayloadClient } from '@/lib/payload'
+import { resolveLayoutTenant } from '@/lib/tournament/tenant'
 import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
 import { ThemeToggle } from '@/components/theme-toggle'
 
@@ -10,14 +13,37 @@ export default async function ManageLayout({ children }: { children: React.React
   const user = await getSessionUser()
   if (!isManager(user)) redirect('/login')
 
+  const org = await resolveLayoutTenant(await getPayloadClient())
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="text-foreground">
       <header className="border-b border-border bg-card/50">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3">
-          <Link href="/manage" className="font-bold">
-            Cup <span className="text-primary">Generator</span>
+          <Link href="/manage" className="flex items-center gap-2 font-bold">
+            {org?.logoUrl ? (
+              <>
+                <span className="relative h-7 w-7 shrink-0">
+                  <Image
+                    src={org.logoUrl}
+                    alt={org.name}
+                    fill
+                    sizes="28px"
+                    unoptimized
+                    className="object-contain"
+                  />
+                </span>
+                <span className="truncate">{org.name}</span>
+              </>
+            ) : (
+              <span>
+                Cup <span className="text-primary">Generator</span>
+              </span>
+            )}
           </Link>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <Link href="/manage/apparence" className="hover:text-foreground">
+              Apparence
+            </Link>
             <Link href="/" className="hover:text-foreground">
               Voir le site public
             </Link>

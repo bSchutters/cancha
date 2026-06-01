@@ -145,21 +145,10 @@
 } */
 
 @theme inline {
-  --font-marjorie: "Marjorie", sans-serif;
-  --font-nugros: "Nugros", sans-serif;
-  --color-spanish-bg: var(--spanish-bg);
-  --color-spanish-nav: var(--spanish-nav);
-  --color-spanish-bg-light: var(--spanish-bg-light);
-  --color-spanish-bg-lighter: var(--spanish-bg-lighter);
-  --color-spanish-bg-lighter-plus: var(--spanish-bg-lighter-plus);
-  --color-spanish-bg-dark: var(--spanish-bg-dark);
-  --color-spanish-bg-dark-minus: var(--spanish-bg-dark-minus);
-  --color-spanish-accent: var(--spanish-accent);
-  --color-spanish-accent-2: var(--spanish-accent-2);
-  --color-spanish-accent-2-light: var(--spanish-accent-2-light);
-  --color-spanish-accent-light: var(--spanish-accent-light);
-  --color-spanish-accent-2-dark: var(--spanish-accent-2-dark);
-  --color-spanish-accent-dark: var(--spanish-accent-dark);
+  /* Per-org fonts (set on .tournament-scope) override the defaults; fall back to
+     the bundled brand fonts when an organization hasn't chosen any. */
+  --font-marjorie: var(--font-heading, "Marjorie", sans-serif);
+  --font-nugros: var(--font-body, "Nugros", sans-serif);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -200,21 +189,9 @@
 }
 
 :root {
-  --spanish-nav: rgb(27, 49, 80);
-  --spanish-bg: #1c3456;
-  --spanish-bg-light: #264268;
-  --spanish-bg-lighter: #38537a;
-  --spanish-bg-lighter-plus: rgb(54, 74, 104);
-  --spanish-bg-dark-minus: rgb(13, 28, 46);
-  --spanish-bg-dark: #122642;
-  --spanish-accent-2: #fed164;
-  --spanish-accent-2-light: #ffe095;
-  --spanish-accent-2-dark: #c2962b;
-  --spanish-accent: #a2d6f8;
-  --spanish-accent-light: #cbeaff;
-  --spanish-accent-dark: #77b4dc;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  /* Light page sits just below pure white so white cards/popovers separate. */
+  --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -285,6 +262,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Background is painted ONLY by <body> (bg-background). <html> intentionally has
+     no background so the body's bg propagates to the canvas as a single layer -
+     painting both html and body seams into a faint two-tone band. */
 }
 
 /* Tournament console/public: remove unstyled number-input spinners */

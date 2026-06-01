@@ -26,12 +26,12 @@ import type { ManageTournament } from '@/lib/tournament/manage-view'
  */
 function statusTag(t: ManageTournament): { label: string; tone: string } {
   if (t.status === 'archived') return { label: 'Archivé', tone: 'bg-muted text-muted-foreground' }
-  if (t.status === 'finished') return { label: 'Terminé', tone: 'bg-emerald-500/15 text-emerald-300' }
+  if (t.status === 'finished') return { label: 'Terminé', tone: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' }
   if (t.matches.some((m) => m.phase === 'knockout')) return { label: 'Phase finale', tone: 'bg-primary/20 text-primary' }
   if (t.matches.some((m) => m.phase === 'group')) return { label: 'En cours', tone: 'bg-primary/20 text-primary' }
-  if (t.groups.length > 0) return { label: 'Tirage effectué', tone: 'bg-sky-500/15 text-sky-300' }
-  if (t.status === 'registration_closed') return { label: 'Inscriptions fermées', tone: 'bg-amber-500/15 text-amber-300' }
-  if (t.status === 'registration') return { label: 'Inscriptions ouvertes', tone: 'bg-amber-500/15 text-amber-300' }
+  if (t.groups.length > 0) return { label: 'Tirage effectué', tone: 'bg-sky-500/15 text-sky-700 dark:text-sky-300' }
+  if (t.status === 'registration_closed') return { label: 'Inscriptions fermées', tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
+  if (t.status === 'registration') return { label: 'Inscriptions ouvertes', tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
   return { label: 'Brouillon', tone: 'bg-muted text-muted-foreground' }
 }
 
@@ -123,7 +123,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold">{t.name}</h1>
-            <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', tag.tone)}>{tag.label}</span>
+            <span className={cn('rounded-md px-3 py-1 text-xs font-semibold', tag.tone)}>{tag.label}</span>
           </div>
           <p className="text-sm text-muted-foreground">/{t.slug}</p>
         </div>
@@ -196,7 +196,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             variant="ghost"
             onClick={() => setConfirmReset(true)}
             disabled={busy !== null}
-            className="h-auto flex-col items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/5 p-4 text-left text-red-300 hover:bg-red-500/10 hover:text-red-300"
+            className="h-auto flex-col items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/5 p-4 text-left text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300"
           >
             <RotateCcw className="h-5 w-5" />
             <span className="text-sm font-semibold">Réinitialiser</span>
@@ -253,14 +253,13 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {[5, 10, 15].map((d) => (
-              <Button key={d} size="sm" variant="secondary" disabled={busy !== null}
+              <Button key={d} variant="secondary" disabled={busy !== null}
                 onClick={() => setOffset((o) => Math.min(240, o + d))}>
                 +{d}
               </Button>
             ))}
             <NumberStepper value={offset} onChange={setOffset} min={0} max={240} />
             <Button
-              variant="secondary"
               disabled={busy !== null || offset === t.schedule.globalOffsetMin}
               onClick={() => patchTournament({ global_offset_min: offset }, 'Retard appliqué')}
             >
@@ -297,7 +296,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                     size="sm"
                     onClick={() => setDrawMode(m)}
                     className={cn(
-                      'h-7 rounded px-3 text-xs',
+                      'h-7 rounded-sm px-3 text-xs',
                       drawMode === m
                         ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -347,7 +346,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       {/* Dev control center - owner only */}
       {isOwner && t.devMode && (
         <section className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-5">
-          <h2 className="mb-1 flex items-center gap-2 font-bold text-fuchsia-300">
+          <h2 className="mb-1 flex items-center gap-2 font-bold text-fuchsia-700 dark:text-fuchsia-300">
             <FlaskConical className="h-4 w-4" /> Centre de contrôle dev
           </h2>
           <p className="mb-4 text-xs text-muted-foreground">
@@ -462,7 +461,7 @@ function DevButton({
       className={cn(
         'h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border p-4 text-left',
         done
-          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-300'
+          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-300'
           : primary
             ? 'border-fuchsia-400/60 bg-fuchsia-500/25 text-foreground hover:bg-fuchsia-500/35 hover:text-foreground'
             : 'border-border bg-card/60 text-foreground hover:bg-muted hover:text-foreground',
@@ -502,7 +501,7 @@ function ControlButton({
       className={cn(
         'h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border p-4 text-left',
         done
-          ? 'border-emerald-400/30 bg-emerald-400/5 text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-300'
+          ? 'border-emerald-400/30 bg-emerald-400/5 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-300'
           : 'border-border bg-card hover:bg-muted hover:text-foreground',
       )}
     >

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access'
+import { BASE_COLORS, BASE_COLOR_KEYS, RADIUS_PRESETS, RADIUS_KEYS, FONTS } from '@/lib/tournament/theme'
 
 /**
  * Tenant collection: one organization (TO) per row. Tournaments and their
@@ -72,11 +73,50 @@ export const Organizations: CollectionConfig = {
           relationTo: 'media',
           label: 'Logo',
         },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Apparence (thème)',
+      admin: {
+        initCollapsed: true,
+        description: 'Presets shadcn appliqués aux pages publiques et TV. Éditables aussi dans /manage/apparence.',
+      },
+      fields: [
+        {
+          name: 'base_color',
+          type: 'select',
+          label: 'Couleur de base',
+          defaultValue: 'neutral',
+          options: BASE_COLOR_KEYS.map((k) => ({ label: BASE_COLORS[k].label, value: k })),
+          admin: { description: 'Palette neutre (fonds, bordures, texte).' },
+        },
         {
           name: 'accent_color',
           type: 'text',
           label: "Couleur d'accent (hex)",
-          admin: { description: 'ex. #fed164. Applique le thème de l\'organisation.' },
+          admin: { description: 'ex. #fed164. Définit la couleur principale (boutons, liens).' },
+        },
+        {
+          name: 'radius',
+          type: 'select',
+          label: 'Arrondi',
+          defaultValue: 'default',
+          options: RADIUS_KEYS.map((k) => ({ label: RADIUS_PRESETS[k].label, value: k })),
+        },
+        {
+          name: 'heading_font',
+          type: 'select',
+          label: 'Police des titres',
+          options: FONTS.map((f) => ({ label: f.label, value: f.value })),
+          admin: { description: 'Par défaut : police du site.' },
+        },
+        {
+          name: 'body_font',
+          type: 'select',
+          label: 'Police du texte',
+          options: FONTS.map((f) => ({ label: f.label, value: f.value })),
+          admin: { description: 'Par défaut : police du site.' },
         },
       ],
     },

@@ -46,7 +46,7 @@ export function GroupStandings({
                         <span
                           className={cn(
                             'inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-semibold',
-                            qualified ? 'bg-emerald-400/20 text-emerald-300' : 'text-muted-foreground',
+                            qualified ? 'bg-emerald-400/20 text-emerald-700 dark:text-emerald-300' : 'text-muted-foreground',
                           )}
                         >
                           {s.rank}

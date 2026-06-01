@@ -247,7 +247,7 @@ export function TvDraw({
         {drawn && phase === 'idle' && (
           <Button
             onClick={start}
-            className="h-auto gap-3 rounded-2xl bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105 hover:bg-primary/90"
+            className="h-auto gap-3 rounded-lg bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105 hover:bg-primary/90"
           >
             <Dices className="size-7" /> Lancer le tirage
           </Button>
@@ -256,7 +256,7 @@ export function TvDraw({
         {waitingForManual && (
           <Button
             onClick={advance}
-            className="h-auto animate-pulse gap-3 rounded-2xl bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg hover:scale-105 hover:bg-primary/90"
+            className="h-auto animate-pulse gap-3 rounded-lg bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg hover:scale-105 hover:bg-primary/90"
           >
             <ChevronRight className="size-7" /> {landed === 0 ? 'Premier tirage' : 'Équipe suivante'}
           </Button>
@@ -264,7 +264,7 @@ export function TvDraw({
 
         {displayTeam && (
           <div
-            className={`flex items-center gap-6 rounded-3xl border px-12 py-6 transition-all duration-200 ${
+            className={`flex items-center gap-6 rounded-lg border px-12 py-6 transition-all duration-200 ${
               settled
                 ? 'animate-in border-primary bg-primary/20 zoom-in-95 duration-300'
                 : 'border-primary/30 bg-primary/5'
@@ -315,7 +315,7 @@ export function TvDraw({
             return (
               <div
                 key={pool.label}
-                className={`flex flex-col rounded-2xl border bg-card p-4 transition-all duration-300 ${
+                className={`flex flex-col rounded-lg border bg-card p-4 transition-all duration-300 ${
                   incoming ? 'border-primary ring-2 ring-ring/50' : 'border-border'
                 }`}
               >
@@ -339,7 +339,7 @@ export function TvDraw({
                             <span className="truncate font-medium">{team.name}</span>
                           </>
                         ) : (
-                          <span className="h-8 flex-1 rounded bg-card" />
+                          <span className="h-8 flex-1 rounded-sm bg-card" />
                         )}
                       </li>
                     )

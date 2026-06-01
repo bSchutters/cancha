@@ -39,7 +39,7 @@ export function TeamPicker({
               <Button
                 variant="ghost"
                 onClick={() => onSelect(null)}
-                className="mb-2 h-auto w-full justify-start rounded-lg px-3 py-2 text-left text-sm font-normal text-red-300 hover:bg-muted/50 hover:text-red-300"
+                className="mb-2 h-auto w-full justify-start rounded-lg px-3 py-2 text-left text-sm font-normal text-red-700 dark:text-red-300 hover:bg-muted/50 hover:text-red-300"
               >
                 Ne plus suivre d’équipe
               </Button>

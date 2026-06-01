@@ -29,7 +29,15 @@ const STATUS_LABEL: Record<string, string> = {
   archived: 'Archivé',
 }
 
-export function TournamentView({ slug, initial }: { slug: string; initial: PublicTournament }) {
+export function TournamentView({
+  slug,
+  initial,
+  org,
+}: {
+  slug: string
+  initial: PublicTournament
+  org?: { name: string; logoUrl: string | null }
+}) {
   const data = useTournamentLive(slug, initial)
   const searchParams = useSearchParams()
   const [followed, setFollowed] = useFollowedTeam(slug)
@@ -88,7 +96,20 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
             <ChevronLeft className="h-3.5 w-3.5" /> Tous les tournois
           </Link>
           <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-3">
+              {org?.logoUrl && (
+                <span className="relative h-9 w-9 shrink-0 sm:h-10 sm:w-10">
+                  <Image
+                    src={org.logoUrl}
+                    alt={org.name}
+                    fill
+                    sizes="40px"
+                    unoptimized
+                    className="object-contain"
+                  />
+                </span>
+              )}
+              <div className="min-w-0">
               <h1 className="truncate text-xl font-bold sm:text-2xl">{data.name}</h1>
               <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                 {data.status === 'live' && (
@@ -102,27 +123,32 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
                 )}
                 <Badge variant="secondary">{STATUS_LABEL[data.status] ?? data.status}</Badge>
               </div>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              onClick={() => (followedTeam ? selectTab('mine') : setPickerOpen(true))}
-              className="h-auto shrink-0 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary"
-            >
-              {followedTeam ? (
-                <>
-                  {followedTeam.logoUrl && (
-                    <span className="relative h-5 w-5 shrink-0">
-                      <Image src={followedTeam.logoUrl} alt={followedTeam.name} fill sizes="20px" unoptimized className="object-contain" />
-                    </span>
-                  )}
-                  <span className="max-w-[6rem] truncate">{followedTeam.name}</span>
-                </>
-              ) : (
-                <>
-                  <Star className="h-4 w-4" /> <span className="hidden sm:inline">Suivre mon équipe</span>
-                </>
-              )}
-            </Button>
+            {/* Following a team only makes sense once there are matches to track,
+                not during registration. */}
+            {!isLanding && (
+              <Button
+                variant="ghost"
+                onClick={() => (followedTeam ? selectTab('mine') : setPickerOpen(true))}
+                className="h-auto shrink-0 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+              >
+                {followedTeam ? (
+                  <>
+                    {followedTeam.logoUrl && (
+                      <span className="relative h-5 w-5 shrink-0">
+                        <Image src={followedTeam.logoUrl} alt={followedTeam.name} fill sizes="20px" unoptimized className="object-contain" />
+                      </span>
+                    )}
+                    <span className="max-w-[6rem] truncate">{followedTeam.name}</span>
+                  </>
+                ) : (
+                  <>
+                    <Star className="h-4 w-4" /> <span className="hidden sm:inline">Suivre mon équipe</span>
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -134,7 +160,7 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
                 variant="ghost"
                 onClick={() => selectTab(t.key)}
                 className={cn(
-                  'h-auto whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-normal',
+                  'h-auto whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-normal',
                   activeTab === t.key
                     ? 'bg-primary font-semibold text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
@@ -179,7 +205,7 @@ export function TournamentView({ slug, initial }: { slug: string; initial: Publi
                 </p>
                 <Button
                   onClick={() => setPickerOpen(true)}
-                  className="mt-4 rounded-full bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
+                  className="mt-4 rounded-md bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   Choisir mon équipe
                 </Button>

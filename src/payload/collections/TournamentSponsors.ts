@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
+import { setTenantFromTournament } from '../hooks/tenantFromTournament'
 
 const sponsorTags = (doc: Record<string, unknown>) => {
   const t = doc.tournament as { slug?: string } | string | undefined
@@ -23,6 +24,7 @@ export const TournamentSponsors: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeValidate: [setTenantFromTournament],
     afterChange: [revalidateAfterChangeDynamic(sponsorTags)],
     afterDelete: [revalidateAfterDeleteDynamic(sponsorTags)],
   },

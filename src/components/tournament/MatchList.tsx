@@ -25,7 +25,7 @@ function TeamLine({
         )}
         <span className="truncate">{name ?? 'À déterminer'}</span>
         {penaltyWin && (
-          <span className="shrink-0 rounded bg-emerald-400/20 px-1 text-[10px] font-semibold uppercase text-emerald-300">
+          <span className="shrink-0 rounded-sm bg-emerald-400/20 px-1 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-300">
             t.a.b.
           </span>
         )}
@@ -47,7 +47,7 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
         <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             {match.code && (
-              <span className="rounded bg-muted px-1.5 py-0.5 font-bold text-muted-foreground">{match.code}</span>
+              <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-muted-foreground">{match.code}</span>
             )}
             {match.scheduledTime ?? ''}
             {match.court != null ? ` · Terrain ${match.court}` : ''}

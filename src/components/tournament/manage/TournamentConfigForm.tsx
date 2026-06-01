@@ -194,6 +194,8 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
     const body = {
       ...s,
       venue_map: venueMapId,
+      // Empty date string is rejected by Postgres (timestamp column) - send null.
+      edition_date: s.edition_date || null,
       payment_amount: s.payment_amount === '' ? null : Number(s.payment_amount),
       finals_start_time: s.finals_start_time || null,
       // Lunch is handled by the finals start time; the mid-schedule meal break is unused.
@@ -281,11 +283,11 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           <div
             className={cn(
               'rounded-lg border p-3 text-sm',
-              tooLate ? 'border-red-500/40 bg-red-500/10 text-red-200' : 'border-border bg-card text-muted-foreground',
+              tooLate ? 'border-red-500/40 bg-red-500/10 text-red-800 dark:text-red-200' : 'border-border bg-card text-muted-foreground',
             )}
           >
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {tooLate && <AlertTriangle className="h-4 w-4 shrink-0 text-red-300" />}
+              {tooLate && <AlertTriangle className="h-4 w-4 shrink-0 text-red-700 dark:text-red-300" />}
               <span>{est.teams} équipes</span>
               <span>·</span>
               <span>{est.totalMatches} matchs ({est.groupMatches} poules + {est.finalsMatches} finales)</span>

@@ -302,6 +302,15 @@ function placementLadder(
       loserNextMatchKey: lower.entries[j].key,
       loserNextSlot: lower.entries[j].slot,
     })
+    // Wire the WINNER's destination (upper decider) back to this barrage match so
+    // the public view names its slot "Vainqueur {code}" instead of "À déterminer".
+    // (The loser's destination is named via the loserNext link / loserInto map.)
+    const dest = upper.entries[j]
+    const destMatch = upper.matches.find((mm) => mm.key === dest.key)
+    if (destMatch) {
+      if (dest.slot === 'home') destMatch.homeSourceKey = key
+      else destMatch.awaySourceKey = key
+    }
     entries[2 * j] = { key, slot: 'home' }
     entries[2 * j + 1] = { key, slot: 'away' }
   }

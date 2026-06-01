@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
+import { ConfirmDialog } from '@/components/tournament/manage/ConfirmDialog'
 import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
 
 type Fairplay = 'home' | 'away' | 'none'
@@ -36,10 +37,10 @@ function IconBtn({
       disabled={disabled}
       className={cn(
         'rounded-md border disabled:opacity-25',
-        tone === 'danger' && 'border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-300',
-        tone === 'edit' && 'border-border bg-muted text-foreground hover:bg-white/20 hover:text-foreground',
+        tone === 'danger' && 'border-red-500/40 text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300',
+        tone === 'edit' && 'border-border bg-muted text-foreground hover:bg-accent hover:text-accent-foreground',
         tone === 'save' &&
-          'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-300',
+          'border-emerald-400/40 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-300',
       )}
     >
       {children}
@@ -56,6 +57,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
   const [penAway, setPenAway] = useState<number | null>(match.penaltyAway)
   const [locked, setLocked] = useState<boolean>(match.status === 'finished')
   const [saving, setSaving] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
 
   const isFinals = match.phase !== 'group' // knockout + classification
   const bothEntered = home != null && away != null
@@ -130,14 +132,14 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
   return (
     <div
       className={cn(
-        'rounded-xl border p-4 transition-colors',
-        locked ? 'border-border bg-black/20 text-muted-foreground' : 'border-border bg-card',
+        'rounded-lg border p-4 transition-colors',
+        locked ? 'border-border bg-muted/40' : 'border-border bg-card',
       )}
     >
       <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
         <span className="flex items-center gap-2">
           {match.code && (
-            <span className="rounded bg-muted px-1.5 py-0.5 font-bold text-foreground">{match.code}</span>
+            <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{match.code}</span>
           )}
           {match.scheduledTime ?? ''}
           {match.court != null ? ` · Terrain ${match.court}` : ''}
@@ -205,6 +207,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
         <Select
           defaultValue={match.refereeId ? String(match.refereeId) : undefined}
           onValueChange={(v) => setReferee(v === '__none__' ? '' : v)}
+          disabled={locked || saving}
         >
           <SelectTrigger size="sm" className="min-w-0 flex-1 text-xs">
             <SelectValue placeholder="- Arbitre -" />
@@ -219,7 +222,12 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
           </SelectContent>
         </Select>
         <div className="flex shrink-0 items-center gap-2">
-          <IconBtn title="Reset" tone="danger" disabled={saving} onClick={reset}>
+          <IconBtn
+            title="Reset"
+            tone="danger"
+            disabled={saving}
+            onClick={() => (match.status === 'finished' ? setConfirmReset(true) : reset())}
+          >
             <RotateCcw className="h-4 w-4" />
           </IconBtn>
           <IconBtn title="Modifier" tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
@@ -230,6 +238,19 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
           </IconBtn>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="Réinitialiser le score ?"
+        description="Le score enregistré sera effacé. Cette action est irréversible."
+        confirmLabel="Réinitialiser"
+        busy={saving}
+        onConfirm={() => {
+          setConfirmReset(false)
+          reset()
+        }}
+        onCancel={() => setConfirmReset(false)}
+      />
     </div>
   )
 }
@@ -245,13 +266,13 @@ function SectionBlock({ section, referees }: { section: Section; referees: Manag
   const total = section.matches.length
   const complete = done === total && total > 0
   return (
-    <section className={cn('mb-8', complete && 'opacity-70')}>
+    <section className="mb-8">
       <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
         {section.title}
         <span
           className={cn(
-            'rounded-full px-2 py-0.5 text-xs font-semibold',
-            complete ? 'bg-emerald-400/20 text-emerald-300' : 'bg-muted text-muted-foreground',
+            'rounded-md px-2 py-0.5 text-xs font-semibold',
+            complete ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-muted text-muted-foreground',
           )}
         >
           {done}/{total}

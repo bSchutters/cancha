@@ -25,7 +25,7 @@ export function InfoTab({ data }: { data: PublicTournament }) {
               href={venue.mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
             >
               <Navigation className="h-4 w-4" /> Itinéraire
             </a>
