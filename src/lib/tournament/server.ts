@@ -17,13 +17,15 @@ export async function requireManager(
   return null
 }
 
-/** Like {@link requireManager} but restricted to the single tool owner (OWNER_EMAIL). */
+/** Restricted to the platform super-admin (role 'admin'), or OWNER_EMAIL as a fallback. */
 export async function requireOwner(request: NextRequest): Promise<{ payload: Payload } | null> {
   try {
     const payload = await getPayloadClient()
     const { user } = await payload.auth({ headers: request.headers })
+    const u = user as { role?: string; email?: string } | null
+    if (u?.role === 'admin') return { payload }
     const owner = process.env.OWNER_EMAIL?.trim().toLowerCase()
-    if (owner && user?.email && user.email.trim().toLowerCase() === owner) return { payload }
+    if (owner && u?.email && u.email.trim().toLowerCase() === owner) return { payload }
   } catch {
     // fall through
   }

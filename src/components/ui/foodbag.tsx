@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Foodbag({ className }: { className?: string }) {
   return (
-    <div className={cn("text-white transition duration-300")}>
+    <div className={cn("text-foreground transition duration-300")}>
       <svg
         id="Layer_1"
         data-name="Layer 1"

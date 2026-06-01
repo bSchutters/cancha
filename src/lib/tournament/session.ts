@@ -47,6 +47,7 @@ export function getUserTenantId(user: SessionUser | null): number | string | nul
  * dev features stay hidden if the env var is missing.
  */
 export function isOwner(user: SessionUser | null): boolean {
+  if (isSuperAdmin(user)) return true
   const owner = process.env.OWNER_EMAIL?.trim().toLowerCase()
   return !!owner && !!user?.email && user.email.trim().toLowerCase() === owner
 }

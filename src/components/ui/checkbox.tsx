@@ -27,8 +27,8 @@ export function Checkbox({
       className={cn(
         'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors disabled:opacity-40',
         checked
-          ? 'border-spanish-accent-2 bg-spanish-accent-2 text-spanish-bg-dark'
-          : 'border-white/30 bg-transparent hover:border-white/50',
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-input bg-transparent hover:border-ring',
         className,
       )}
     >

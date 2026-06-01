@@ -24,7 +24,7 @@ export function Switch({
       onClick={() => onChange(!checked)}
       className={cn(
         'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50',
-        checked ? 'bg-spanish-accent-2' : 'bg-white/20',
+        checked ? 'bg-primary' : 'bg-input',
       )}
     >
       <span
@@ -43,7 +43,7 @@ export function Switch({
       {toggle}
       <span>
         <span className="block text-sm font-medium">{label}</span>
-        {description && <span className="block text-xs text-white/40">{description}</span>}
+        {description && <span className="block text-xs text-muted-foreground">{description}</span>}
       </span>
     </label>
   )

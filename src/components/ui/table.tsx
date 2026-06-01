@@ -21,7 +21,7 @@ function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
 function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return (
     <tr
-      className={cn('border-b border-white/10 transition-colors hover:bg-white/5', className)}
+      className={cn('border-b border-border transition-colors hover:bg-muted/50', className)}
       {...props}
     />
   )
@@ -31,7 +31,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
   return (
     <th
       className={cn(
-        'h-10 px-2 text-left align-middle font-medium text-white/60 whitespace-nowrap',
+        'h-10 px-2 text-left align-middle font-medium text-muted-foreground whitespace-nowrap',
         className,
       )}
       {...props}
@@ -44,7 +44,7 @@ function TableCell({ className, ...props }: React.ComponentProps<'td'>) {
 }
 
 function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) {
-  return <caption className={cn('mt-4 text-sm text-white/60', className)} {...props} />
+  return <caption className={cn('mt-4 text-sm text-muted-foreground', className)} {...props} />
 }
 
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption }

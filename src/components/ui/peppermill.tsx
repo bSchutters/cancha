@@ -5,7 +5,7 @@ export default function Peppermill({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "group text-spanish-bg-lighter hover:text-white transition duration-300"
+        "group text-muted-foreground hover:text-foreground transition duration-300"
       )}
     >
       <svg
