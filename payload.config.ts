@@ -70,6 +70,17 @@ export default buildConfig({
       // debug: makes the `tenant` field visible on each document form so the
       // organization can be assigned/verified directly (useful while building).
       debug: true,
+      tenantField: { label: 'Organisation' },
+      i18n: {
+        translations: {
+          fr: {
+            'assign-tenant-button-label': 'Affecter une organisation',
+            'assign-tenant-modal-title': 'Affecter « {{title}} »',
+            'field-assignedTenant-label': 'Organisation affectée',
+            'nav-tenantSelector-label': 'Filtrer par organisation',
+          },
+        },
+      },
       userHasAccessToAllTenants: (user) => isSuperAdmin(user as { role?: string } | null),
       collections: {
         media: {},
