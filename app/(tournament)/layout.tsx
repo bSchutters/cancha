@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant } from '@/lib/tournament/tenant'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
 export const viewport: Viewport = {
@@ -29,13 +30,15 @@ export default async function TournamentLayout({
   const accent = org?.accentColor
 
   return (
-    <html lang="fr" className="h-full dark" suppressHydrationWarning>
-      <body className={cn('tournament-scope antialiased min-h-full bg-spanish-bg text-white font-nugros')}>
+    <html lang="fr" className="h-full" suppressHydrationWarning>
+      <body className={cn('tournament-scope antialiased min-h-full bg-background text-foreground font-nugros')}>
         {accent && (
           <style>{`.tournament-scope{--spanish-accent-2:${accent};--spanish-accent-2-light:color-mix(in srgb, ${accent} 70%, #fff);--spanish-accent-2-dark:color-mix(in srgb, ${accent} 65%, #000);}`}</style>
         )}
-        {children}
-        <Toaster />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )

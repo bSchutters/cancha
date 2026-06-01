@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSessionUser, isManager } from '@/lib/tournament/session'
 import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,11 +17,12 @@ export default async function ManageLayout({ children }: { children: React.React
           <Link href="/manage" className="font-bold">
             Cup <span className="text-spanish-accent-2">Generator</span>
           </Link>
-          <div className="flex items-center gap-4 text-sm text-white/60">
+          <div className="flex items-center gap-3 text-sm text-white/60">
             <Link href="/" className="hover:text-white">
               Voir le site public
             </Link>
             <span className="hidden sm:inline">{user?.email}</span>
+            <ThemeToggle />
             <LogoutButton />
           </div>
         </div>
