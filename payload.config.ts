@@ -3,12 +3,15 @@ import { fr } from '@payloadcms/translations/languages/fr'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { isSuperAdmin } from '@/payload/access'
 import { Users } from '@/payload/collections/Users'
 import { Media } from '@/payload/collections/Media'
+import { Organizations } from '@/payload/collections/Organizations'
 import { Tournaments } from '@/payload/collections/Tournaments'
 import { TournamentTeams } from '@/payload/collections/TournamentTeams'
 import { TournamentMatches } from '@/payload/collections/TournamentMatches'
@@ -36,6 +39,7 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    Organizations,
     Tournaments,
     TournamentTeams,
     TournamentMatches,
@@ -58,6 +62,21 @@ export default buildConfig({
   }),
   sharp,
   plugins: [
+    // Per-organization data isolation. Adds a `tenant` field to each listed
+    // collection and a `tenants` membership array to users. Super-admins
+    // (role 'admin') bypass tenant scoping and manage every organization.
+    multiTenantPlugin({
+      tenantsSlug: 'organizations',
+      userHasAccessToAllTenants: (user) => isSuperAdmin(user as { role?: string } | null),
+      collections: {
+        media: {},
+        tournaments: {},
+        'tournament-teams': {},
+        'tournament-matches': {},
+        'tournament-referees': {},
+        'tournament-sponsors': {},
+      },
+    }),
     vercelBlobStorage({
       collections: {
         media: {
