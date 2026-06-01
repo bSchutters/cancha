@@ -3,6 +3,7 @@ import { computeStandings } from './standings'
 import { fairplayRanking } from './fairplay'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
+import { getSessionUser, getUserTenantId } from './session'
 import { computeFinalRanking as computeFinalRankingRaw, type FinalMatchInput } from './final-ranking'
 import type { Id, MatchResult, TeamRef } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
@@ -142,9 +143,13 @@ export async function buildManageTournament(
   payload: Payload,
   slug: string,
 ): Promise<ManageTournament | null> {
+  // Tenant isolation: a manager can only load their own organization's tournament
+  // (a super-admin is not scoped). Slug uniqueness is per-tenant, so we filter on both.
+  const tenantId = getUserTenantId(await getSessionUser())
+  const slugFilter = { slug: { equals: slug } }
   const res = await payload.find({
     collection: 'tournaments',
-    where: { slug: { equals: slug } },
+    where: tenantId != null ? { and: [slugFilter, { tenant: { equals: tenantId } }] } : slugFilter,
     limit: 1,
     depth: 1,
   })

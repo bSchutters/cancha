@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
+import { getSessionUser, getUserTenantId } from '@/lib/tournament/session'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -17,8 +18,11 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function ManageHomePage() {
   const payload = await getPayloadClient()
+  // A manager only lists their own organization's tournaments (super-admin: all).
+  const tenantId = getUserTenantId(await getSessionUser())
   const res = await payload.find({
     collection: 'tournaments',
+    where: tenantId != null ? { tenant: { equals: tenantId } } : undefined,
     sort: '-edition_date',
     limit: 200,
     depth: 0,
