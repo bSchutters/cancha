@@ -11,14 +11,14 @@ export default async function ManageLayout({ children }: { children: React.React
   if (!isManager(user)) redirect('/login')
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-white/10 bg-spanish-bg-dark/50">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-card/50">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3">
           <Link href="/manage" className="font-bold">
-            Cup <span className="text-spanish-accent-2">Generator</span>
+            Cup <span className="text-primary">Generator</span>
           </Link>
-          <div className="flex items-center gap-3 text-sm text-white/60">
-            <Link href="/" className="hover:text-white">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-foreground">
               Voir le site public
             </Link>
             <span className="hidden sm:inline">{user?.email}</span>
