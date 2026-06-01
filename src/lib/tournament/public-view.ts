@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { computeStandings } from './standings'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
+import { resolveTenantId } from './tenant'
 import { computeFinalRanking } from './final-ranking'
 import { rankAll, type RankingDepth } from './bracket'
 import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef } from './types'
@@ -120,9 +121,12 @@ function visualUrl(visual: unknown): string | null {
 }
 
 export async function listPublicTournaments(payload: Payload): Promise<PublicTournamentSummary[]> {
+  // Scope to the organization resolved from the host (apex/bare localhost -> all).
+  const tenantId = await resolveTenantId(payload)
+  const notDraft = { status: { not_equals: 'draft' } }
   const res = await payload.find({
     collection: 'tournaments',
-    where: { status: { not_equals: 'draft' } },
+    where: tenantId != null ? { and: [notDraft, { tenant: { equals: tenantId } }] } : notDraft,
     sort: '-edition_date',
     limit: 100,
     depth: 1,
@@ -141,9 +145,12 @@ export async function buildPublicTournament(
   payload: Payload,
   slug: string,
 ): Promise<PublicTournament | null> {
+  // A tournament is only reachable on its organization's host (apex -> unscoped).
+  const tenantId = await resolveTenantId(payload)
+  const slugFilter = { slug: { equals: slug } }
   const res = await payload.find({
     collection: 'tournaments',
-    where: { slug: { equals: slug } },
+    where: tenantId != null ? { and: [slugFilter, { tenant: { equals: tenantId } }] } : slugFilter,
     limit: 1,
     depth: 1,
   })

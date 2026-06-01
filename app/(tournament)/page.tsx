@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
+import { resolveTenant } from '@/lib/tournament/tenant'
 import { Badge } from '@/components/ui/badge'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +19,8 @@ const ACTIVE = new Set(['registration', 'registration_closed', 'draw_done', 'liv
 
 export default async function CupHomePage() {
   const payload = await getPayloadClient()
-  const tournaments = await listPublicTournaments(payload)
+  const [org, tournaments] = await Promise.all([resolveTenant(payload), listPublicTournaments(payload)])
+  const title = org?.name ?? 'Cup Generator'
 
   const active = tournaments.filter((t) => ACTIVE.has(t.status))
   const past = tournaments.filter((t) => !ACTIVE.has(t.status))
@@ -26,8 +28,8 @@ export default async function CupHomePage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-16">
       <header className="text-center">
-        <h1 className="text-5xl font-bold">UD Asturiana Cup</h1>
-        <p className="mt-3 text-white/60">Les tournois de futsal organisés par UD Asturiana</p>
+        <h1 className="text-5xl font-bold">{title}</h1>
+        <p className="mt-3 text-white/60">Tournois de futsal - inscriptions, classements et résultats en direct.</p>
       </header>
 
       {tournaments.length === 0 && (
