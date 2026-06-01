@@ -1,0 +1,341 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { RotateCcw, Pencil, Check, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+import { NumberStepper } from '@/components/tournament/NumberStepper'
+import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
+
+type Fairplay = 'home' | 'away' | 'none'
+
+function IconBtn({
+  title,
+  onClick,
+  disabled,
+  tone,
+  children,
+}: {
+  title: string
+  onClick: () => void
+  disabled: boolean
+  tone: 'danger' | 'edit' | 'save'
+  children: React.ReactNode
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      title={title}
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'rounded-md border disabled:opacity-25',
+        tone === 'danger' && 'border-red-500/40 text-red-300 hover:bg-red-500/10 hover:text-red-300',
+        tone === 'edit' && 'border-white/60 bg-white/10 text-white hover:bg-white/20 hover:text-white',
+        tone === 'save' &&
+          'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-300',
+      )}
+    >
+      {children}
+    </Button>
+  )
+}
+
+function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: ManageReferee[] }) {
+  const router = useRouter()
+  const [home, setHome] = useState<number | null>(match.scoreHome)
+  const [away, setAway] = useState<number | null>(match.scoreAway)
+  const [fairplay, setFairplay] = useState<Fairplay>(match.fairplayWinner)
+  const [penHome, setPenHome] = useState<number | null>(match.penaltyHome)
+  const [penAway, setPenAway] = useState<number | null>(match.penaltyAway)
+  const [locked, setLocked] = useState<boolean>(match.status === 'finished')
+  const [saving, setSaving] = useState(false)
+
+  const isFinals = match.phase !== 'group' // knockout + classification
+  const bothEntered = home != null && away != null
+  const isDraw = bothEntered && home === away
+  const needsPenalty = isFinals && isDraw
+
+  const reset = async () => {
+    setHome(null)
+    setAway(null)
+    setFairplay('none')
+    setPenHome(null)
+    setPenAway(null)
+    setLocked(false) // unlock so the score can be re-entered then saved
+    // If the match was already saved, clear it on the server too.
+    if (match.status === 'finished') {
+      await fetch(`/api/tournament/match/${match.id}/score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ clear: true }),
+      }).catch(() => toast.error('Erreur lors de la réinitialisation'))
+      router.refresh()
+    }
+  }
+
+  const save = async () => {
+    if (!bothEntered) {
+      toast.error('Saisissez les deux scores')
+      return
+    }
+    if (needsPenalty && (penHome == null || penAway == null || penHome === penAway)) {
+      toast.error('Tirs au but : saisissez un score décisif (pas d’égalité)')
+      return
+    }
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/tournament/match/${match.id}/score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          scoreHome: home,
+          scoreAway: away,
+          fairplayWinner: fairplay,
+          penaltyHome: needsPenalty ? penHome : null,
+          penaltyAway: needsPenalty ? penAway : null,
+        }),
+      })
+      const body = await res.json()
+      if (res.ok) {
+        toast.success('Score enregistré')
+        setLocked(true)
+        router.refresh()
+      } else {
+        toast.error(body?.error?.message ?? 'Erreur')
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const setReferee = async (refId: string) => {
+    await fetch(`/api/tournament-matches/${match.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ referee: refId ? Number(refId) : null }),
+    }).catch(() => toast.error('Erreur arbitre'))
+    router.refresh()
+  }
+
+  return (
+    <div
+      className={cn(
+        'rounded-xl border p-4 transition-colors',
+        locked ? 'border-white/10 bg-black/20 text-white/50' : 'border-white/15 bg-white/5',
+      )}
+    >
+      <div className="mb-3 flex items-center justify-between text-xs text-white/50">
+        <span className="flex items-center gap-2">
+          {match.code && (
+            <span className="rounded bg-white/10 px-1.5 py-0.5 font-bold text-white/80">{match.code}</span>
+          )}
+          {match.scheduledTime ?? ''}
+          {match.court != null ? ` · Terrain ${match.court}` : ''}
+        </span>
+        <span>{match.groupLabel ? `Poule ${match.groupLabel}` : match.bracketLabel}</span>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-white/40')}>
+            {match.homeName ?? 'À déterminer'}
+          </span>
+          <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-white/40')}>
+            {match.awayName ?? 'À déterminer'}
+          </span>
+          <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
+        </div>
+      </div>
+
+      {/* Fair-play - labelled with team names */}
+      <div className="mt-3">
+        <p className="mb-1 text-xs text-white/50">Point fair-play</p>
+        <div className="flex gap-1">
+          {(['home', 'none', 'away'] as Fairplay[]).map((v) => (
+            <Button
+              key={v}
+              type="button"
+              variant="ghost"
+              disabled={locked}
+              onClick={() => setFairplay(v)}
+              className={cn(
+                'h-auto flex-1 truncate rounded-md border px-2 py-1 text-xs font-normal',
+                fairplay === v
+                  ? 'border-spanish-accent-2 bg-spanish-accent-2/15 text-white hover:bg-spanish-accent-2/15 hover:text-white'
+                  : 'border-white/10 text-white/50 hover:bg-transparent hover:text-white',
+                locked && 'opacity-60',
+              )}
+            >
+              {v === 'home' ? (match.homeName ?? 'Domicile') : v === 'away' ? (match.awayName ?? 'Extérieur') : 'Aucune'}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Penalty shootout score for KO draws */}
+      {needsPenalty && (
+        <div className="mt-3">
+          <p className="mb-1 text-xs text-white/50">Tirs au but</p>
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate text-sm">{match.homeName}</span>
+            <NumberStepper value={penHome} onChange={setPenHome} disabled={locked} size="sm" />
+          </div>
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <span className="truncate text-sm">{match.awayName}</span>
+            <NumberStepper value={penAway} onChange={setPenAway} disabled={locked} size="sm" />
+          </div>
+        </div>
+      )}
+
+      {/* Referee select (fills) + action icons */}
+      <div className="mt-4 flex items-center gap-2">
+        <Select
+          defaultValue={match.refereeId ? String(match.refereeId) : undefined}
+          onValueChange={(v) => setReferee(v === '__none__' ? '' : v)}
+        >
+          <SelectTrigger size="sm" className="min-w-0 flex-1 text-xs">
+            <SelectValue placeholder="- Arbitre -" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__none__">- Aucun -</SelectItem>
+            {referees.map((r) => (
+              <SelectItem key={String(r.id)} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="flex shrink-0 items-center gap-2">
+          <IconBtn title="Reset" tone="danger" disabled={saving} onClick={reset}>
+            <RotateCcw className="h-4 w-4" />
+          </IconBtn>
+          <IconBtn title="Modifier" tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
+            <Pencil className="h-4 w-4" />
+          </IconBtn>
+          <IconBtn title="Valider" tone="save" disabled={locked || saving} onClick={save}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+          </IconBtn>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type Section = { key: string; title: string; matches: ManageMatch[]; time: string | null }
+
+function isComplete(s: Section): boolean {
+  return s.matches.length > 0 && s.matches.every((m) => m.status === 'finished')
+}
+
+function SectionBlock({ section, referees }: { section: Section; referees: ManageReferee[] }) {
+  const done = section.matches.filter((m) => m.status === 'finished').length
+  const total = section.matches.length
+  const complete = done === total && total > 0
+  return (
+    <section className={cn('mb-8', complete && 'opacity-70')}>
+      <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+        {section.title}
+        <span
+          className={cn(
+            'rounded-full px-2 py-0.5 text-xs font-semibold',
+            complete ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60',
+          )}
+        >
+          {done}/{total}
+        </span>
+      </h2>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+        {section.matches.map((m) => (
+          <MatchScoreCard key={String(m.id)} match={m} referees={referees} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/** Sort by scheduled time; completed sections sink to the very bottom. */
+function orderSections(sections: Section[]): Section[] {
+  return [...sections].sort(
+    (a, b) =>
+      (isComplete(a) ? 1 : 0) - (isComplete(b) ? 1 : 0) || (a.time ?? '99:99').localeCompare(b.time ?? '99:99'),
+  )
+}
+
+export function ScoresClient({
+  matches,
+  referees,
+}: {
+  matches: ManageMatch[]
+  referees: ManageReferee[]
+}) {
+  const [filter, setFilter] = useState<'all' | 'pending'>('all')
+  const visible = filter === 'pending' ? matches.filter((m) => m.status !== 'finished') : matches
+
+  const byRound = (ms: ManageMatch[]) => {
+    const rounds = [...new Set(ms.map((m) => m.round ?? 0))].sort((a, b) => a - b)
+    return rounds.map((r) => ({ round: r, matches: ms.filter((m) => (m.round ?? 0) === r) }))
+  }
+
+  const groupSections: Section[] = byRound(visible.filter((m) => m.phase === 'group')).map(({ round, matches }) => ({
+    key: `g${round}`,
+    title: `Round ${round}`,
+    matches: matches.sort((a, b) => (a.court ?? 0) - (b.court ?? 0)),
+    time: matches[0]?.scheduledTime ?? null,
+  }))
+  // Group knockout by bracket label so the Final and Petite finale are separate.
+  const koByLabel = new Map<string, ManageMatch[]>()
+  for (const m of visible.filter((mm) => mm.phase === 'knockout')) {
+    const label = m.bracketLabel ?? `Tour ${m.round}`
+    koByLabel.set(label, [...(koByLabel.get(label) ?? []), m])
+  }
+  const koSections: Section[] = [...koByLabel.entries()].map(([label, ms]) => ({
+    key: `k:${label}`,
+    title: label,
+    matches: ms,
+    time: ms[0]?.scheduledTime ?? null,
+  }))
+  // Group the placement bracket by round; each card keeps its own place label
+  // (e.g. "Places 9-10") shown in the card header.
+  const clRounds = byRound(visible.filter((m) => m.phase === 'classification'))
+  const clSections: Section[] = clRounds.map(({ round, matches }) => ({
+    key: `c${round}`,
+    title: clRounds.length > 1 ? `Placements - tour ${round}` : 'Placements',
+    matches: matches.sort((a, b) => (a.court ?? 0) - (b.court ?? 0)),
+    time: matches[0]?.scheduledTime ?? null,
+  }))
+  const allSections = orderSections([...groupSections, ...koSections, ...clSections])
+
+  if (matches.length === 0) {
+    return <p className="text-white/60">Aucun match généré. Lancez le tirage puis le calendrier.</p>
+  }
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center gap-2">
+        <Badge variant={filter === 'all' ? 'default' : 'secondary'} className="cursor-pointer" onClick={() => setFilter('all')}>
+          Tous
+        </Badge>
+        <Badge variant={filter === 'pending' ? 'default' : 'secondary'} className="cursor-pointer" onClick={() => setFilter('pending')}>
+          À saisir
+        </Badge>
+      </div>
+
+      {allSections.map((s) => (
+        <SectionBlock key={s.key} section={s} referees={referees} />
+      ))}
+    </div>
+  )
+}
