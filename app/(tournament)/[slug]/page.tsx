@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getPayloadClient } from '@/lib/payload'
-import { buildPublicTournament } from '@/lib/tournament/public-view'
+import { getCachedPublicTournament } from '@/lib/tournament/public-view'
 import { resolveTenant, resolveTournamentTenant } from '@/lib/tournament/tenant'
 import { getRequestBaseUrl, socialMetadata, tenantBaseUrl } from '@/lib/tournament/seo'
 import { TournamentView } from '@/components/tournament/TournamentView'
@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { slug } = await params
   const payload = await getPayloadClient()
   const hostOrg = await resolveTenant(payload)
-  const t = await buildPublicTournament(payload, slug, hostOrg?.id ?? null)
+  const t = await getCachedPublicTournament(payload, slug, hostOrg?.id ?? null)
   if (!t) return { title: 'Tournoi introuvable', robots: { index: false, follow: false } }
   const description = t.description ?? `Suivez le tournoi ${t.name} en direct.`
   // On a tenant host this is the host org; on the apex fallback, resolve the
@@ -42,7 +42,7 @@ export default async function TournamentPage({
   const { slug } = await params
   const payload = await getPayloadClient()
   const org = await resolveTenant(payload)
-  const tournament = await buildPublicTournament(payload, slug, org?.id ?? null)
+  const tournament = await getCachedPublicTournament(payload, slug, org?.id ?? null)
   if (!tournament) notFound()
 
   const base = await getRequestBaseUrl()

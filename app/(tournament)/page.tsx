@@ -134,6 +134,8 @@ function Landing() {
       </section>
 
       <section id="features" className="mx-auto max-w-5xl px-4 pb-24">
+        {/* Keeps the heading order h1 -> h2 -> h3 without altering the layout. */}
+        <h2 className="sr-only">Fonctionnalités</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div key={f.title} className="rounded-xl border border-border bg-card p-6">
