@@ -1,4 +1,5 @@
 import type { Payload } from 'payload'
+import { unstable_cache } from 'next/cache'
 import { computeStandings } from './standings'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
@@ -141,6 +142,26 @@ export async function listPublicTournaments(
     editionDate: t.edition_date ?? null,
     visualUrl: visualUrl(t.visual),
   }))
+}
+
+/**
+ * Cached public-tournament read, shared by the page, its metadata and OG image
+ * so a request hits the DB once. Kept fresh by the `tournament-${slug}` tag,
+ * which every tournament/match/team/sponsor afterChange hook purges (e.g. score
+ * entry), so cached live scores are invalidated on write - the 30s window is
+ * just a backstop. Tenant is part of the key (headers can't run inside the
+ * cache), mirroring app/api/tournament/[slug].
+ */
+export function getCachedPublicTournament(
+  payload: Payload,
+  slug: string,
+  tenantId: string | number | null,
+): Promise<PublicTournament | null> {
+  return unstable_cache(
+    () => buildPublicTournament(payload, slug, tenantId),
+    ['tournament', slug, String(tenantId ?? 'all')],
+    { tags: [`tournament-${slug}`], revalidate: 30 },
+  )()
 }
 
 export async function buildPublicTournament(

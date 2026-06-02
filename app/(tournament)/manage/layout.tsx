@@ -4,10 +4,15 @@ import { redirect } from 'next/navigation'
 import { getSessionUser, isManager } from '@/lib/tournament/session'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveLayoutTenant } from '@/lib/tournament/tenant'
+import type { Metadata } from 'next'
 import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export const dynamic = 'force-dynamic'
+
+// Private organizer console: keep it out of search indexes (defence in depth
+// alongside the robots.txt Disallow and the login redirect).
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function ManageLayout({ children }: { children: React.ReactNode }) {
   const user = await getSessionUser()
