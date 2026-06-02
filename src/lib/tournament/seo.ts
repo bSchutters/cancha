@@ -21,6 +21,26 @@ export async function getRequestBaseUrl(): Promise<string> {
   return `${proto}://${host}`
 }
 
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'cupgenerator.app'
+
+/**
+ * The canonical, indexable base URL for a tenant. A tournament is reachable both
+ * on its organization's host and on the apex fallback, so its canonical must
+ * point at the tenant host to avoid duplicate content. Subdomains are the live
+ * tenant hosts today; custom domains are provisioned later, so we never
+ * canonicalise to one. Outside production (and for tenants without a subdomain)
+ * we keep the request-derived `fallback` so dev never canonicalises to prod.
+ */
+export function tenantBaseUrl(
+  org: { subdomain: string | null } | null,
+  fallback: string,
+): string {
+  if (org?.subdomain && process.env.NODE_ENV === 'production') {
+    return `https://${org.subdomain}.${ROOT_DOMAIN}`
+  }
+  return fallback
+}
+
 /**
  * Open Graph + Twitter card metadata branded for the active tenant. URLs and
  * image paths are relative; Next.js resolves them against `metadataBase` (the
@@ -34,8 +54,11 @@ export function socialMetadata(opts: {
   description?: string
   path?: string
   images?: (string | null | undefined)[]
+  card?: 'summary' | 'summary_large_image'
 }): Pick<Metadata, 'openGraph' | 'twitter'> {
   const siteName = opts.org?.name ?? 'Cup Generator'
+  // Pass `images: []` when a file-based opengraph-image route supplies the image
+  // (it becomes og:image automatically, and Twitter falls back to it).
   const picked = (opts.images ?? [opts.org?.logoUrl]).filter(Boolean) as string[]
   const images = picked.length ? picked : undefined
   return {
@@ -49,7 +72,7 @@ export function socialMetadata(opts: {
       images,
     },
     twitter: {
-      card: images ? 'summary_large_image' : 'summary',
+      card: opts.card ?? (images ? 'summary_large_image' : 'summary'),
       title: opts.title,
       description: opts.description,
       images,

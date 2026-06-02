@@ -23,6 +23,8 @@ export interface ResolvedTenant {
   id: string | number
   name: string
   slug: string
+  subdomain: string | null
+  customDomain: string | null
   accentColor: string | null
   logoUrl: string | null
   theme: OrgTheme
@@ -37,6 +39,8 @@ type OrgDoc = {
   id: string | number
   name?: string
   slug?: string
+  subdomain?: string
+  custom_domain?: string
   accent_color?: string
   base_color?: string
   radius?: string
@@ -50,6 +54,8 @@ function toResolvedTenant(doc: OrgDoc): ResolvedTenant {
     id: doc.id,
     name: doc.name ?? '',
     slug: doc.slug ?? '',
+    subdomain: doc.subdomain ?? null,
+    customDomain: doc.custom_domain ?? null,
     accentColor: safeHexColor(doc.accent_color),
     logoUrl: doc.logo && typeof doc.logo === 'object' ? (doc.logo.url ?? null) : null,
     theme: normalizeTheme(doc),
@@ -91,6 +97,26 @@ export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | 
 
 export async function resolveTenantId(payload: Payload): Promise<string | number | null> {
   return (await resolveTenant(payload))?.id ?? null
+}
+
+/**
+ * The organization that owns a tournament (by slug), regardless of the request
+ * host. Used to canonicalise the apex copy of a tournament page to its tenant
+ * host (depth 1 populates the multi-tenant `tenant` relationship).
+ */
+export async function resolveTournamentTenant(
+  payload: Payload,
+  slug: string,
+): Promise<ResolvedTenant | null> {
+  const res = await payload.find({
+    collection: 'tournaments',
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 1,
+    overrideAccess: true,
+  })
+  const tenant = (res.docs[0] as { tenant?: unknown } | undefined)?.tenant
+  return tenant && typeof tenant === 'object' ? toResolvedTenant(tenant as OrgDoc) : null
 }
 
 /** The only organization's id when exactly one exists, else null (dev/mono-client). */
