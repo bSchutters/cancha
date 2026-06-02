@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant, resolveLayoutTenant } from '@/lib/tournament/tenant'
 import { buildThemeCss, googleFontsHref } from '@/lib/tournament/theme'
+import { getRequestBaseUrl, socialMetadata } from '@/lib/tournament/seo'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -14,10 +15,19 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const org = await resolveTenant(await getPayloadClient())
+  const base = await getRequestBaseUrl()
+  const siteName = org?.name ?? 'Cup Generator'
+  const description =
+    'Gestion de tournois de futsal : inscriptions, tirage, calendrier, classements et résultats en direct.'
   return {
-    title: org?.name ?? 'Cup Generator',
-    description: 'Gestion de tournois de futsal : inscriptions, tirage, calendrier, classements et résultats en direct.',
+    metadataBase: new URL(base),
+    // Child pages set a bare title (e.g. the tournament name); it's framed with
+    // the tenant brand here. `default` is used for pages without their own title.
+    title: { default: siteName, template: `%s | ${siteName}` },
+    description,
     robots: 'index, follow',
+    alternates: { canonical: '/' },
+    ...socialMetadata({ org, title: siteName, description, path: '/' }),
   }
 }
 
