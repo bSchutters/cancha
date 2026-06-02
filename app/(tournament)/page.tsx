@@ -4,6 +4,7 @@ import { ClipboardList, Dices, CalendarClock, Trophy, Tv, Radio } from 'lucide-r
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { resolveTenant } from '@/lib/tournament/tenant'
+import { formatEditionDate } from '@/lib/tournament/format'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -172,14 +173,8 @@ function TournamentCard({
         <h3 className="text-xl font-bold">{t.name}</h3>
         <Badge variant="secondary">{STATUS_LABEL[t.status] ?? t.status}</Badge>
       </div>
-      {t.editionDate && (
-        <p className="mt-2 text-sm text-muted-foreground">
-          {new Date(t.editionDate).toLocaleDateString('fr-BE', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
-        </p>
+      {formatEditionDate(t.editionDate) && (
+        <p className="mt-2 text-sm text-muted-foreground">{formatEditionDate(t.editionDate)}</p>
       )}
     </Link>
   )

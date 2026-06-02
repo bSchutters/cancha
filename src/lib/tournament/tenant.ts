@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { headers } from 'next/headers'
 import type { Payload } from 'payload'
 import { normalizeTheme, type OrgTheme } from './theme'
@@ -67,7 +68,9 @@ function toResolvedTenant(doc: OrgDoc): ResolvedTenant {
  * domain match first, then a subdomain. Returns null for the apex / bare
  * localhost (no tenant scope -> public pages fall back to showing everything).
  */
-export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | null> {
+// cache(): dedupe the host->org lookup across a request (layout metadata, page
+// metadata, the page component and the opengraph-image route all resolve it).
+export const resolveTenant = cache(async (payload: Payload): Promise<ResolvedTenant | null> => {
   const host = (await headers()).get('host')
   if (!host) return null
 
@@ -93,7 +96,7 @@ export async function resolveTenant(payload: Payload): Promise<ResolvedTenant | 
     if (bySub.docs[0]) return toResolved(bySub.docs[0] as never)
   }
   return null
-}
+})
 
 export async function resolveTenantId(payload: Payload): Promise<string | number | null> {
   return (await resolveTenant(payload))?.id ?? null
@@ -104,20 +107,19 @@ export async function resolveTenantId(payload: Payload): Promise<string | number
  * host. Used to canonicalise the apex copy of a tournament page to its tenant
  * host (depth 1 populates the multi-tenant `tenant` relationship).
  */
-export async function resolveTournamentTenant(
-  payload: Payload,
-  slug: string,
-): Promise<ResolvedTenant | null> {
-  const res = await payload.find({
-    collection: 'tournaments',
-    where: { slug: { equals: slug } },
-    limit: 1,
-    depth: 1,
-    overrideAccess: true,
-  })
-  const tenant = (res.docs[0] as { tenant?: unknown } | undefined)?.tenant
-  return tenant && typeof tenant === 'object' ? toResolvedTenant(tenant as OrgDoc) : null
-}
+export const resolveTournamentTenant = cache(
+  async (payload: Payload, slug: string): Promise<ResolvedTenant | null> => {
+    const res = await payload.find({
+      collection: 'tournaments',
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 1,
+      overrideAccess: true,
+    })
+    const tenant = (res.docs[0] as { tenant?: unknown } | undefined)?.tenant
+    return tenant && typeof tenant === 'object' ? toResolvedTenant(tenant as OrgDoc) : null
+  },
+)
 
 /** The only organization's id when exactly one exists, else null (dev/mono-client). */
 async function singleOrgId(payload: Payload): Promise<string | number | null> {

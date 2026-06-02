@@ -28,17 +28,29 @@ const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'cupgenerator.app'
  * on its organization's host and on the apex fallback, so its canonical must
  * point at the tenant host to avoid duplicate content. Subdomains are the live
  * tenant hosts today; custom domains are provisioned later, so we never
- * canonicalise to one. Outside production (and for tenants without a subdomain)
- * we keep the request-derived `fallback` so dev never canonicalises to prod.
+ * canonicalise to one.
+ *
+ * We only rewrite to the subdomain host when the request is actually served on
+ * the canonical domain family - the apex `ROOT_DOMAIN` or a direct
+ * `{sub}.ROOT_DOMAIN`. On localhost, `*.vercel.app` previews or a staging host
+ * like `org.staging.cupgenerator.app`, we keep the request-derived `fallback`
+ * so those environments never point their canonical/OG URLs at production.
  */
 export function tenantBaseUrl(
   org: { subdomain: string | null } | null,
   fallback: string,
 ): string {
-  if (org?.subdomain && process.env.NODE_ENV === 'production') {
-    return `https://${org.subdomain}.${ROOT_DOMAIN}`
+  if (!org?.subdomain) return fallback
+  let host: string
+  try {
+    host = new URL(fallback).hostname
+  } catch {
+    return fallback
   }
-  return fallback
+  const suffix = `.${ROOT_DOMAIN}`
+  const label = host.endsWith(suffix) ? host.slice(0, -suffix.length) : null
+  const onCanonicalDomain = host === ROOT_DOMAIN || (label !== null && label.length > 0 && !label.includes('.'))
+  return onCanonicalDomain ? `https://${org.subdomain}.${ROOT_DOMAIN}` : fallback
 }
 
 /**
