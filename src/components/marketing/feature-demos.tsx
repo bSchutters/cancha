@@ -65,10 +65,10 @@ function Initials({ name, className }: { name: string; className?: string }) {
 
 /** Shared pool-A standings, reused by several demos. */
 export const LIVE_STANDINGS = [
-  { rank: 1, name: 'Real Sporting', j: 3, pts: 9, q: true },
-  { rank: 2, name: 'AS Tonnerre', j: 3, pts: 6, q: true },
-  { rank: 3, name: 'Les Lynx', j: 3, pts: 3, q: false },
-  { rank: 4, name: 'FC Comète', j: 3, pts: 0, q: false },
+  { rank: 1, name: 'Real Sporting', pts: 9, q: true },
+  { rank: 2, name: 'AS Tonnerre', pts: 6, q: true },
+  { rank: 3, name: 'Les Lynx', pts: 3, q: false },
+  { rank: 4, name: 'FC Comète', pts: 0, q: false },
 ]
 
 function shortName(n: string) {
@@ -404,13 +404,16 @@ function Cards({ yellow, red }: { yellow: number; red: number }) {
   if (yellow === 0 && red === 0) {
     return <span className="text-xs text-muted-foreground">Aucun carton</span>
   }
+  const label = [yellow && `${yellow} carton${yellow > 1 ? 's' : ''} jaune${yellow > 1 ? 's' : ''}`, red && `${red} carton${red > 1 ? 's' : ''} rouge${red > 1 ? 's' : ''}`]
+    .filter(Boolean)
+    .join(', ')
   return (
-    <span className="flex items-center gap-1">
+    <span className="flex items-center gap-1" role="img" aria-label={label}>
       {Array.from({ length: yellow }).map((_, i) => (
-        <span key={`y${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-amber-400" />
+        <span key={`y${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-amber-400" title="Carton jaune" />
       ))}
       {Array.from({ length: red }).map((_, i) => (
-        <span key={`r${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-red-500" />
+        <span key={`r${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-red-500" title="Carton rouge" />
       ))}
     </span>
   )
