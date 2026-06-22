@@ -49,9 +49,6 @@ export default async function ManageLayout({ children }: { children: React.React
             <Link href="/manage/apparence" className="hover:text-foreground">
               Apparence
             </Link>
-            <Link href="/" className="hover:text-foreground">
-              Voir le site public
-            </Link>
             <span className="hidden sm:inline">{user?.email}</span>
             <ThemeToggle />
             <LogoutButton />

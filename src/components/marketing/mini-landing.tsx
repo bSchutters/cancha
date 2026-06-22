@@ -44,7 +44,7 @@ export function MiniLanding({
               </Link>
             </Button>
             <Link
-              href="/#features"
+              href="/fonctionnalites"
               className={cn(
                 'inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-primary',
                 focusRing,

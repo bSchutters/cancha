@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { display, focusRing } from './theme'
 
 const LINKS = [
-  { href: '/#features', label: 'Fonctionnalités' },
+  { href: '/fonctionnalites', label: 'Fonctionnalités' },
   { href: '/demo', label: 'Aperçu' },
   { href: '/tarifs', label: 'Tarifs' },
   { href: '/comparatif', label: 'Comparatif' },
@@ -33,15 +33,6 @@ export function MarketingNav() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
-          <Link
-            href="/login"
-            className={cn(
-              'hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline',
-              focusRing,
-            )}
-          >
-            Connexion
-          </Link>
           <Button asChild size="sm">
             <Link href="/#contact">Demander une démo</Link>
           </Button>
