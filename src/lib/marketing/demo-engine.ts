@@ -36,6 +36,8 @@ export const INITIAL_TEAMS: DemoTeam[] = [
   { id: 4, name: 'Olympic 7', pool: null, confirmed: true, paid: true },
   { id: 5, name: 'Stade Central', pool: null, confirmed: true, paid: true },
   { id: 6, name: 'Les Aigles', pool: null, confirmed: true, paid: false },
+  { id: 7, name: 'FC Comète', pool: null, confirmed: true, paid: true },
+  { id: 8, name: 'Dynamo Nord', pool: null, confirmed: true, paid: false },
 ]
 
 export const nameById = (teams: DemoTeam[], id: number | null): string | null =>
@@ -73,29 +75,34 @@ function schedulePool(ids: number[]): { homeId: number; awayId: number; round: n
   return out
 }
 
-/** Generate the group calendar from the drawn pools. */
+/** Generate the group calendar from the drawn pools (courts spread per round). */
 export function buildGroupMatches(teams: DemoTeam[]): DemoMatch[] {
-  const matches: DemoMatch[] = []
-  POOLS.forEach((pool, pi) => {
-    schedulePool(poolIds(teams, pool)).forEach((m, idx) => {
-      matches.push({
-        id: `${pool}${idx + 1}`,
-        code: `${pool}${idx + 1}`,
-        phase: 'group',
-        bracketLabel: null,
-        round: m.round,
-        time: START[m.round - 1] ?? '15:00',
-        court: pi + 1,
-        pool,
-        homeId: m.homeId,
-        awayId: m.awayId,
-        hs: 0,
-        as: 0,
-        locked: false,
-      })
-    })
+  const raw = POOLS.flatMap((pool) => schedulePool(poolIds(teams, pool)).map((m) => ({ pool, ...m })))
+  raw.sort((x, y) => x.round - y.round || x.pool.localeCompare(y.pool))
+
+  const courtPerRound = new Map<number, number>()
+  const codePerPool = new Map<Pool, number>()
+  return raw.map((m) => {
+    const court = (courtPerRound.get(m.round) ?? 0) + 1
+    courtPerRound.set(m.round, court)
+    const ci = (codePerPool.get(m.pool) ?? 0) + 1
+    codePerPool.set(m.pool, ci)
+    return {
+      id: `${m.pool}${ci}`,
+      code: `${m.pool}${ci}`,
+      phase: 'group',
+      bracketLabel: null,
+      round: m.round,
+      time: START[m.round - 1] ?? '15:00',
+      court,
+      pool: m.pool,
+      homeId: m.homeId,
+      awayId: m.awayId,
+      hs: 0,
+      as: 0,
+      locked: false,
+    }
   })
-  return matches
 }
 
 /** Standings per pool, recomputed from the saved (locked) group scores. */

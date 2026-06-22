@@ -60,7 +60,7 @@ export function DemoShowcase({
             </div>
           </div>
           <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
-            6 équipes · 2 poules
+            8 équipes · 2 poules
           </span>
         </div>
 
