@@ -1,12 +1,6 @@
 import Link from 'next/link'
 import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
-
-// Slice 1 ships Leads; Clients + dashboard land in the next slices.
-const NAV: { href: string; label: string; soon?: boolean }[] = [
-  { href: '/console/leads', label: 'Leads' },
-  { href: '#', label: 'Clients', soon: true },
-  { href: '#', label: 'Tableau de bord', soon: true },
-]
+import { ConsoleNav } from './console-nav'
 
 /** Backoffice frame: brand + nav sidebar, content on the right. */
 export function ConsoleShell({ email, children }: { email?: string; children: React.ReactNode }) {
@@ -19,32 +13,16 @@ export function ConsoleShell({ email, children }: { email?: string; children: Re
             Console
           </span>
         </div>
-        <nav aria-label="Navigation console" className="mt-8 flex flex-col gap-1">
-          {NAV.map((n) =>
-            n.soon ? (
-              <span
-                key={n.label}
-                className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-muted-foreground/50"
-              >
-                {n.label}
-                <span className="text-[10px] uppercase tracking-wide">bientôt</span>
-              </span>
-            ) : (
-              <Link
-                key={n.label}
-                href={n.href}
-                className="rounded-lg bg-primary/10 px-3 py-2 text-sm font-medium text-primary"
-              >
-                {n.label}
-              </Link>
-            ),
-          )}
-        </nav>
+        <ConsoleNav />
         <div className="mt-auto flex flex-col gap-2 pt-6 text-xs text-muted-foreground">
           <Link href="/" className="transition-colors hover:text-foreground">
             Voir le site ↗
           </Link>
-          {email && <span className="truncate" title={email}>{email}</span>}
+          {email && (
+            <span className="truncate" title={email}>
+              {email}
+            </span>
+          )}
           <LogoutButton />
         </div>
       </aside>
