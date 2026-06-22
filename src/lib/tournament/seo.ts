@@ -7,8 +7,8 @@ import type { ResolvedTenant } from './tenant'
  * Absolute base URL for the *current request host*.
  *
  * This app is multi-tenant by host: every organization is served on its own
- * host (`{subdomain}.cupgenerator.app` or a custom domain), and the apex
- * (`cupgenerator.app`) is the public landing. Deriving the base from the request
+ * host (`{subdomain}.cancha.be` or a custom domain), and the apex
+ * (`cancha.be`) is the public landing. Deriving the base from the request
  * host therefore gives each tenant correct, self-referential metadataBase /
  * canonical / sitemap / Open Graph URLs with zero global configuration - and
  * never canonicalises to a host that isn't actually serving yet.
@@ -22,7 +22,7 @@ export async function getRequestBaseUrl(): Promise<string> {
   return `${proto}://${host}`
 }
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'cupgenerator.app'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'cancha.be'
 
 /**
  * The canonical, indexable base URL for a tenant. A tournament is reachable both
@@ -34,7 +34,7 @@ const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'cupgenerator.app'
  * We only rewrite to the subdomain host when the request is actually served on
  * the canonical domain family - the apex `ROOT_DOMAIN` or a direct
  * `{sub}.ROOT_DOMAIN`. On localhost, `*.vercel.app` previews or a staging host
- * like `org.staging.cupgenerator.app`, we keep the request-derived `fallback`
+ * like `org.staging.cancha.be`, we keep the request-derived `fallback`
  * so those environments never point their canonical/OG URLs at production.
  */
 export function tenantBaseUrl(

@@ -17,7 +17,7 @@ export function MarketingFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div>
           <span style={display} className="text-lg font-medium tracking-tight">
-            Cup <span className="text-primary">Generator</span>
+            Cancha
           </span>
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
             La plateforme de gestion de tournois sportifs, du tirage au trophée.
@@ -60,7 +60,7 @@ export function MarketingFooter() {
 
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6">
-          <span>© 2026 Cup Generator</span>
+          <span>© 2026 Cancha</span>
           <div className="flex items-center gap-5">
             <a
               href={`mailto:${CONTACT_EMAIL}`}

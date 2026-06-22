@@ -463,7 +463,7 @@ export function PublicPageDemo() {
       <div className="flex items-center gap-2 border-b border-border bg-secondary/40 px-4 py-3">
         <WindowDots />
         <span className="ml-2 flex-1 truncate rounded-md border border-border bg-background px-3 py-1 text-xs text-muted-foreground">
-          realsporting.cupgenerator.be/tournoi-de-noel
+          realsporting.cancha.be/tournoi-de-noel
         </span>
       </div>
       <div className="p-6">

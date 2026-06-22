@@ -40,7 +40,7 @@ export function TournamentJsonLd({
     eventStatus: 'https://schema.org/EventScheduled',
     organizer: {
       '@type': 'Organization',
-      name: org?.name ?? 'Cup Generator',
+      name: org?.name ?? 'Cancha',
       url: origin,
       ...(logo ? { logo } : {}),
     },

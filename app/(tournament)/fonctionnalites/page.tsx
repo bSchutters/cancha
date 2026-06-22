@@ -22,9 +22,9 @@ import {
 } from '@/components/marketing/feature-demos'
 
 export const metadata: Metadata = {
-  title: 'Fonctionnalités : tout ce que fait Cup Generator',
+  title: 'Fonctionnalités : tout ce que fait Cancha',
   description:
-    'Inscriptions en ligne, tirage au sort, calendrier multi-terrains, arbitres, scores et classements en direct, phase finale, affichage TV et page publique : découvrez en images toutes les fonctionnalités de Cup Generator.',
+    'Inscriptions en ligne, tirage au sort, calendrier multi-terrains, arbitres, scores et classements en direct, phase finale, affichage TV et page publique : découvrez en images toutes les fonctionnalités de Cancha.',
   alternates: { canonical: '/fonctionnalites' },
 }
 
@@ -131,7 +131,7 @@ export default function FonctionnalitesPage() {
       <section className="mx-auto max-w-3xl px-4 pb-6 pt-20 text-center sm:px-6 lg:pt-24">
         <span className="text-sm font-medium text-primary">Fonctionnalités</span>
         <h1 style={display} className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-          Tout ce que fait Cup Generator, en images
+          Tout ce que fait Cancha, en images
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           De la première inscription au dernier coup de sifflet, voici concrètement ce que la

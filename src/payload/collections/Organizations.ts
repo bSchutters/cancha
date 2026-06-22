@@ -50,7 +50,7 @@ export const Organizations: CollectionConfig = {
           unique: true,
           index: true,
           label: 'Sous-domaine',
-          admin: { description: 'ex. "asturiana" pour asturiana.cupgenerator.app' },
+          admin: { description: 'ex. "asturiana" pour asturiana.cancha.be' },
         },
         {
           name: 'custom_domain',

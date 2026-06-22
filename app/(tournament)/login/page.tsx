@@ -47,7 +47,7 @@ export default function ManageLoginPage() {
         className="w-full max-w-sm rounded-xl border border-border bg-card p-8"
       >
         <h1 className="text-2xl font-bold">
-          Cup <span className="text-primary">Generator</span>
+          Cancha
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">Connexion organisateur</p>
 

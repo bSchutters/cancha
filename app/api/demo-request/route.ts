@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   try {
     const resend = new Resend(key)
     await resend.emails.send({
-      from: `Cup Generator <${from}>`,
+      from: `Cancha <${from}>`,
       to,
       replyTo: data.email,
       subject: `Demande de démo - ${data.name}${data.organization ? ` (${data.organization})` : ''}`,

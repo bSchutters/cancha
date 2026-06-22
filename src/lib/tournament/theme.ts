@@ -122,12 +122,12 @@ function tintedBase(
 
 /** Canonical shadcn/ui base color palettes (light + dark), oklch. */
 export const BASE_COLORS: Record<BaseColorKey, BaseColor> = {
-  // Cup Generator house palette: cream paper + ink-blue, matching the marketing
+  // Cancha house palette: cream paper + ink-blue, matching the marketing
   // landing. This is the default, so a brand-new tournament looks like the site
   // out of the box; a client can still pick any other base color + accent.
   paper: {
     key: 'paper',
-    label: 'Papier (Cup Generator)',
+    label: 'Papier (Cancha)',
     swatch: '#35527D',
     light: {
       background: '#FAF9F5',

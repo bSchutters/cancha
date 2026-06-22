@@ -7,7 +7,7 @@ import { display } from '@/components/marketing/theme'
 export const metadata: Metadata = {
   title: 'Aperçu interactif',
   description:
-    'Aperçu interactif de Cup Generator : lancez un tirage au sort animé, parcourez les poules, le calendrier et la phase finale, sur des données d’exemple.',
+    'Aperçu interactif de Cancha : lancez un tirage au sort animé, parcourez les poules, le calendrier et la phase finale, sur des données d’exemple.',
   alternates: { canonical: '/demo' },
 }
 

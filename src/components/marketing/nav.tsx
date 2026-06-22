@@ -16,7 +16,7 @@ export function MarketingNav() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" style={display} className={cn('text-xl font-medium tracking-tight', focusRing)}>
-          Cup <span className="text-primary">Generator</span>
+          Cancha
         </Link>
         <nav className="hidden items-center gap-6 lg:flex">
           {LINKS.map((l) => (

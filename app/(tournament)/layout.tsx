@@ -10,7 +10,7 @@ import { BRAND_NAME, SITE_DESCRIPTION, SITE_LOCALE } from '@/lib/site'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
-// Default product faces (Cup Generator house style, matching the landing): an
+// Default product faces (Cancha house style, matching the landing): an
 // editorial serif for headings + a clean grotesque for body. Per-org fonts, when
 // chosen, override these via --font-heading / --font-body (see globals.css).
 const productSerif = Newsreader({

@@ -41,7 +41,7 @@ export default async function ManageLayout({ children }: { children: React.React
               </>
             ) : (
               <span>
-                Cup <span className="text-primary">Generator</span>
+                Cancha
               </span>
             )}
           </Link>

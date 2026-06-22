@@ -43,7 +43,7 @@ export const GUIDES: Guide[] = [
         heading: '4. Préparez le tirage au sort',
         body: [
           'Un tirage transparent évite les contestations. Répartissez les équipes dans les poules de façon équilibrée, en séparant si besoin les favoris connus.',
-          'Un tirage animé à l’écran, visible par tous, donne un côté officiel à l’événement et rassure les capitaines. Cup Generator gère cette étape automatiquement et affiche le résultat en direct.',
+          'Un tirage animé à l’écran, visible par tous, donne un côté officiel à l’événement et rassure les capitaines. Cancha gère cette étape automatiquement et affiche le résultat en direct.',
         ],
       },
       {
@@ -110,7 +110,7 @@ export const GUIDES: Guide[] = [
         heading: 'Comment décider concrètement',
         body: [
           'Partez du nombre d’équipes et du temps total disponible. Divisez le temps par la durée d’un match et le nombre de terrains pour estimer combien de rencontres tiennent dans la journée.',
-          'Si le calcul devient compliqué, un outil comme Cup Generator simule le planning selon le format choisi et vous montre tout de suite si la journée tient dans les horaires. Vous ajustez avant l’événement, pas pendant.',
+          'Si le calcul devient compliqué, un outil comme Cancha simule le planning selon le format choisi et vous montre tout de suite si la journée tient dans les horaires. Vous ajustez avant l’événement, pas pendant.',
         ],
       },
     ],

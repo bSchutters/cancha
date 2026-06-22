@@ -6,7 +6,7 @@ import { FAQ } from '@/lib/marketing/content'
 
 export const metadata: Metadata = {
   title: 'FAQ',
-  description: 'Questions fréquentes sur Cup Generator : sports pris en charge, prise en main, tarifs, suivi en direct et données.',
+  description: 'Questions fréquentes sur Cancha : sports pris en charge, prise en main, tarifs, suivi en direct et données.',
   alternates: { canonical: '/faq' },
 }
 

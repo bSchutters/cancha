@@ -22,7 +22,7 @@ export default async function OpengraphImage({
   // so we never leak a draft's name) and reuses the tournament-${slug} cache.
   const t = await getCachedPublicTournament(payload, slug, org?.id ?? null)
 
-  const siteName = org?.name ?? 'Cup Generator'
+  const siteName = org?.name ?? 'Cancha'
   const title = t?.name ?? siteName
   const accent = org?.accentColor ?? '#fed164'
   const dateLabel = formatEditionDate(t?.editionDate)

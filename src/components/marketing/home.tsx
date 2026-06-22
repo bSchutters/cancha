@@ -318,7 +318,7 @@ export function HomeSections() {
                 <tr className="border-b border-border text-left">
                   <th className="p-4 font-medium text-muted-foreground">Tâche</th>
                   <th className="p-4 font-medium text-muted-foreground">Excel / papier</th>
-                  <th className="p-4 font-medium text-primary">Cup Generator</th>
+                  <th className="p-4 font-medium text-primary">Cancha</th>
                 </tr>
               </thead>
               <tbody>
@@ -329,7 +329,7 @@ export function HomeSections() {
                     <td className="bg-primary/[0.04] p-4">
                       <span className="flex items-start gap-2">
                         <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                        <span className="font-medium text-foreground">{row.cupgenerator}</span>
+                        <span className="font-medium text-foreground">{row.cancha}</span>
                       </span>
                     </td>
                   </tr>
