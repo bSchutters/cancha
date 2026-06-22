@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -228,6 +229,16 @@ export function DemoExplorer() {
             knockout={ko.map((m) => toPublicMatch(m, teams))}
           />
         )}
+      </div>
+
+      {/* Marketing CTA, clearly outside the demo mockup */}
+      <div className="mt-6 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
+        <p className="text-sm text-muted-foreground">
+          Vous tenez le pilotage. Sur votre vrai tournoi, on configure tout avec vous.
+        </p>
+        <Button asChild size="sm" className="shrink-0">
+          <Link href="#contact">Demander une démo</Link>
+        </Button>
       </div>
 
       {tour && (

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { CalendarClock, Check, Dices, Flag, Lock, Minus, Pencil, Plus, RotateCcw, Trophy, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -335,14 +334,6 @@ export function ManagerShowcase({
           </div>
         )}
 
-        <div className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/[0.06] p-5 text-center sm:flex-row sm:text-left">
-          <p className="text-sm text-muted-foreground">
-            Vous tenez le pilotage. Sur votre vrai tournoi, on configure tout avec vous.
-          </p>
-          <Button asChild size="sm" className="shrink-0">
-            <Link href="#contact">Demander une démo</Link>
-          </Button>
-        </div>
       </div>
     </div>
   )
