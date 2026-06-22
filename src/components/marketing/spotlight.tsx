@@ -4,22 +4,29 @@ import { useEffect, useState } from 'react'
 
 /**
  * Guided-tour spotlight: dims everything except the targeted element (matched by
- * a CSS selector) and shows a tip bubble below it. The target stays clickable
- * (overlay is pointer-events-none), so the visitor performs the step themselves.
+ * a CSS selector), scrolls it into view, and shows a tip bubble next to it
+ * (above or below, never overlapping). The target stays clickable (overlay is
+ * pointer-events-none) so the visitor performs the step themselves.
  */
 export function Spotlight({ selector, text, onSkip }: { selector: string; text: string; onSkip: () => void }) {
   const [rect, setRect] = useState<DOMRect | null>(null)
 
   useEffect(() => {
+    const el = document.querySelector(selector)
+    if (el) {
+      const r = el.getBoundingClientRect()
+      if (r.top < 96 || r.bottom > window.innerHeight - 150) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
     const measure = () => {
-      const el = document.querySelector(selector)
-      const r = el?.getBoundingClientRect() ?? null
+      const t = document.querySelector(selector)
+      const r = t?.getBoundingClientRect() ?? null
       setRect(r && r.width > 0 ? r : null)
     }
     measure()
-    // Poll so the highlight follows layout/smooth-scroll changes without a
-    // per-frame scroll listener.
-    const id = setInterval(measure, 150)
+    // Poll so the highlight follows layout / smooth-scroll without a per-frame listener.
+    const id = setInterval(measure, 100)
     window.addEventListener('resize', measure)
     return () => {
       clearInterval(id)
@@ -30,8 +37,11 @@ export function Spotlight({ selector, text, onSkip }: { selector: string; text: 
   if (!rect) return null
 
   const pad = 8
+  const placeBelow = window.innerHeight - rect.bottom > 170
   const tipLeft = Math.max(12, Math.min(rect.left, window.innerWidth - 300))
-  const tipTop = Math.min(rect.bottom + pad + 6, window.innerHeight - 120)
+  const tipStyle = placeBelow
+    ? { left: tipLeft, top: rect.bottom + pad + 8 }
+    : { left: tipLeft, top: rect.top - pad - 8, transform: 'translateY(-100%)' }
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50">
@@ -47,13 +57,13 @@ export function Spotlight({ selector, text, onSkip }: { selector: string; text: 
       />
       <div
         className="pointer-events-auto absolute w-[280px] rounded-xl border border-border bg-card p-3 shadow-2xl"
-        style={{ left: tipLeft, top: tipTop }}
+        style={tipStyle}
       >
         <p className="text-sm text-foreground">{text}</p>
         <button
           type="button"
           onClick={onSkip}
-          className="mt-2 cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
+          className="mt-2 cursor-pointer text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
         >
           Passer le guide
         </button>
