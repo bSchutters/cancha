@@ -50,6 +50,11 @@ export function DemoForm() {
 
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-xl text-left">
+      {/* Honeypot: off-screen + hidden from AT and tab order; only bots fill it. */}
+      <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="df-website">Laissez ce champ vide</label>
+        <input id="df-website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="df-name" className={labelClass}>
