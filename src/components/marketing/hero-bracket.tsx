@@ -28,7 +28,7 @@ const BRANCHES = [
 export function HeroBracket() {
   return (
     <svg viewBox="0 0 260 150" className="w-full" fill="none" role="img" aria-label="Arbre de la phase finale">
-      <g stroke="var(--border)" strokeWidth="1" strokeLinecap="round">
+      <g className="hs-branch" stroke="var(--border)" strokeWidth="1" strokeLinecap="round">
         {BRANCHES.map((d) => (
           <path key={d} d={d} />
         ))}

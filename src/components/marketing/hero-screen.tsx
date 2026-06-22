@@ -37,8 +37,10 @@ export function HeroScreen({ standings }: { standings: Standing[] }) {
         if (view === 'poules') {
           tl.from('.hs-row', { opacity: 0, x: -14, duration: 0.4, stagger: 0.06, ease: 'power3.out' })
         } else {
-          tl.from('.hs-bracket', { opacity: 0, scale: 0.94, duration: 0.45, ease: 'back.out(1.4)' })
-          tl.from('.hs-node', { opacity: 0, y: 8, duration: 0.3, stagger: 0.04, ease: 'power2.out' }, '-=0.25')
+          // Nodes appear first, then the branches connect them (not before).
+          tl.from('.hs-bracket', { scale: 0.96, duration: 0.4, ease: 'power2.out' }, 0)
+          tl.from('.hs-node', { opacity: 0, y: 8, duration: 0.3, stagger: 0.05, ease: 'back.out(1.5)' }, 0.05)
+          tl.from('.hs-branch', { opacity: 0, duration: 0.45, ease: 'power1.out' }, '>-0.1')
         }
       })
     },
