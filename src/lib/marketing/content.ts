@@ -23,7 +23,7 @@ export const SPORTS: SportContent[] = [
     slug: 'football',
     name: 'Football',
     eyebrow: 'Logiciel de tournoi de football',
-    h1: 'Votre tournoi de football, organisé sans tableur',
+    h1: 'Votre tournoi de football, organisé sans Excel',
     intro:
       'Foot à 5, à 7 ou à 11 : créez vos poules, générez le calendrier sur plusieurs terrains et suivez scores et classements en temps réel, sur une seule plateforme.',
   },
@@ -155,7 +155,7 @@ export const FAQ: { q: string; a: string }[] = [
 export type ComparisonRow = { criterion: string; excel: string; generic: string; cupgenerator: string }
 
 export const COMPARISON_INTRO =
-  'Beaucoup d’organisateurs gèrent encore leur tournoi sur tableur ou avec un outil généraliste. Voici comment ces approches se comparent à Cup Generator sur les tâches qui comptent vraiment.'
+  'Beaucoup d’organisateurs gèrent encore leur tournoi sur Excel et papier, ou avec un outil généraliste. Voici comment ces approches se comparent à Cup Generator sur les tâches qui comptent vraiment.'
 
 export const COMPARISON: ComparisonRow[] = [
   { criterion: 'Inscriptions en ligne', excel: 'Saisie manuelle, erreurs fréquentes', generic: 'Formulaire de base', cupgenerator: 'Formulaire dédié, liste centralisée' },

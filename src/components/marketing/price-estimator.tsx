@@ -79,7 +79,7 @@ export function PriceEstimator() {
 
       {atMax ? (
         <div className="mt-6 rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-4 text-center text-sm">
-          <p className="text-muted-foreground">Plus de 48 équipes, format multi-jours ou fédération ?</p>
+          <p className="text-muted-foreground">Plus de 48 équipes ou un besoin particulier ?</p>
           <Link
             href="#contact"
             className={cn('mt-1 inline-block font-medium text-primary hover:underline', focusRing)}

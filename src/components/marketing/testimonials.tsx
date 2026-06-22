@@ -48,7 +48,7 @@ export function Testimonials() {
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-medium text-primary">Ils organisent avec Cup Generator</span>
           <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            Des organisateurs qui ont rangé le tableur
+            Des organisateurs qui ont rangé Excel et le papier
           </h2>
         </Reveal>
         <div className="mt-12 grid gap-4 md:grid-cols-3">

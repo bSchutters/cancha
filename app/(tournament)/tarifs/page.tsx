@@ -127,7 +127,7 @@ export default function TarifsPage() {
               Grands tournois & sur mesure
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Au-delà de 48 équipes, format multi-jours, fédération ou complexe sportif :{' '}
+              Au-delà de 48 équipes ou avec un besoin particulier,{' '}
               <Link href="#contact" className="font-medium text-primary underline underline-offset-2">
                 on construit une offre adaptée
               </Link>
