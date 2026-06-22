@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 export type Lead = {
@@ -22,6 +23,8 @@ const COLUMNS = [
   { value: 'converted', label: 'Converti', dot: 'bg-emerald-500' },
   { value: 'lost', label: 'Perdu', dot: 'bg-muted-foreground/50' },
 ] as const
+
+const KNOWN_STATUSES = new Set<string>(COLUMNS.map((c) => c.value))
 
 function fmtDate(iso: string): string {
   try {
@@ -57,7 +60,11 @@ export function LeadsBoard({
   return (
     <div className="grid gap-4 lg:grid-cols-4">
       {COLUMNS.map((col) => {
-        const items = leads.filter((l) => l.status === col.value)
+        // Catch-all: a lead with an unexpected/missing status lands in "Nouveau"
+        // rather than vanishing from every column.
+        const items = leads.filter((l) =>
+          col.value === 'new' ? l.status === 'new' || !KNOWN_STATUSES.has(l.status) : l.status === col.value,
+        )
         return (
           <section key={col.value} className="rounded-2xl border border-border bg-card/40 p-3">
             <div className="mb-3 flex items-center justify-between px-1">
@@ -109,10 +116,19 @@ function LeadCard({
 
       <div className="mt-2.5 flex items-center gap-2">
         <select
-          aria-label="Statut du lead"
+          aria-label={`Statut – ${lead.name}`}
           value={lead.status}
           disabled={pending}
-          onChange={(e) => start(() => onSetStatus(lead.id, e.target.value))}
+          onChange={(e) => {
+            const value = e.target.value
+            start(async () => {
+              try {
+                await onSetStatus(lead.id, value)
+              } catch {
+                toast.error('Impossible de changer le statut.')
+              }
+            })
+          }}
           className={cn(fieldClass, 'cursor-pointer')}
         >
           {COLUMNS.map((c) => (
@@ -123,6 +139,7 @@ function LeadCard({
         </select>
         <button
           type="button"
+          aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
           className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -145,7 +162,15 @@ function LeadCard({
           <button
             type="button"
             disabled={pending || notes === lead.notes}
-            onClick={() => start(() => onSaveNotes(lead.id, notes))}
+            onClick={() =>
+              start(async () => {
+                try {
+                  await onSaveNotes(lead.id, notes)
+                } catch {
+                  toast.error('Impossible d’enregistrer la note.')
+                }
+              })
+            }
             className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             Enregistrer la note

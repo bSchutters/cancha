@@ -5,6 +5,7 @@ import { Newsreader, Geist } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
 import { ConsoleShell } from '@/components/console/console-shell'
+import { Toaster } from '@/components/ui/sonner'
 
 // Same house faces as the rest of the product (Cancha DA). The cream tokens come
 // from globals.css :root; no next-themes here, so the console stays light.
@@ -43,6 +44,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
         )}
       >
         <ConsoleShell email={user?.email}>{children}</ConsoleShell>
+        <Toaster />
       </body>
     </html>
   )

@@ -12,8 +12,10 @@ const schema = z.object({
   sport: z.string().trim().max(80).optional().default(''),
   teams: z.string().trim().max(40).optional().default(''),
   message: z.string().trim().max(2000).optional().default(''),
-  // Honeypot: hidden in the UI, so any value means a bot filled it.
-  website: z.string().max(0).optional().default(''),
+  // Honeypot: hidden in the UI, so any value means a bot filled it. Accept any
+  // string here (don't reject) so the handler can return a silent fake success
+  // instead of a 400 that signals the bot it was caught.
+  website: z.string().max(200).optional().default(''),
 })
 
 // Best-effort, in-memory rate limit. On serverless this is per warm instance
@@ -33,11 +35,6 @@ function rateLimited(ip: string): boolean {
 }
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  if (rateLimited(ip)) {
-    return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
-  }
-
   let data: z.infer<typeof schema>
   try {
     data = schema.parse(await req.json())
@@ -46,12 +43,19 @@ export async function POST(req: Request) {
   }
 
   // Honeypot tripped: pretend success and send nothing, so bots get no signal.
+  // Checked BEFORE the rate limit so honeypot spam doesn't burn the budget of a
+  // legitimate visitor sharing the same IP (NAT/proxy).
   if (data.website) {
     return NextResponse.json({ ok: true })
   }
 
-  // 1) Persist the lead first — this is the source of truth, so a prospect is
-  // never lost even if the email notification fails or Resend isn't configured.
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
+  }
+
+  // 1) Persist the lead first — the primary capture path. The owner email below
+  // is a best-effort notification on top, so a prospect isn't lost if it fails.
   let saved = false
   try {
     const payload = await getPayloadClient()
@@ -70,8 +74,10 @@ export async function POST(req: Request) {
       overrideAccess: true,
     })
     saved = true
-  } catch {
-    // Swallow: fall through to the email attempt below.
+  } catch (err) {
+    // Don't fail the request yet (email may still notify), but make the outage
+    // visible and log the payload so the lead is recoverable from server logs.
+    console.error('[demo-request] lead persist failed', { email: data.email, err })
   }
 
   // 2) Best-effort email notification to the owner.
@@ -98,8 +104,10 @@ export async function POST(req: Request) {
         text: lines.join('\n'),
       })
       emailed = true
-    } catch {
-      // Swallow: the lead is already saved; the owner will see it in /console.
+    } catch (err) {
+      // The lead is already saved; the owner will see it in /console. Still log
+      // so a silently-expired Resend key is noticed.
+      console.error('[demo-request] owner email failed', err)
     }
   }
 

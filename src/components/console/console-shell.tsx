@@ -19,7 +19,7 @@ export function ConsoleShell({ email, children }: { email?: string; children: Re
             Console
           </span>
         </div>
-        <nav className="mt-8 flex flex-col gap-1">
+        <nav aria-label="Navigation console" className="mt-8 flex flex-col gap-1">
           {NAV.map((n) =>
             n.soon ? (
               <span

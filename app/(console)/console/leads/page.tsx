@@ -6,10 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export default async function LeadsPage() {
   const payload = await getPayloadClient()
-  const { docs } = await payload.find({
+  const LIMIT = 300
+  const { docs, totalDocs } = await payload.find({
     collection: 'leads',
     sort: '-createdAt',
-    limit: 300,
+    limit: LIMIT,
     depth: 0,
     overrideAccess: true,
   })
@@ -33,6 +34,10 @@ export default async function LeadsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Les demandes de démo, de la réception à la conversion.
+          {totalDocs > 0 && <span className="ml-1">{totalDocs} au total.</span>}
+          {totalDocs > LIMIT && (
+            <span className="ml-1">Affichage des {LIMIT} plus récents.</span>
+          )}
         </p>
       </header>
       <div className="mt-6">
