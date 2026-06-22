@@ -17,10 +17,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { DEMO_KNOCKOUT, type DemoMatch } from '@/lib/marketing/demo-data'
 
 type TabKey = 'dashboard' | 'scores' | 'teams'
 type Team = { id: number; name: string; pool: string; confirmed: boolean; paid: boolean }
-type Match = { code: string; time: string; court: number; pool: string; home: string; away: string; hs: number; as: number; locked: boolean }
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: 'Tableau de bord' },
@@ -44,11 +44,6 @@ const INITIAL_TEAMS: Team[] = [
   { id: 6, name: 'Stade Central', pool: 'B', confirmed: false, paid: false },
 ]
 
-const INITIAL_MATCHES: Match[] = [
-  { code: 'A1', time: '14:00', court: 1, pool: 'A', home: 'Real Sporting', away: 'FC Comète', hs: 5, as: 1, locked: true },
-  { code: 'A3', time: '15:00', court: 1, pool: 'A', home: 'Real Sporting', away: 'AS Tonnerre', hs: 0, as: 0, locked: false },
-]
-
 function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: number) => void; disabled: boolean }) {
   return (
     <span className={cn('inline-flex items-center overflow-hidden rounded-md border border-border', disabled && 'opacity-60')}>
@@ -57,7 +52,7 @@ function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: num
         aria-label="Diminuer"
         disabled={disabled}
         onClick={() => onDelta(-1)}
-        className="cursor-pointer px-2 py-1 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed"
+        className="cursor-pointer px-2 py-1 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
       >
         <Minus className="size-3.5" />
       </button>
@@ -67,7 +62,7 @@ function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: num
         aria-label="Augmenter"
         disabled={disabled}
         onClick={() => onDelta(1)}
-        className="cursor-pointer px-2 py-1 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed"
+        className="cursor-pointer px-2 py-1 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
       >
         <Plus className="size-3.5" />
       </button>
@@ -77,13 +72,20 @@ function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: num
 
 /**
  * Interactive (non-persistent) preview of the organizer dashboard, mirroring the
- * real DashboardClient / ScoresClient / TeamsClient. State is local: it shows how
- * the platform works, then pushes toward a real demo.
+ * real DashboardClient / ScoresClient / TeamsClient. Match scores are lifted to
+ * the parent (DemoExplorer) so they flow into the public view.
  */
-export function ManagerShowcase() {
+export function ManagerShowcase({
+  matches,
+  onDelta,
+  onToggleLock,
+}: {
+  matches: DemoMatch[]
+  onDelta: (i: number, side: 'hs' | 'as', d: number) => void
+  onToggleLock: (i: number) => void
+}) {
   const [tab, setTab] = useState<TabKey>('dashboard')
   const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS)
-  const [matches, setMatches] = useState<Match[]>(INITIAL_MATCHES)
   const [doneSteps, setDoneSteps] = useState(3)
   const [seq, setSeq] = useState(100)
   const [newName, setNewName] = useState('')
@@ -93,13 +95,8 @@ export function ManagerShowcase() {
     { label: 'Inscrites', value: teams.length },
     { label: 'Confirmées', value: teams.filter((t) => t.confirmed).length },
     { label: 'Payées', value: teams.filter((t) => t.paid).length },
-    { label: 'Matchs', value: 9 },
+    { label: 'Matchs', value: matches.length + DEMO_KNOCKOUT.length },
   ]
-
-  const bump = (i: number, side: 'hs' | 'as', d: number) =>
-    setMatches((ms) => ms.map((m, idx) => (idx === i && !m.locked ? { ...m, [side]: Math.max(0, m[side] + d) } : m)))
-  const toggleLock = (i: number) =>
-    setMatches((ms) => ms.map((m, idx) => (idx === i ? { ...m, locked: !m.locked } : m)))
 
   const addTeam = (e: React.FormEvent) => {
     e.preventDefault()
@@ -216,20 +213,20 @@ export function ManagerShowcase() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 truncate text-sm">{m.home}</span>
-                    <Stepper value={m.hs} disabled={m.locked} onDelta={(d) => bump(i, 'hs', d)} />
+                    <Stepper value={m.hs} disabled={m.locked} onDelta={(d) => onDelta(i, 'hs', d)} />
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 truncate text-sm">{m.away}</span>
-                    <Stepper value={m.as} disabled={m.locked} onDelta={(d) => bump(i, 'as', d)} />
+                    <Stepper value={m.as} disabled={m.locked} onDelta={(d) => onDelta(i, 'as', d)} />
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-end">
                   {m.locked ? (
-                    <Button type="button" size="sm" variant="secondary" onClick={() => toggleLock(i)}>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => onToggleLock(i)}>
                       <Pencil className="size-3.5" /> Modifier
                     </Button>
                   ) : (
-                    <Button type="button" size="sm" onClick={() => toggleLock(i)}>
+                    <Button type="button" size="sm" onClick={() => onToggleLock(i)}>
                       Enregistrer
                     </Button>
                   )}

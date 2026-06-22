@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ManagerShowcase } from './manager-showcase'
 import { DemoShowcase } from './demo-showcase'
+import { INITIAL_DEMO_MATCHES, type DemoMatch } from '@/lib/marketing/demo-data'
 
 type View = 'organisateur' | 'public'
 
@@ -12,10 +13,20 @@ const VIEWS: { key: View; label: string; caption: string }[] = [
   { key: 'public', label: 'Côté public', caption: 'Ce que voient les équipes et les spectateurs, en direct.' },
 ]
 
-/** Lets the visitor switch between the manager dashboard and the public view. */
+/**
+ * Lets the visitor switch between the manager dashboard and the public view.
+ * Match scores live here so a score saved on the organizer side flows into the
+ * public standings + calendar (the real link between the two sides).
+ */
 export function DemoExplorer() {
   const [view, setView] = useState<View>('organisateur')
+  const [matches, setMatches] = useState<DemoMatch[]>(INITIAL_DEMO_MATCHES)
   const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0]
+
+  const onDelta = (i: number, side: 'hs' | 'as', d: number) =>
+    setMatches((ms) => ms.map((m, idx) => (idx === i && !m.locked ? { ...m, [side]: Math.max(0, m[side] + d) } : m)))
+  const onToggleLock = (i: number) =>
+    setMatches((ms) => ms.map((m, idx) => (idx === i ? { ...m, locked: !m.locked } : m)))
 
   return (
     <div>
@@ -37,9 +48,18 @@ export function DemoExplorer() {
           ))}
         </div>
         <p className="text-sm text-muted-foreground">{current.caption}</p>
+        <p className="text-xs text-primary">
+          Astuce : saisissez un score côté organisateur, puis basculez côté public pour le voir apparaître.
+        </p>
       </div>
 
-      <div className="mt-8">{view === 'organisateur' ? <ManagerShowcase /> : <DemoShowcase />}</div>
+      <div className="mt-8">
+        {view === 'organisateur' ? (
+          <ManagerShowcase matches={matches} onDelta={onDelta} onToggleLock={onToggleLock} />
+        ) : (
+          <DemoShowcase matches={matches} />
+        )}
+      </div>
     </div>
   )
 }

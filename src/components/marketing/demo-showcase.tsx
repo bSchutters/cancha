@@ -6,7 +6,13 @@ import { GroupStandings } from '@/components/tournament/GroupStandings'
 import { MatchesByRound } from '@/components/tournament/MatchList'
 import { Bracket } from '@/components/tournament/Bracket'
 import { AnimatedDraw } from './animated-draw'
-import { DEMO_GROUPS, DEMO_GROUP_MATCHES, DEMO_KNOCKOUT, DEMO_QUALIFIERS } from '@/lib/marketing/demo-data'
+import {
+  computeGroups,
+  toPublicMatch,
+  DEMO_KNOCKOUT,
+  DEMO_QUALIFIERS,
+  type DemoMatch,
+} from '@/lib/marketing/demo-data'
 
 type TabKey = 'tirage' | 'poules' | 'calendrier' | 'finale'
 
@@ -18,16 +24,14 @@ const TABS: { key: TabKey; label: string }[] = [
 ]
 
 /**
- * Interactive preview that renders the REAL public tournament components
- * (GroupStandings, MatchList, Bracket) on example data, inside a frame that
- * mirrors the actual product header + tabs. No live polling, no fake UI.
+ * Public-facing preview. Renders the REAL public components on the shared demo
+ * matches, so standings and calendar reflect scores saved on the organizer side.
  */
-export function DemoShowcase() {
-  const [tab, setTab] = useState<TabKey>('tirage')
+export function DemoShowcase({ matches }: { matches: DemoMatch[] }) {
+  const [tab, setTab] = useState<TabKey>('poules')
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
-      {/* Product-style header */}
       <div className="border-b border-border px-5 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -37,7 +41,7 @@ export function DemoShowcase() {
                 <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75 motion-safe:animate-ping" />
                 <span className="relative inline-flex size-2 rounded-full bg-primary" />
               </span>
-              En cours
+              En direct
             </div>
           </div>
           <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
@@ -45,7 +49,6 @@ export function DemoShowcase() {
           </span>
         </div>
 
-        {/* Tab bar (mirrors TournamentView) */}
         <nav className="mt-4 flex flex-wrap gap-1">
           {TABS.map((t) => (
             <button
@@ -55,9 +58,7 @@ export function DemoShowcase() {
               aria-pressed={tab === t.key}
               className={cn(
                 '-mb-px shrink-0 cursor-pointer border-b-2 px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
-                tab === t.key
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground',
+                tab === t.key ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
               {t.label}
@@ -66,13 +67,10 @@ export function DemoShowcase() {
         </nav>
       </div>
 
-      {/* Tab content */}
       <div className="bg-secondary/30 p-5 sm:p-7">
         {tab === 'tirage' && <AnimatedDraw />}
-        {tab === 'poules' && (
-          <GroupStandings groups={DEMO_GROUPS} qualifiersPerGroup={DEMO_QUALIFIERS} />
-        )}
-        {tab === 'calendrier' && <MatchesByRound matches={DEMO_GROUP_MATCHES} />}
+        {tab === 'poules' && <GroupStandings groups={computeGroups(matches)} qualifiersPerGroup={DEMO_QUALIFIERS} />}
+        {tab === 'calendrier' && <MatchesByRound matches={matches.map(toPublicMatch)} />}
         {tab === 'finale' && <Bracket matches={DEMO_KNOCKOUT} />}
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
