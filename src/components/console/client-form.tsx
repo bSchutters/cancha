@@ -114,10 +114,10 @@ export function ClientForm({ action }: { action: Action }) {
               name="password"
               type="text"
               required
-              minLength={8}
+              minLength={12}
               autoComplete="off"
               className={cn(fieldClass, 'font-mono')}
-              placeholder="8 caractères minimum"
+              placeholder="12 caractères minimum"
             />
           </div>
         </div>

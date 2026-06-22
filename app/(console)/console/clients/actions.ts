@@ -13,24 +13,28 @@ const schema = z.object({
   slug: z
     .string()
     .trim()
+    .toLowerCase()
     .min(2, 'Le slug est trop court.')
     .max(60)
     .regex(/^[a-z0-9-]+$/, 'Slug : uniquement a-z, 0-9 et tirets.'),
   subdomain: z
     .string()
     .trim()
+    .toLowerCase()
     .max(60)
     .regex(/^[a-z0-9-]*$/, 'Sous-domaine : uniquement a-z, 0-9 et tirets.')
     .optional()
     .default(''),
-  email: z.string().trim().email('Email invalide.').max(160),
-  password: z.string().min(8, 'Mot de passe : 8 caractères minimum.').max(200),
+  email: z.string().trim().toLowerCase().email('Email invalide.').max(160),
+  password: z.string().min(12, 'Mot de passe : 12 caractères minimum.').max(200),
 })
 
 /**
  * One-screen client onboarding: create the organization, then a manager user
- * bound to it (tenant membership). If the user step fails, the orphan org is
- * removed so a retry is clean.
+ * bound to it (tenant membership). Friendly uniqueness pre-checks give precise
+ * errors; the DB unique indexes stay the real guard against races. If the user
+ * step fails, the org is rolled back — and if that rollback ALSO fails, the
+ * admin is told an orphan org remains (rather than a silent wedge).
  */
 export async function createClient(
   _prev: CreateClientState,
@@ -51,8 +55,39 @@ export async function createClient(
 
   const payload = await getPayloadClient()
 
+  const slugTaken = await payload.find({
+    collection: 'organizations',
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (slugTaken.totalDocs > 0) return { error: 'Ce slug est déjà pris.' }
+
+  if (subdomain) {
+    const subTaken = await payload.find({
+      collection: 'organizations',
+      where: { subdomain: { equals: subdomain } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    if (subTaken.totalDocs > 0) return { error: 'Ce sous-domaine est déjà pris.' }
+  }
+
+  const emailTaken = await payload.find({
+    collection: 'users',
+    where: { email: { equals: email } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (emailTaken.totalDocs > 0) return { error: 'Un compte existe déjà avec cet email.' }
+
   let orgId: number | string
   try {
+    // Empty subdomain is omitted on purpose: '' would collide on the unique
+    // index (only one row could ever be blank). Omitting stores NULL.
     const org = await payload.create({
       collection: 'organizations',
       data: { name, slug, ...(subdomain ? { subdomain } : {}) },
@@ -60,8 +95,8 @@ export async function createClient(
     })
     orgId = org.id
   } catch (err) {
-    console.error('[createClient] org create failed', err)
-    return { error: 'Création de l’organisation impossible (slug ou sous-domaine déjà pris ?).' }
+    console.error('[createClient] org create failed:', err instanceof Error ? err.message : err)
+    return { error: 'Création de l’organisation impossible. Réessayez.' }
   }
 
   try {
@@ -71,9 +106,20 @@ export async function createClient(
       overrideAccess: true,
     })
   } catch (err) {
-    console.error('[createClient] manager create failed, rolling back org', err)
-    await payload.delete({ collection: 'organizations', id: orgId, overrideAccess: true }).catch(() => {})
-    return { error: 'Création du compte manager impossible (email déjà utilisé ?).' }
+    console.error('[createClient] manager create failed:', err instanceof Error ? err.message : err)
+    try {
+      await payload.delete({ collection: 'organizations', id: orgId, overrideAccess: true })
+    } catch (delErr) {
+      console.error(
+        '[createClient] ROLLBACK FAILED — orphan org',
+        orgId,
+        delErr instanceof Error ? delErr.message : delErr,
+      )
+      return {
+        error: `Le compte n’a pas pu être créé et l’organisation « ${slug} » est restée en base. Supprimez-la dans l’admin Payload ou réessayez avec un autre slug.`,
+      }
+    }
+    return { error: 'Création du compte organisateur impossible. Réessayez.' }
   }
 
   revalidatePath('/console/clients')

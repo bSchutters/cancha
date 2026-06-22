@@ -5,37 +5,36 @@ import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
-type TenantRef = number | string | { id: number | string } | null | undefined
-
-function tenantId(ref: TenantRef): number | string | null {
-  if (ref == null) return null
-  return typeof ref === 'object' ? ref.id : ref
-}
-
 export default async function ClientsPage() {
   const payload = await getPayloadClient()
-  const [orgsRes, tournamentsRes] = await Promise.all([
-    payload.find({ collection: 'organizations', limit: 200, depth: 1, sort: 'name', overrideAccess: true }),
-    payload.find({ collection: 'tournaments', limit: 1000, depth: 0, overrideAccess: true }),
-  ])
-
-  const counts = new Map<number | string, number>()
-  for (const t of tournamentsRes.docs) {
-    const id = tenantId((t as { tenant?: TenantRef }).tenant)
-    if (id != null) counts.set(id, (counts.get(id) ?? 0) + 1)
-  }
-
-  const clients = orgsRes.docs.map((o) => {
-    const logo = (o as { logo?: { url?: string | null } | string | null }).logo
-    return {
-      id: o.id,
-      name: (o as { name?: string }).name ?? '—',
-      slug: (o as { slug?: string }).slug ?? '',
-      subdomain: (o as { subdomain?: string | null }).subdomain ?? '',
-      logoUrl: logo && typeof logo === 'object' ? (logo.url ?? null) : null,
-      count: counts.get(o.id) ?? 0,
-    }
+  const orgsRes = await payload.find({
+    collection: 'organizations',
+    limit: 200,
+    depth: 1,
+    sort: 'name',
+    overrideAccess: true,
   })
+
+  // Exact tournament count per org via an aggregate count (no full-table scan,
+  // no silent truncation).
+  const clients = await Promise.all(
+    orgsRes.docs.map(async (o) => {
+      const { totalDocs } = await payload.count({
+        collection: 'tournaments',
+        where: { tenant: { equals: o.id } },
+        overrideAccess: true,
+      })
+      const logo = (o as { logo?: { url?: string | null } | string | null }).logo
+      return {
+        id: o.id,
+        name: (o as { name?: string }).name ?? '—',
+        slug: (o as { slug?: string }).slug ?? '',
+        subdomain: (o as { subdomain?: string | null }).subdomain ?? '',
+        logoUrl: logo && typeof logo === 'object' ? (logo.url ?? null) : null,
+        count: totalDocs,
+      }
+    }),
+  )
 
   return (
     <div className="mx-auto max-w-5xl">
