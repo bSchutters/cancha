@@ -138,7 +138,7 @@ export function BracketView({
       {/* Petite finale shown below the bracket so it never widens the columns. */}
       {petite.length > 0 && (
         <div className="border-t border-border pt-3">
-          <h4 className={cn('mb-2 font-bold uppercase tracking-wide text-orange-300/70', s.head)}>
+          <h4 className={cn('mb-2 font-bold uppercase tracking-wide text-orange-700 dark:text-orange-300/70', s.head)}>
             {petite[0]?.bracketLabel ?? 'Petite finale (3e place)'}
           </h4>
           <div className={cn('flex flex-wrap', s.gap)}>
