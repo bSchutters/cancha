@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { DEMO_KNOCKOUT, type DemoMatch } from '@/lib/marketing/demo-data'
 
 type TabKey = 'dashboard' | 'scores' | 'teams'
-type Team = { id: number; name: string; pool: string; confirmed: boolean; paid: boolean }
+type Team = { id: number; name: string; pool: string | null; confirmed: boolean; paid: boolean }
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: 'Tableau de bord' },
@@ -91,7 +91,6 @@ export function ManagerShowcase({
   const [doneSteps, setDoneSteps] = useState(3)
   const [seq, setSeq] = useState(100)
   const [newName, setNewName] = useState('')
-  const [newPool, setNewPool] = useState('A')
 
   const stats = [
     { label: 'Inscrites', value: teams.length },
@@ -104,7 +103,7 @@ export function ManagerShowcase({
     e.preventDefault()
     const name = newName.trim()
     if (!name) return
-    setTeams((ts) => [...ts, { id: seq, name, pool: newPool, confirmed: true, paid: false }])
+    setTeams((ts) => [...ts, { id: seq, name, pool: null, confirmed: true, paid: false }])
     setSeq((s) => s + 1)
     setNewName('')
   }
@@ -248,14 +247,6 @@ export function ManagerShowcase({
                 placeholder="Nom de l’équipe"
                 className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
               />
-              <select
-                value={newPool}
-                onChange={(e) => setNewPool(e.target.value)}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-              >
-                <option value="A">Poule A</option>
-                <option value="B">Poule B</option>
-              </select>
               <Button type="submit" size="sm">
                 <Plus className="size-3.5" /> Ajouter
               </Button>
@@ -268,7 +259,7 @@ export function ManagerShowcase({
                   <span className="flex min-w-0 items-center gap-2">
                     <Users className="size-4 shrink-0 text-muted-foreground" />
                     <span className="truncate font-medium">{t.name}</span>
-                    <span className="shrink-0 text-xs text-muted-foreground">Poule {t.pool}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{t.pool ? `Poule ${t.pool}` : 'Poule à tirer'}</span>
                   </span>
                   <span className="flex shrink-0 items-center gap-2">
                     <button
