@@ -75,12 +75,6 @@ const NEXT_MATCHES = [
   { home: 'Real Sporting', away: 'AS Tonnerre', time: '15:00', court: 'T1' },
 ]
 
-const KO_ROUNDS = [
-  { label: 'Quarts', teams: ['Real Sporting', 'Olympic 7', 'AS Tonnerre', 'Les Lynx'] },
-  { label: 'Demi', teams: ['Real Sporting', 'AS Tonnerre'] },
-  { label: 'Finale', teams: ['Real Sporting'] },
-]
-
 const AUDIENCE = ['Clubs', 'Comités des fêtes', 'Écoles de jeunes', 'Entreprises', 'Associations']
 
 /** Live "En direct" pill with a pulsing dot. */
@@ -186,13 +180,13 @@ export function HomeSections() {
       {/* Spotlight: the in-hall show */}
       <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-medium text-primary">L’atout en salle</span>
+          <span className="text-sm font-medium text-primary">L’atout sur place</span>
           <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            Un show pour vos équipes, un écran pour votre salle
+            Un show pour vos équipes, un écran pour votre événement
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-            Le tirage des poules se dévoile en grand, et l’affichage TV garde la salle informée :
-            prochains matchs, scores et phase finale, en continu.
+            Le tirage des poules se dévoile en grand, et l’affichage TV garde tout le monde informé :
+            prochains matchs, scores et classements, en continu.
           </p>
         </Reveal>
 
@@ -202,7 +196,7 @@ export function HomeSections() {
         >
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
             <span style={display} className="font-medium">
-              Affichage salle
+              Affichage sur écran
             </span>
             <LivePill />
           </div>
@@ -223,26 +217,22 @@ export function HomeSections() {
               </div>
             </div>
             <div className="bg-card p-6">
-              <h3 className="text-sm font-medium text-muted-foreground">Phase finale</h3>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-                {KO_ROUNDS.map((col) => (
-                  <div key={col.label}>
-                    <div className="mb-2 text-muted-foreground">{col.label}</div>
-                    <div className="space-y-1.5">
-                      {col.teams.map((team, i) => (
-                        <div
-                          key={i}
-                          className={cn(
-                            'truncate rounded-md border px-2 py-1',
-                            col.label === 'Finale'
-                              ? 'border-primary/30 bg-primary/10 font-medium text-primary'
-                              : 'border-border',
-                          )}
-                        >
-                          {team}
-                        </div>
-                      ))}
-                    </div>
+              <h3 className="text-sm font-medium text-muted-foreground">Classement · Poule A</h3>
+              <div className="mt-4 space-y-2">
+                {STANDINGS.map((s) => (
+                  <div key={s.rank} className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-3">
+                      <span
+                        className={cn(
+                          'w-4 text-center font-semibold tabular-nums',
+                          s.rank <= 2 ? 'text-primary' : 'text-muted-foreground',
+                        )}
+                      >
+                        {s.rank}
+                      </span>
+                      <span className="font-medium">{s.name}</span>
+                    </span>
+                    <span className="font-semibold tabular-nums">{s.pts} pts</span>
                   </div>
                 ))}
               </div>

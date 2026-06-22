@@ -78,12 +78,15 @@ export function PriceEstimator() {
       </div>
 
       {atMax ? (
-        <p className="mt-6 rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-3 text-center text-sm text-muted-foreground">
-          Plus de 48 équipes, format multi-jours ou fédération ?{' '}
-          <Link href="#contact" className={cn('font-medium text-primary underline underline-offset-2', focusRing)}>
-            Parlons-en, on s’adapte.
+        <div className="mt-6 rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-4 text-center text-sm">
+          <p className="text-muted-foreground">Plus de 48 équipes, format multi-jours ou fédération ?</p>
+          <Link
+            href="#contact"
+            className={cn('mt-1 inline-block font-medium text-primary hover:underline', focusRing)}
+          >
+            Parlons-en, on s’adapte
           </Link>
-        </p>
+        </div>
       ) : (
         <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
           Paiement unique, par équipe, dégressif au volume. Pas d’abonnement, et vous ne payez que si

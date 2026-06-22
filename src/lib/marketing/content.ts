@@ -41,7 +41,7 @@ export const SPORTS: SportContent[] = [
     eyebrow: 'Logiciel de tournoi de volley',
     h1: 'Votre tournoi de volley, géré de A à Z',
     intro:
-      'Des poules à la phase finale, Cup Generator répartit les matchs sur vos terrains, calcule les classements et affiche tout en direct dans la salle.',
+      'Des poules à la phase finale, Cup Generator répartit les matchs sur vos terrains, calcule les classements et affiche tout en direct sur place.',
   },
   {
     slug: 'basket',
@@ -144,7 +144,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Les équipes et le public peuvent-ils suivre en direct ?',
-    a: 'Oui. Chaque tournoi a une page publique avec scores et classements en temps réel, et un mode TV pour l’affichage en salle.',
+    a: 'Oui. Chaque tournoi a une page publique avec scores et classements en temps réel, et un mode TV pour l’affichage sur place.',
   },
   {
     q: 'Mes données sont-elles en sécurité ?',
@@ -163,7 +163,7 @@ export const COMPARISON: ComparisonRow[] = [
   { criterion: 'Planning multi-terrains', excel: 'Très long à construire', generic: 'Souvent limité', cupgenerator: 'Généré automatiquement' },
   { criterion: 'Recalcul après retard', excel: 'Tout reprendre à la main', generic: 'Variable selon l’outil', cupgenerator: 'Horaires recalés en un clic' },
   { criterion: 'Scores et classements', excel: 'Formules fragiles, erreurs de calcul', generic: 'Mise à jour manuelle', cupgenerator: 'Classements en direct, automatiques' },
-  { criterion: 'Affichage en salle', excel: 'Non prévu', generic: 'Rarement disponible', cupgenerator: 'Écran TV et tableau live' },
+  { criterion: 'Affichage sur place', excel: 'Non prévu', generic: 'Rarement disponible', cupgenerator: 'Écran TV et tableau live' },
   { criterion: 'Gestion des arbitres', excel: 'Sur papier', generic: 'Peu adapté', cupgenerator: 'Saisie des scores par terrain' },
   { criterion: 'Sponsors et marque', excel: 'Aucun', generic: 'Limité', cupgenerator: 'Logos et couleurs personnalisés' },
   { criterion: 'Prise en main', excel: 'Familier mais laborieux', generic: 'Courbe d’apprentissage variable', cupgenerator: 'Pensé pour les organisateurs' },

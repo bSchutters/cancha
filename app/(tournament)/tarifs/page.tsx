@@ -36,7 +36,7 @@ export default function TarifsPage() {
       </section>
 
       {/* Launch offer (prominent) */}
-      <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6">
+      <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
         <Reveal className="overflow-hidden rounded-3xl border border-primary/30 bg-primary p-8 text-center text-primary-foreground sm:p-10">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
             <Sparkles className="size-3.5" /> Offre de lancement
@@ -56,45 +56,56 @@ export default function TarifsPage() {
         </Reveal>
       </section>
 
-      {/* Interactive estimator */}
-      <section className="mx-auto max-w-xl px-4 sm:px-6">
-        <Reveal>
-          <PriceEstimator />
-        </Reveal>
+      {/* Estimator + degressive grid, side by side */}
+      <section className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
+          <Reveal>
+            <PriceEstimator />
+          </Reveal>
+          <Reveal delay={0.08} className="flex h-full flex-col gap-4">
+            <div className="overflow-hidden rounded-3xl border border-border bg-card">
+              <div className="border-b border-border px-5 py-3 text-sm font-medium text-muted-foreground">
+                Tarif dégressif
+              </div>
+              {PRICE_TIERS.map((t) => (
+                <div
+                  key={t.from}
+                  className="flex items-center justify-between border-b border-border px-5 py-3.5 text-sm last:border-b-0"
+                >
+                  <span className="font-medium">{tierLabel(t)}</span>
+                  <span style={display} className="font-semibold tabular-nums">
+                    {t.rate} € <span className="text-xs font-normal text-muted-foreground">/ équipe</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-3xl border border-border bg-secondary/40 px-5 py-4 text-sm text-muted-foreground">
+              Plus on a d’équipes, moins c’est cher à l’équipe. Le total reste raisonnable, même pour
+              les gros tournois.
+            </div>
+          </Reveal>
+        </div>
       </section>
 
-      {/* Degressive grid */}
-      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-        <Reveal className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-5 py-3 text-sm font-medium text-muted-foreground">
-            Tarif dégressif
-          </div>
-          {PRICE_TIERS.map((t) => (
-            <div key={t.from} className="flex items-center justify-between border-b border-border px-5 py-3 text-sm last:border-b-0">
-              <span className="font-medium">{tierLabel(t)}</span>
-              <span style={display} className="font-semibold tabular-nums">
-                {t.rate} € <span className="text-xs font-normal text-muted-foreground">/ équipe</span>
-              </span>
-            </div>
-          ))}
-        </Reveal>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {PRICING_POINTS.map((p) => (
-            <div key={p.title} className="rounded-2xl border border-border bg-card p-5">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Check className="size-4" />
+      {/* Reassurance */}
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {PRICING_POINTS.map((p, i) => (
+            <Reveal key={p.title} delay={i * 0.06} className="rounded-2xl border border-border bg-card p-6">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Check className="size-5" />
               </span>
               <h2 style={display} className="mt-3 text-base font-medium">
                 {p.title}
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* Guarantee + custom/large tournaments */}
-      <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6">
+      <section className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
         <Reveal className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-6">
             <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -116,7 +127,7 @@ export default function TarifsPage() {
               Grands tournois & sur mesure
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Au-delà de 48 équipes, format multi-jours, fédération ou salle :{' '}
+              Au-delà de 48 équipes, format multi-jours, fédération ou complexe sportif :{' '}
               <Link href="#contact" className="font-medium text-primary underline underline-offset-2">
                 on construit une offre adaptée
               </Link>

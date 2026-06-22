@@ -21,7 +21,7 @@ export const GUIDES: Guide[] = [
       {
         heading: '1. Fixez le cadre avant tout le reste',
         body: [
-          'Avant de penser aux matchs, posez les bases. Choisissez une date, réservez la salle et définissez le nombre d’équipes que vous pouvez accueillir selon le nombre de terrains disponibles.',
+          'Avant de penser aux matchs, posez les bases. Choisissez une date, réservez le lieu et définissez le nombre d’équipes que vous pouvez accueillir selon le nombre de terrains disponibles.',
           'Décidez aussi du public visé (jeunes, adultes, mixte, entreprises) et du prix d’inscription. Ces décisions conditionnent tout le reste de l’organisation.',
         ],
       },
@@ -63,7 +63,7 @@ export const GUIDES: Guide[] = [
       {
         heading: '7. Soignez la fin de journée',
         body: [
-          'Affichez le tableau final sur un écran dans la salle pour que tout le monde suive la phase à élimination directe. L’ambiance monte d’un cran.',
+          'Affichez le tableau final sur un écran sur place pour que tout le monde suive la phase à élimination directe. L’ambiance monte d’un cran.',
           'Préparez la remise des prix à l’avance : le classement final est prêt dès le dernier coup de sifflet. Vous terminez la journée sur une note professionnelle, sans calcul de dernière minute.',
         ],
       },
