@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils'
 import type { PublicGroup, PublicMatch } from '@/lib/tournament/public-view'
 import { GroupStandings } from '@/components/tournament/GroupStandings'
 import { MatchesByRound } from '@/components/tournament/MatchList'
-import { Bracket } from '@/components/tournament/Bracket'
 import { AnimatedDraw } from './animated-draw'
+import { DemoBracket } from './demo-bracket'
 import { QUALIFIERS, type Step } from '@/lib/marketing/demo-engine'
 
 type TabKey = 'tirage' | 'poules' | 'calendrier' | 'finale'
@@ -98,7 +98,13 @@ export function DemoShowcase({
             <Pending>Le calendrier sera publié une fois généré.</Pending>
           ))}
         {tab === 'finale' &&
-          (step >= 3 ? <Bracket matches={knockout} /> : <Pending>La phase finale démarre après les poules.</Pending>)}
+          (step >= 3 ? (
+            <div className="mx-auto max-w-md py-2">
+              <DemoBracket matches={knockout} />
+            </div>
+          ) : (
+            <Pending>La phase finale démarre après les poules.</Pending>
+          ))}
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Aperçu sur données d’exemple, avec les composants réels du produit.
