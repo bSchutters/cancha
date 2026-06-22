@@ -20,8 +20,9 @@ import { Bracket } from '@/components/tournament/Bracket'
 import { MatchCard } from '@/components/tournament/MatchList'
 import { DEMO_KNOCKOUT, DEMO_GROUP_MATCHES } from '@/lib/marketing/demo-data'
 import { COMPARISON } from '@/lib/marketing/content'
+import { HeroScreen } from './hero-screen'
 import { display, focusRing } from './theme'
-import { Reveal, Parallax } from './motion'
+import { Reveal } from './motion'
 import { CtaSection } from './cta-section'
 import { Testimonials } from './testimonials'
 
@@ -73,11 +74,6 @@ const NEXT_MATCHES = [
   { home: 'Real Sporting', away: 'Les Lynx', time: '14:30', court: 'T1' },
   { home: 'AS Tonnerre', away: 'FC Comète', time: '14:30', court: 'T2' },
   { home: 'Real Sporting', away: 'AS Tonnerre', time: '15:00', court: 'T1' },
-]
-
-const BRACKET = [
-  { round: 'Demi-finales', pairs: [['Real Sporting', 'Stade Central'], ['Olympic 7', 'AS Tonnerre']] },
-  { round: 'Finale', pairs: [['Real Sporting', 'Olympic 7']] },
 ]
 
 const AUDIENCE = ['Clubs', 'Comités des fêtes', 'Écoles de jeunes', 'Entreprises', 'Associations']
@@ -141,44 +137,10 @@ export function HomeSections() {
             </div>
           </div>
 
-          {/* Live group mini-preview (illustrative data) */}
-          <Parallax
-            amount={28}
-            className="rounded-2xl border border-border bg-card p-5 shadow-[0_12px_40px_-20px_rgba(26,26,24,0.18)] motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000"
-          >
-            <div className="flex items-center justify-between">
-              <LivePill />
-              <span className="text-xs text-muted-foreground">Poule A · Terrain 1</span>
-            </div>
-            <div className="mt-4 space-y-1">
-              {STANDINGS.map((t) => (
-                <div
-                  key={t.name}
-                  className={cn(
-                    'flex items-center justify-between rounded-lg px-3 py-2 text-sm',
-                    t.q && 'bg-primary/10',
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={cn(
-                        'w-4 text-center font-semibold tabular-nums',
-                        t.q ? 'text-primary' : 'text-muted-foreground',
-                      )}
-                    >
-                      {t.rank}
-                    </span>
-                    <span className="font-medium">{t.name}</span>
-                  </div>
-                  <span className="font-semibold tabular-nums">{t.pts} pts</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs">
-              <span className="text-muted-foreground">Prochain match</span>
-              <span className="font-medium">Real Sporting vs Les Lynx · 14:30</span>
-            </div>
-          </Parallax>
+          {/* Live screen: alternates between pool standings and the knockout tree */}
+          <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000">
+            <HeroScreen standings={STANDINGS} />
+          </div>
         </div>
       </section>
 
@@ -195,83 +157,52 @@ export function HomeSections() {
           </p>
         </Reveal>
 
-        {/* Two superimposed screens: the group view in front, the knockout view behind. */}
-        <Reveal delay={0.1} className="relative mx-auto mt-14 max-w-3xl">
-          {/* Front screen: group view (matches + standings) */}
-          <div className="relative z-10 rounded-2xl border border-border bg-card p-5 shadow-[0_24px_60px_-30px_rgba(26,26,24,0.35)] lg:mt-24 lg:w-[64%] lg:-rotate-2">
-            <div className="mb-4 flex items-center justify-between">
-              <span style={display} className="text-sm font-medium">
-                Affichage sur écran
-              </span>
-              <LivePill />
-            </div>
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Prochains matchs</h3>
-            <div className="mt-2 space-y-2">
-              {NEXT_MATCHES.map((m, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="font-medium">
-                    {m.home} <span className="text-muted-foreground">vs</span> {m.away}
-                  </span>
-                  <span className="tabular-nums text-muted-foreground">
-                    {m.time} · {m.court}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <h3 className="mt-5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Classement · Poule A
-            </h3>
-            <div className="mt-2 space-y-1.5">
-              {STANDINGS.map((s) => (
-                <div key={s.rank} className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-3">
-                    <span
-                      className={cn(
-                        'w-4 text-center font-semibold tabular-nums',
-                        s.rank <= 2 ? 'text-primary' : 'text-muted-foreground',
-                      )}
-                    >
-                      {s.rank}
-                    </span>
-                    <span className="font-medium">{s.name}</span>
-                  </span>
-                  <span className="font-semibold tabular-nums">{s.pts} pts</span>
-                </div>
-              ))}
-            </div>
+        <Reveal
+          delay={0.1}
+          className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]"
+        >
+          <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+            <span style={display} className="font-medium">
+              Affichage sur écran
+            </span>
+            <LivePill />
           </div>
-
-          {/* Back screen: knockout bracket, peeking out top-right */}
-          <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-[0_18px_50px_-30px_rgba(26,26,24,0.25)] lg:absolute lg:right-0 lg:top-0 lg:mt-0 lg:w-[56%] lg:rotate-3">
-            <div className="mb-3 flex items-center justify-between">
-              <span style={display} className="text-sm font-medium">
-                Phase finale
-              </span>
-              <span className="text-xs text-muted-foreground">Vue tableau</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              {BRACKET.map((col) => (
-                <div key={col.round}>
-                  <div className="mb-2 text-muted-foreground">{col.round}</div>
-                  <div className="space-y-2">
-                    {col.pairs.map((pair, i) => (
-                      <div key={i} className="overflow-hidden rounded-md border border-border">
-                        {pair.map((t, j) => (
-                          <div
-                            key={j}
-                            className={cn(
-                              'truncate px-2 py-1',
-                              j === 0 ? 'border-b border-border font-medium text-primary' : 'text-muted-foreground',
-                            )}
-                          >
-                            {t}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+          <div className="grid gap-px bg-border sm:grid-cols-2">
+            <div className="bg-card p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">Prochains matchs</h3>
+              <div className="mt-4 space-y-3">
+                {NEXT_MATCHES.map((m, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <span className="font-medium">
+                      {m.home} <span className="text-muted-foreground">vs</span> {m.away}
+                    </span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {m.time} · {m.court}
+                    </span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+            <div className="bg-card p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">Classement · Poule A</h3>
+              <div className="mt-4 space-y-2">
+                {STANDINGS.map((s) => (
+                  <div key={s.rank} className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-3">
+                      <span
+                        className={cn(
+                          'w-4 text-center font-semibold tabular-nums',
+                          s.rank <= 2 ? 'text-primary' : 'text-muted-foreground',
+                        )}
+                      >
+                        {s.rank}
+                      </span>
+                      <span className="font-medium">{s.name}</span>
+                    </span>
+                    <span className="font-semibold tabular-nums">{s.pts} pts</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </Reveal>
