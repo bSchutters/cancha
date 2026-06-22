@@ -91,6 +91,31 @@ export function Reveal({
   )
 }
 
+/**
+ * Staggered GSAP entrance for hero elements tagged `[data-hero]`, so the first
+ * viewport shares the same easing vocabulary (power3.out) as the scroll reveals.
+ * useGSAP runs in a layout effect (no flash); static under reduced motion.
+ */
+export function HeroIntro({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        const items = ref.current?.querySelectorAll('[data-hero]')
+        if (!items?.length) return
+        gsap.from(items, { opacity: 0, y: 20, duration: 0.8, ease: 'power3.out', stagger: 0.09 })
+      })
+    },
+    { scope: ref },
+  )
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  )
+}
+
 /** Subtle parallax drift on scroll. No-op under reduced motion. */
 export function Parallax({
   children,
