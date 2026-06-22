@@ -3,6 +3,8 @@ import { getPayloadClient } from '@/lib/payload'
 import { resolveTenantId } from '@/lib/tournament/tenant'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { getRequestBaseUrl } from '@/lib/tournament/seo'
+import { SPORTS, PROFILES } from '@/lib/marketing/content'
+import { GUIDES } from '@/lib/marketing/guides'
 
 // Per-host sitemap: the tenant is resolved from the request headers, so each
 // organization's subdomain/custom domain serves a sitemap listing only that
@@ -27,6 +29,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: t.status === 'live' ? 'hourly' : 'weekly',
         priority: t.status === 'live' ? 0.9 : 0.7,
       })
+    }
+  } else {
+    // Apex (no tenant): the marketing site. List the static + SEO pages here,
+    // where they are canonical.
+    for (const path of ['/demo', '/tarifs', '/comparatif', '/faq', '/a-propos', '/ressources']) {
+      entries.push({ url: `${base}${path}`, changeFrequency: 'monthly', priority: 0.6 })
+    }
+    for (const s of SPORTS) {
+      entries.push({ url: `${base}/sports/${s.slug}`, changeFrequency: 'monthly', priority: 0.6 })
+    }
+    for (const p of PROFILES) {
+      entries.push({ url: `${base}/organisateurs/${p.slug}`, changeFrequency: 'monthly', priority: 0.6 })
+    }
+    for (const g of GUIDES) {
+      entries.push({ url: `${base}/ressources/${g.slug}`, changeFrequency: 'monthly', priority: 0.5 })
     }
   }
 

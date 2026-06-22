@@ -1,0 +1,54 @@
+import type { PublicMatch } from '@/lib/tournament/public-view'
+
+// Two finished example matches for the home page's "feature bento" preview only.
+// The interactive demo's live simulation lives in demo-engine.ts (single source
+// of truth for draw -> schedule -> standings -> knockout); keep this minimal so
+// the two never diverge.
+export const DEMO_GROUP_MATCHES: PublicMatch[] = [
+  {
+    id: 'A1',
+    code: 'A1',
+    phase: 'group',
+    groupLabel: 'A',
+    round: 1,
+    court: 1,
+    scheduledTime: '14:00',
+    bracketLabel: null,
+    homeTeamId: null,
+    awayTeamId: null,
+    homeName: 'Real Sporting',
+    awayName: 'FC Comète',
+    homeLogoUrl: null,
+    awayLogoUrl: null,
+    scoreHome: 5,
+    scoreAway: 1,
+    penaltyWinner: null,
+    penaltyHome: null,
+    penaltyAway: null,
+    refereeName: null,
+    status: 'finished',
+  },
+  {
+    id: 'B1',
+    code: 'B1',
+    phase: 'group',
+    groupLabel: 'B',
+    round: 1,
+    court: 2,
+    scheduledTime: '14:00',
+    bracketLabel: null,
+    homeTeamId: null,
+    awayTeamId: null,
+    homeName: 'Olympic 7',
+    awayName: 'Dynamo Nord',
+    homeLogoUrl: null,
+    awayLogoUrl: null,
+    scoreHome: 3,
+    scoreAway: 0,
+    penaltyWinner: null,
+    penaltyHome: null,
+    penaltyAway: null,
+    refereeName: null,
+    status: 'finished',
+  },
+]

@@ -1,12 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ClipboardList, Dices, CalendarClock, Trophy, Tv, Radio } from 'lucide-react'
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { resolveTenant } from '@/lib/tournament/tenant'
 import { formatEditionDate } from '@/lib/tournament/format'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { MarketingShell } from '@/components/marketing/shell'
+import { HomeSections } from '@/components/marketing/home'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +27,13 @@ export default async function CupHomePage() {
 
   // Apex host (no organization): product landing page. Each organization's public
   // tournament list lives on its own subdomain / custom domain.
-  if (!org) return <Landing />
+  if (!org) {
+    return (
+      <MarketingShell>
+        <HomeSections />
+      </MarketingShell>
+    )
+  }
 
   const tournaments = await listPublicTournaments(payload, org.id)
   const active = tournaments.filter((t) => ACTIVE.has(t.status))
@@ -43,7 +49,7 @@ export default async function CupHomePage() {
         )}
         <h1 className="text-5xl font-bold">{org.name}</h1>
         <p className="mt-3 text-muted-foreground">
-          Tournois de futsal - inscriptions, classements et résultats en direct.
+          Inscriptions, classements et résultats en direct.
         </p>
       </header>
 
@@ -72,83 +78,6 @@ export default async function CupHomePage() {
           </div>
         </section>
       )}
-    </main>
-  )
-}
-
-const FEATURES = [
-  {
-    icon: ClipboardList,
-    title: 'Inscriptions en ligne',
-    desc: 'Les équipes s’inscrivent, paient et sont validées en quelques clics.',
-  },
-  {
-    icon: Dices,
-    title: 'Tirage au sort animé',
-    desc: 'Un tirage des poules spectaculaire, projeté sur grand écran.',
-  },
-  {
-    icon: CalendarClock,
-    title: 'Calendrier automatique',
-    desc: 'Génération des matchs multi-terrains, horaires et retards gérés.',
-  },
-  {
-    icon: Trophy,
-    title: 'Phase finale & classements',
-    desc: 'Poules, arbre, barrages et classement final calculés en direct.',
-  },
-  {
-    icon: Tv,
-    title: 'Affichage TV',
-    desc: 'Des écrans pour la salle : prochains matchs, programme, classements.',
-  },
-  {
-    icon: Radio,
-    title: 'Suivi en direct',
-    desc: 'Une page publique par tournoi : scores et horaires en temps réel.',
-  },
-]
-
-/** Product landing page shown on the apex host (no organization). */
-function Landing() {
-  return (
-    <main>
-      <section className="mx-auto max-w-5xl px-4 pb-16 pt-20 text-center sm:pt-28">
-        <span className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
-          ⚽ Football &amp; Futsal
-        </span>
-        <h1 className="mt-6 text-5xl font-bold tracking-tight sm:text-6xl">
-          Cup <span className="text-primary">Generator</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-          La plateforme tout-en-un pour organiser vos tournois de football et de futsal - de
-          l’inscription des équipes au classement final, en passant par le tirage et l’affichage TV.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button asChild size="lg">
-            <Link href="/login">Connexion organisateur</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link href="#features">Découvrir les fonctionnalités</Link>
-          </Button>
-        </div>
-      </section>
-
-      <section id="features" className="mx-auto max-w-5xl px-4 pb-24">
-        {/* Keeps the heading order h1 -> h2 -> h3 without altering the layout. */}
-        <h2 className="sr-only">Fonctionnalités</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-xl border border-border bg-card p-6">
-              <span className="inline-flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <f.icon className="size-5" />
-              </span>
-              <h3 className="mt-4 font-bold">{f.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
     </main>
   )
 }

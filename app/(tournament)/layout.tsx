@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const base = await getRequestBaseUrl()
   const siteName = org?.name ?? 'Cup Generator'
   const description =
-    'Gestion de tournois de futsal : inscriptions, tirage, calendrier, classements et résultats en direct.'
+    'Gestion de tournois sportifs : inscriptions, tirage, calendrier, classements et résultats en direct.'
   return {
     metadataBase: new URL(base),
     // Child pages set a bare title (e.g. the tournament name); it's framed with
