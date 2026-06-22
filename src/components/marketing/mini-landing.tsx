@@ -12,11 +12,13 @@ export function MiniLanding({
   h1,
   intro,
   bullets,
+  formats,
 }: {
   eyebrow: string
   h1: string
   intro: string
   bullets?: string[]
+  formats?: string[]
 }) {
   return (
     <>
@@ -54,6 +56,24 @@ export function MiniLanding({
           </div>
         </div>
       </section>
+
+      {formats && formats.length > 0 && (
+        <section className="mx-auto max-w-3xl px-4 pb-4 sm:px-6">
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+            <h2 style={display} className="text-xl font-semibold tracking-tight">
+              Formats pris en charge
+            </h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+              {formats.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+                  <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {bullets && bullets.length > 0 && (
         <section className="mx-auto max-w-4xl px-4 pb-8 sm:px-6">

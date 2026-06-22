@@ -5,6 +5,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant, resolveLayoutTenant } from '@/lib/tournament/tenant'
 import { buildThemeCss, googleFontsHref } from '@/lib/tournament/theme'
 import { getRequestBaseUrl, socialMetadata } from '@/lib/tournament/seo'
+import { BRAND_NAME, SITE_DESCRIPTION, SITE_LOCALE } from '@/lib/site'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -16,9 +17,8 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const org = await resolveTenant(await getPayloadClient())
   const base = await getRequestBaseUrl()
-  const siteName = org?.name ?? 'Cup Generator'
-  const description =
-    'Gestion de tournois sportifs : inscriptions, tirage, calendrier, classements et résultats en direct.'
+  const siteName = org?.name ?? BRAND_NAME
+  const description = SITE_DESCRIPTION
   return {
     metadataBase: new URL(base),
     // Child pages set a bare title (e.g. the tournament name); it's framed with
@@ -45,7 +45,7 @@ export default async function TournamentLayout({
   const fontsHref = org ? googleFontsHref(org.theme.headingFont, org.theme.bodyFont) : null
 
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={SITE_LOCALE} suppressHydrationWarning>
       {/* Single background layer: ONLY the <body> paints var(--background) (it
           propagates to the whole viewport canvas because <html> has no background).
           Never also paint <html> - two layers of the same colour seam into a band. */}

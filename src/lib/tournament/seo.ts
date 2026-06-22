@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
+import { BRAND_NAME, SITE_LOCALE_OG } from '@/lib/site'
 import type { ResolvedTenant } from './tenant'
 
 /**
@@ -68,7 +69,7 @@ export function socialMetadata(opts: {
   images?: (string | null | undefined)[]
   card?: 'summary' | 'summary_large_image'
 }): Pick<Metadata, 'openGraph' | 'twitter'> {
-  const siteName = opts.org?.name ?? 'Cup Generator'
+  const siteName = opts.org?.name ?? BRAND_NAME
   // Pass `images: []` when a file-based opengraph-image route supplies the image
   // (it becomes og:image automatically, and Twitter falls back to it).
   const picked = (opts.images ?? [opts.org?.logoUrl]).filter(Boolean) as string[]
@@ -77,7 +78,7 @@ export function socialMetadata(opts: {
     openGraph: {
       type: 'website',
       siteName,
-      locale: 'fr_BE',
+      locale: SITE_LOCALE_OG,
       title: opts.title,
       description: opts.description,
       url: opts.path ?? '/',

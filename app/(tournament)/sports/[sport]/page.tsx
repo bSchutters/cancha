@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { MarketingShell } from '@/components/marketing/shell'
 import { MiniLanding } from '@/components/marketing/mini-landing'
+import { Breadcrumbs } from '@/components/marketing/structured-data'
+import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { SPORTS } from '@/lib/marketing/content'
 
 export function generateStaticParams() {
@@ -23,9 +25,11 @@ export default async function SportPage({ params }: { params: Promise<{ sport: s
   const { sport } = await params
   const c = SPORTS.find((s) => s.slug === sport)
   if (!c) notFound()
+  const base = await getRequestBaseUrl()
   return (
     <MarketingShell>
-      <MiniLanding eyebrow={c.eyebrow} h1={c.h1} intro={c.intro} />
+      <Breadcrumbs baseUrl={base} items={[{ name: 'Accueil', href: '/' }, { name: c.name }]} />
+      <MiniLanding eyebrow={c.eyebrow} h1={c.h1} intro={c.intro} formats={c.formats} />
     </MarketingShell>
   )
 }

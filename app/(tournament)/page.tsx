@@ -3,10 +3,12 @@ import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { resolveTenant } from '@/lib/tournament/tenant'
+import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { formatEditionDate } from '@/lib/tournament/format'
 import { Badge } from '@/components/ui/badge'
 import { MarketingShell } from '@/components/marketing/shell'
 import { HomeSections } from '@/components/marketing/home'
+import { SiteJsonLd } from '@/components/marketing/structured-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,8 +30,10 @@ export default async function CupHomePage() {
   // Apex host (no organization): product landing page. Each organization's public
   // tournament list lives on its own subdomain / custom domain.
   if (!org) {
+    const base = await getRequestBaseUrl()
     return (
       <MarketingShell>
+        <SiteJsonLd baseUrl={base} />
         <HomeSections />
       </MarketingShell>
     )

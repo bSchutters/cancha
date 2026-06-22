@@ -5,7 +5,9 @@ import { cn } from '@/lib/utils'
 import { MarketingShell } from '@/components/marketing/shell'
 import { Reveal } from '@/components/marketing/motion'
 import { CtaSection } from '@/components/marketing/cta-section'
+import { Breadcrumbs } from '@/components/marketing/structured-data'
 import { display, focusRing } from '@/components/marketing/theme'
+import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { GUIDES } from '@/lib/marketing/guides'
 
 export const metadata: Metadata = {
@@ -15,9 +17,11 @@ export const metadata: Metadata = {
   alternates: { canonical: '/ressources' },
 }
 
-export default function RessourcesPage() {
+export default async function RessourcesPage() {
+  const base = await getRequestBaseUrl()
   return (
     <MarketingShell>
+      <Breadcrumbs baseUrl={base} items={[{ name: 'Accueil', href: '/' }, { name: 'Ressources' }]} />
       <section className="mx-auto max-w-3xl px-4 pb-10 pt-20 text-center sm:px-6 lg:pt-24">
         <span className="text-sm font-medium text-primary">Ressources</span>
         <h1 style={display} className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
