@@ -58,9 +58,22 @@ export function DemoExplorer() {
   const onSimulateScores = () =>
     setGroupMatches((ms) => ms.map((m, i) => ({ ...m, hs: (i * 3 + 1) % 5, as: (i * 2) % 4, locked: true })))
 
+  const onSimulateFinals = () =>
+    setKoMatches((ms) => {
+      const semis = ms.map((m) =>
+        m.id === 'SF1'
+          ? { ...m, hs: 2, as: 1, locked: true }
+          : m.id === 'SF2'
+            ? { ...m, hs: 3, as: 2, locked: true }
+            : m,
+      )
+      // Resolve the final's participants from the semis, then score + lock it.
+      return resolveKnockout(semis).map((m) => (m.id === 'F' ? { ...m, hs: 1, as: 0, locked: true } : m))
+    })
+
   // Spotlight tour target for the current step (organizer side only). Tab-aware:
   // if the relevant control lives on a hidden tab, point at the tab first.
-  const tour: { sel: string; text: string } | null = (() => {
+  const tour: { sel: string; text: string; action?: { label: string; onClick: () => void } } | null = (() => {
     if (!tourOn || view === 'public') return null
     const onDash = managerTab === 'dashboard'
     const onScores = managerTab === 'scores'
@@ -88,7 +101,17 @@ export function DemoExplorer() {
         : onDash
           ? { sel: '[data-tour="ctl-3"]', text: 'Dernière étape : terminez le tournoi.' }
           : goDash
-    return { sel: '[data-tour="view-public"]', text: 'Tournoi terminé ! Découvrez le résultat complet côté public.' }
+    return {
+      sel: '[data-tour="reset"]',
+      text: 'Bravo, le tournoi est terminé ! Réinitialisez pour tout réessayer librement, à votre rythme.',
+      action: {
+        label: 'Réinitialiser et explorer',
+        onClick: () => {
+          onReset()
+          setTourOn(false)
+        },
+      },
+    }
   })()
 
   const editArr = (id: string, fn: (m: DemoMatch) => DemoMatch) => {
@@ -159,7 +182,6 @@ export function DemoExplorer() {
               className={cn(
                 'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
                 view === v.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
-                v.key === 'public' && view === 'organisateur' && step >= 1 && 'ring-2 ring-primary/40',
               )}
             >
               {v.label}
@@ -192,6 +214,7 @@ export function DemoExplorer() {
             onStep={onStep}
             onReset={onReset}
             onSimulateScores={onSimulateScores}
+            onSimulateFinals={onSimulateFinals}
             onAddTeam={onAddTeam}
             onTogglePaid={onTogglePaid}
             onToggleConfirmed={onToggleConfirmed}
@@ -207,7 +230,7 @@ export function DemoExplorer() {
         )}
       </div>
 
-      {tour && <Spotlight selector={tour.sel} text={tour.text} onSkip={() => setTourOn(false)} />}
+      {tour && <Spotlight selector={tour.sel} text={tour.text} action={tour.action} onSkip={() => setTourOn(false)} />}
     </div>
   )
 }

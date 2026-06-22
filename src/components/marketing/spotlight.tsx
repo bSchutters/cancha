@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 /**
  * Guided-tour spotlight: dims everything except the targeted element (matched by
@@ -9,7 +10,17 @@ import { cn } from '@/lib/utils'
  * bubble is a child of the highlighted box so they move together (no jitter on
  * scroll). The target stays clickable (overlay is pointer-events-none).
  */
-export function Spotlight({ selector, text, onSkip }: { selector: string; text: string; onSkip: () => void }) {
+export function Spotlight({
+  selector,
+  text,
+  action,
+  onSkip,
+}: {
+  selector: string
+  text: string
+  action?: { label: string; onClick: () => void }
+  onSkip: () => void
+}) {
   const [rect, setRect] = useState<DOMRect | null>(null)
 
   useEffect(() => {
@@ -71,6 +82,11 @@ export function Spotlight({ selector, text, onSkip }: { selector: string; text: 
           style={{ left: tipShiftX }}
         >
           <p className="text-sm text-foreground">{text}</p>
+          {action && (
+            <Button size="sm" className="mt-3 w-full" onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
           <button
             type="button"
             onClick={onSkip}

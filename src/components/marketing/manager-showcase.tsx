@@ -66,6 +66,7 @@ export function ManagerShowcase({
   onStep,
   onReset,
   onSimulateScores,
+  onSimulateFinals,
   onAddTeam,
   onTogglePaid,
   onToggleConfirmed,
@@ -82,6 +83,7 @@ export function ManagerShowcase({
   onStep: (i: number) => void
   onReset: () => void
   onSimulateScores: () => void
+  onSimulateFinals: () => void
   onAddTeam: (name: string) => void
   onTogglePaid: (id: number) => void
   onToggleConfirmed: (id: number) => void
@@ -145,6 +147,7 @@ export function ManagerShowcase({
           </div>
           <button
             type="button"
+            data-tour="reset"
             onClick={onReset}
             className="inline-flex shrink-0 cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -218,13 +221,19 @@ export function ManagerShowcase({
             </div>
           ) : (
             <div className="space-y-4">
-              {matches.some((m) => m.phase === 'group' && !m.locked) && (
+              {(matches.some((m) => m.phase === 'group' && !m.locked) ||
+                matches.some((m) => m.phase === 'knockout' && !m.locked)) && (
                 <div
                   data-tour="scores-area"
                   className="flex flex-col items-start justify-between gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] p-4 sm:flex-row sm:items-center"
                 >
                   <p className="text-sm text-foreground">Pas envie de tout saisir match par match ?</p>
-                  <Button type="button" size="sm" onClick={onSimulateScores} className="shrink-0">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={matches.some((m) => m.phase === 'group' && !m.locked) ? onSimulateScores : onSimulateFinals}
+                    className="shrink-0"
+                  >
                     Remplir automatiquement
                   </Button>
                 </div>
