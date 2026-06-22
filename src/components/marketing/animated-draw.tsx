@@ -3,52 +3,16 @@
 import { useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { Dices } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { display } from './theme'
 
 gsap.registerPlugin(useGSAP)
 
-const TEAMS = [
-  'Real Sporting',
-  'AS Tonnerre',
-  'Les Lynx',
-  'FC Comète',
-  'Olympic 7',
-  'Stade Central',
-  'Les Aigles',
-  'Dynamo Nord',
-  'Étoile Sud',
-  'US Vaillante',
-  'Les Panthères',
-  'Racing Est',
-  'FC Horizon',
-  'Les Faucons',
-  'Atlético Parc',
-  'Union Libre',
-]
-const POOL_NAMES = ['Poule A', 'Poule B', 'Poule C', 'Poule D']
-
-function distribute(teams: string[]): string[][] {
-  const pools: string[][] = [[], [], [], []]
-  teams.forEach((t, i) => pools[i % 4].push(t))
-  return pools
-}
-
-function shuffle(arr: string[]): string[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
-/** Animated pool draw: teams drop into their group with a staggered reveal. */
-export function AnimatedDraw() {
+/** Animated reveal of the drawn pools (the real draw result). */
+export function AnimatedDraw({ pools }: { pools: { label: string; teams: string[] }[] }) {
   const root = useRef<HTMLDivElement>(null)
-  const [order, setOrder] = useState<string[]>(TEAMS)
-  const pools = distribute(order)
+  const [replay, setReplay] = useState(0)
 
   const { contextSafe } = useGSAP(
     () => {
@@ -60,14 +24,14 @@ export function AnimatedDraw() {
           scale: 0.9,
           duration: 0.45,
           ease: 'back.out(1.6)',
-          stagger: { each: 0.045, from: 'start' },
+          stagger: { each: 0.05, from: 'start' },
         })
       })
     },
-    { scope: root, dependencies: [order], revertOnUpdate: true },
+    { scope: root, dependencies: [replay, pools] },
   )
 
-  const replay = contextSafe(() => setOrder(shuffle(TEAMS)))
+  const rejouer = contextSafe(() => setReplay((r) => r + 1))
 
   return (
     <div ref={root}>
@@ -75,18 +39,18 @@ export function AnimatedDraw() {
         <span style={display} className="font-medium">
           Tirage des poules
         </span>
-        <Button size="sm" variant="secondary" onClick={replay}>
-          <Dices className="size-4" />
-          Relancer le tirage
+        <Button size="sm" variant="secondary" onClick={rejouer}>
+          <RotateCcw className="size-4" />
+          Rejouer l’animation
         </Button>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {pools.map((teams, pi) => (
-          <div key={pi} className="rounded-2xl border border-border bg-card p-4">
-            <div className="mb-3 text-sm font-medium text-primary">{POOL_NAMES[pi]}</div>
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {pools.map((pool) => (
+          <div key={pool.label} className="rounded-2xl border border-border bg-card p-4">
+            <div className="mb-3 text-sm font-medium text-primary">Poule {pool.label}</div>
             <div className="space-y-2">
-              {teams.map((t) => (
+              {pool.teams.map((t) => (
                 <div
                   key={t}
                   className="draw-chip flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm"

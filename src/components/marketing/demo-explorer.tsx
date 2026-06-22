@@ -4,32 +4,84 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ManagerShowcase } from './manager-showcase'
 import { DemoShowcase } from './demo-showcase'
-import { INITIAL_DEMO_MATCHES, type DemoMatch } from '@/lib/marketing/demo-data'
+import {
+  INITIAL_TEAMS,
+  POOLS,
+  buildGroupMatches,
+  buildKnockout,
+  computeGroups,
+  drawPools,
+  resolveKnockout,
+  toPublicMatch,
+  type DemoMatch,
+  type DemoTeam,
+  type Step,
+} from '@/lib/marketing/demo-engine'
 
 type View = 'organisateur' | 'public'
 
 const VIEWS: { key: View; label: string; caption: string }[] = [
-  { key: 'organisateur', label: 'Côté organisateur', caption: 'Votre poste de pilotage : scores, équipes, déroulé du tournoi.' },
+  { key: 'organisateur', label: 'Côté organisateur', caption: 'Votre poste de pilotage : du tirage aux scores, étape par étape.' },
   { key: 'public', label: 'Côté public', caption: 'Ce que voient les équipes et les spectateurs, en direct.' },
 ]
 
 /**
- * Lets the visitor switch between the manager dashboard and the public view.
- * Match scores live here so a score saved on the organizer side flows into the
- * public standings + calendar (the real link between the two sides).
+ * Drives a coherent end-to-end tournament simulation and shares it between the
+ * organizer and public views. Steps run from the control center: a registered
+ * team flows into the draw, the calendar, the scores, the standings and the
+ * knockout, visible on both sides live.
  */
 export function DemoExplorer() {
   const [view, setView] = useState<View>('organisateur')
-  const [matches, setMatches] = useState<DemoMatch[]>(INITIAL_DEMO_MATCHES)
-  const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0]
+  const [teams, setTeams] = useState<DemoTeam[]>(INITIAL_TEAMS)
+  const [step, setStep] = useState<Step>(0)
+  const [groupMatches, setGroupMatches] = useState<DemoMatch[]>([])
+  const [koMatches, setKoMatches] = useState<DemoMatch[]>([])
+  const [seq, setSeq] = useState(100)
 
-  const onDelta = (i: number, side: 'hs' | 'as', d: number) =>
-    setMatches((ms) => ms.map((m, idx) => (idx === i && !m.locked ? { ...m, [side]: Math.max(0, m[side] + d) } : m)))
-  const onToggleLock = (i: number) =>
-    setMatches((ms) => ms.map((m, idx) => (idx === i ? { ...m, locked: !m.locked } : m)))
-  // Reset clears the tournament: matches back to unplayed, which empties the
-  // public standings/calendar too (the two sides stay in sync).
-  const onReset = () => setMatches((ms) => ms.map((m) => ({ ...m, hs: 0, as: 0, locked: false })))
+  const groups = computeGroups(teams, groupMatches)
+  const ko = resolveKnockout(koMatches)
+  const editableMatches = [...groupMatches, ...ko]
+  const drawnPools = POOLS.map((p) => ({ label: p, teams: teams.filter((t) => t.pool === p).map((t) => t.name) }))
+
+  const editArr = (id: string, fn: (m: DemoMatch) => DemoMatch) => {
+    setGroupMatches((a) => a.map((m) => (m.id === id ? fn(m) : m)))
+    setKoMatches((a) => a.map((m) => (m.id === id ? fn(m) : m)))
+  }
+  const onScore = (id: string, side: 'hs' | 'as', d: number) =>
+    editArr(id, (m) => (m.locked ? m : { ...m, [side]: Math.max(0, m[side] + d) }))
+  const onToggleLock = (id: string) => editArr(id, (m) => ({ ...m, locked: !m.locked }))
+
+  const onStep = (i: number) => {
+    if (i === 0) {
+      setTeams((ts) => drawPools(ts))
+      setStep(1)
+    } else if (i === 1) {
+      setGroupMatches(buildGroupMatches(teams))
+      setStep(2)
+    } else if (i === 2) {
+      setKoMatches(buildKnockout(computeGroups(teams, groupMatches)))
+      setStep(3)
+    } else if (i === 3) {
+      setStep(4)
+    }
+  }
+  const onReset = () => {
+    setTeams(INITIAL_TEAMS)
+    setStep(0)
+    setGroupMatches([])
+    setKoMatches([])
+  }
+
+  const onAddTeam = (name: string) => {
+    setTeams((ts) => [...ts, { id: seq, name, pool: null, confirmed: true, paid: false }])
+    setSeq((s) => s + 1)
+  }
+  const onTogglePaid = (id: number) => setTeams((ts) => ts.map((t) => (t.id === id ? { ...t, paid: !t.paid } : t)))
+  const onToggleConfirmed = (id: number) =>
+    setTeams((ts) => ts.map((t) => (t.id === id ? { ...t, confirmed: !t.confirmed } : t)))
+
+  const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0]
 
   return (
     <div>
@@ -52,15 +104,32 @@ export function DemoExplorer() {
         </div>
         <p className="text-sm text-muted-foreground">{current.caption}</p>
         <p className="text-xs text-primary">
-          Astuce : saisissez un score côté organisateur, puis basculez côté public pour le voir apparaître.
+          Déroulez le tournoi côté organisateur (tirage, calendrier, scores), puis basculez côté public.
         </p>
       </div>
 
       <div className="mt-8">
         {view === 'organisateur' ? (
-          <ManagerShowcase matches={matches} onDelta={onDelta} onToggleLock={onToggleLock} onReset={onReset} />
+          <ManagerShowcase
+            teams={teams}
+            step={step}
+            matches={editableMatches}
+            onScore={onScore}
+            onToggleLock={onToggleLock}
+            onStep={onStep}
+            onReset={onReset}
+            onAddTeam={onAddTeam}
+            onTogglePaid={onTogglePaid}
+            onToggleConfirmed={onToggleConfirmed}
+          />
         ) : (
-          <DemoShowcase matches={matches} />
+          <DemoShowcase
+            step={step}
+            pools={drawnPools}
+            groups={groups}
+            groupMatches={groupMatches.map((m) => toPublicMatch(m, teams))}
+            knockout={ko.map((m) => toPublicMatch(m, teams))}
+          />
         )}
       </div>
     </div>

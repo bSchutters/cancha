@@ -2,25 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  CalendarClock,
-  Check,
-  Dices,
-  Flag,
-  Lock,
-  Minus,
-  Pencil,
-  Plus,
-  RotateCcw,
-  Trophy,
-  Users,
-} from 'lucide-react'
+import { CalendarClock, Check, Dices, Flag, Lock, Minus, Pencil, Plus, RotateCcw, Trophy, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { DEMO_KNOCKOUT, type DemoMatch } from '@/lib/marketing/demo-data'
+import { nameById, type DemoMatch, type DemoTeam, type Step } from '@/lib/marketing/demo-engine'
 
 type TabKey = 'dashboard' | 'scores' | 'teams'
-type Team = { id: number; name: string; pool: string | null; confirmed: boolean; paid: boolean }
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: 'Tableau de bord' },
@@ -33,15 +20,6 @@ const CONTROL_STEPS = [
   { icon: CalendarClock, label: 'Générer le calendrier' },
   { icon: Trophy, label: 'Phase finale' },
   { icon: Flag, label: 'Terminer le tournoi' },
-]
-
-const INITIAL_TEAMS: Team[] = [
-  { id: 1, name: 'Real Sporting', pool: 'A', confirmed: true, paid: true },
-  { id: 2, name: 'AS Tonnerre', pool: 'A', confirmed: true, paid: true },
-  { id: 3, name: 'Les Lynx', pool: 'A', confirmed: true, paid: false },
-  { id: 4, name: 'FC Comète', pool: 'A', confirmed: true, paid: true },
-  { id: 5, name: 'Olympic 7', pool: 'B', confirmed: true, paid: true },
-  { id: 6, name: 'Stade Central', pool: 'B', confirmed: false, paid: false },
 ]
 
 function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: number) => void; disabled: boolean }) {
@@ -71,45 +49,49 @@ function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: num
 }
 
 /**
- * Interactive (non-persistent) preview of the organizer dashboard, mirroring the
- * real DashboardClient / ScoresClient / TeamsClient. Match scores are lifted to
- * the parent (DemoExplorer) so they flow into the public view.
+ * Interactive (non-persistent) organizer dashboard driving the shared simulation.
+ * Mirrors the real DashboardClient / ScoresClient / TeamsClient.
  */
 export function ManagerShowcase({
+  teams,
+  step,
   matches,
-  onDelta,
+  onScore,
   onToggleLock,
+  onStep,
   onReset,
+  onAddTeam,
+  onTogglePaid,
+  onToggleConfirmed,
 }: {
+  teams: DemoTeam[]
+  step: Step
   matches: DemoMatch[]
-  onDelta: (i: number, side: 'hs' | 'as', d: number) => void
-  onToggleLock: (i: number) => void
+  onScore: (id: string, side: 'hs' | 'as', d: number) => void
+  onToggleLock: (id: string) => void
+  onStep: (i: number) => void
   onReset: () => void
+  onAddTeam: (name: string) => void
+  onTogglePaid: (id: number) => void
+  onToggleConfirmed: (id: number) => void
 }) {
   const [tab, setTab] = useState<TabKey>('dashboard')
-  const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS)
-  const [doneSteps, setDoneSteps] = useState(3)
-  const [seq, setSeq] = useState(100)
   const [newName, setNewName] = useState('')
 
   const stats = [
     { label: 'Inscrites', value: teams.length },
     { label: 'Confirmées', value: teams.filter((t) => t.confirmed).length },
     { label: 'Payées', value: teams.filter((t) => t.paid).length },
-    { label: 'Matchs', value: matches.length + DEMO_KNOCKOUT.length },
+    { label: 'Matchs', value: matches.length },
   ]
 
   const addTeam = (e: React.FormEvent) => {
     e.preventDefault()
     const name = newName.trim()
     if (!name) return
-    setTeams((ts) => [...ts, { id: seq, name, pool: null, confirmed: true, paid: false }])
-    setSeq((s) => s + 1)
+    onAddTeam(name)
     setNewName('')
   }
-  const togglePaid = (id: number) => setTeams((ts) => ts.map((t) => (t.id === id ? { ...t, paid: !t.paid } : t)))
-  const toggleConfirmed = (id: number) =>
-    setTeams((ts) => ts.map((t) => (t.id === id ? { ...t, confirmed: !t.confirmed } : t)))
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
@@ -117,7 +99,9 @@ export function ManagerShowcase({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-bold sm:text-xl">Tournoi démo</h3>
-            <span className="rounded-md bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-700">En cours</span>
+            <span className="rounded-md bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-700">
+              {step === 0 ? 'Inscriptions' : step >= 4 ? 'Terminé' : 'En cours'}
+            </span>
           </div>
           <span className="text-xs text-muted-foreground">Tableau de bord organisateur</span>
         </div>
@@ -156,10 +140,7 @@ export function ManagerShowcase({
                 <h4 className="font-bold text-primary">Centre de contrôle</h4>
                 <button
                   type="button"
-                  onClick={() => {
-                    setDoneSteps(0)
-                    onReset()
-                  }}
+                  onClick={onReset}
                   className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <RotateCcw className="size-3.5" /> Réinitialiser
@@ -170,14 +151,14 @@ export function ManagerShowcase({
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {CONTROL_STEPS.map((c, i) => {
-                  const done = i < doneSteps
-                  const available = i === doneSteps
+                  const done = i < step
+                  const available = i === step
                   return (
                     <button
                       key={c.label}
                       type="button"
                       disabled={!available}
-                      onClick={() => setDoneSteps(i + 1)}
+                      onClick={() => onStep(i)}
                       className={cn(
                         'flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors',
                         done && 'border-primary/30 bg-primary/5',
@@ -201,42 +182,56 @@ export function ManagerShowcase({
           </>
         )}
 
-        {tab === 'scores' && (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {matches.map((m, i) => (
-              <div key={m.code} className={cn('rounded-lg border border-border p-4', m.locked ? 'bg-muted/40' : 'bg-card')}>
-                <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="flex items-center gap-2">
-                    <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{m.code}</span>
-                    {m.time} · Terrain {m.court}
-                  </span>
-                  <span>Poule {m.pool}</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate text-sm">{m.home}</span>
-                    <Stepper value={m.hs} disabled={m.locked} onDelta={(d) => onDelta(i, 'hs', d)} />
+        {tab === 'scores' &&
+          (matches.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center text-sm text-muted-foreground">
+              Générez le calendrier dans le centre de contrôle pour saisir les scores.
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {matches.map((m) => {
+                const home = nameById(teams, m.homeId)
+                const away = nameById(teams, m.awayId)
+                const ready = Boolean(home && away)
+                return (
+                  <div key={m.id} className={cn('rounded-lg border border-border p-4', m.locked ? 'bg-muted/40' : 'bg-card')}>
+                    <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="flex items-center gap-2">
+                        <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{m.code}</span>
+                        {m.time} · Terrain {m.court}
+                      </span>
+                      <span>{m.pool ? `Poule ${m.pool}` : m.bracketLabel}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={cn('min-w-0 truncate text-sm', !home && 'italic text-muted-foreground')}>
+                          {home ?? 'À déterminer'}
+                        </span>
+                        <Stepper value={m.hs} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'hs', d)} />
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={cn('min-w-0 truncate text-sm', !away && 'italic text-muted-foreground')}>
+                          {away ?? 'À déterminer'}
+                        </span>
+                        <Stepper value={m.as} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'as', d)} />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-end">
+                      {m.locked ? (
+                        <Button type="button" size="sm" variant="secondary" onClick={() => onToggleLock(m.id)}>
+                          <Pencil className="size-3.5" /> Modifier
+                        </Button>
+                      ) : (
+                        <Button type="button" size="sm" disabled={!ready} onClick={() => onToggleLock(m.id)}>
+                          Enregistrer
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate text-sm">{m.away}</span>
-                    <Stepper value={m.as} disabled={m.locked} onDelta={(d) => onDelta(i, 'as', d)} />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-end">
-                  {m.locked ? (
-                    <Button type="button" size="sm" variant="secondary" onClick={() => onToggleLock(i)}>
-                      <Pencil className="size-3.5" /> Modifier
-                    </Button>
-                  ) : (
-                    <Button type="button" size="sm" onClick={() => onToggleLock(i)}>
-                      Enregistrer
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                )
+              })}
+            </div>
+          ))}
 
         {tab === 'teams' && (
           <div className="space-y-4">
@@ -264,7 +259,7 @@ export function ManagerShowcase({
                   <span className="flex shrink-0 items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => toggleConfirmed(t.id)}
+                      onClick={() => onToggleConfirmed(t.id)}
                       className={cn(
                         'cursor-pointer rounded-md px-2 py-0.5 text-xs font-medium transition-colors',
                         t.confirmed ? 'bg-emerald-500/15 text-emerald-700' : 'bg-amber-500/15 text-amber-700',
@@ -274,7 +269,7 @@ export function ManagerShowcase({
                     </button>
                     <button
                       type="button"
-                      onClick={() => togglePaid(t.id)}
+                      onClick={() => onTogglePaid(t.id)}
                       className={cn('cursor-pointer text-xs transition-colors', t.paid ? 'text-emerald-700' : 'text-muted-foreground hover:text-foreground')}
                     >
                       {t.paid ? 'Payé' : 'En attente'}
@@ -284,7 +279,7 @@ export function ManagerShowcase({
               ))}
             </div>
             <p className="text-xs text-muted-foreground">
-              Cliquez les statuts pour les changer, ajoutez une équipe : tout réagit en direct (aperçu non
+              Ajoutez une équipe, changez les statuts : les poules seront attribuées au tirage (aperçu non
               enregistré).
             </p>
           </div>
