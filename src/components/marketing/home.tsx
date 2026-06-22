@@ -16,11 +16,11 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Bracket } from '@/components/tournament/Bracket'
 import { MatchCard } from '@/components/tournament/MatchList'
-import { DEMO_KNOCKOUT, DEMO_GROUP_MATCHES } from '@/lib/marketing/demo-data'
+import { DEMO_GROUP_MATCHES } from '@/lib/marketing/demo-data'
 import { COMPARISON } from '@/lib/marketing/content'
 import { HeroScreen } from './hero-screen'
+import { HeroBracket } from './hero-bracket'
 import { display, focusRing } from './theme'
 import { Reveal } from './motion'
 import { CtaSection } from './cta-section'
@@ -278,8 +278,10 @@ export function HomeSections() {
                 </h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                 {f.preview === 'bracket' && (
-                  <div className="mt-5 overflow-x-auto rounded-xl border border-border bg-background p-3">
-                    <Bracket matches={DEMO_KNOCKOUT} size="sm" />
+                  <div className="mt-5 rounded-xl border border-border bg-background p-4">
+                    <div className="mx-auto max-w-[320px]">
+                      <HeroBracket />
+                    </div>
                   </div>
                 )}
                 {f.preview === 'matches' && (
