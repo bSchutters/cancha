@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ManagerShowcase } from './manager-showcase'
+import { Button } from '@/components/ui/button'
+import { ManagerShowcase, type TabKey } from './manager-showcase'
 import { DemoShowcase } from './demo-showcase'
 import { Spotlight } from './spotlight'
 import {
@@ -39,33 +41,55 @@ export function DemoExplorer() {
   const [groupMatches, setGroupMatches] = useState<DemoMatch[]>([])
   const [koMatches, setKoMatches] = useState<DemoMatch[]>([])
   const [seq, setSeq] = useState(100)
-  const [tourOn, setTourOn] = useState(true)
+  const [tourOn, setTourOn] = useState(false)
+  const [managerTab, setManagerTab] = useState<TabKey>('dashboard')
+  const [sawAfterGroups, setSawAfterGroups] = useState(false)
+  const [sawAfterFinals, setSawAfterFinals] = useState(false)
 
   const groups = computeGroups(teams, groupMatches)
   const ko = resolveKnockout(koMatches)
   const editableMatches = [...groupMatches, ...ko]
   const drawnPools = POOLS.map((p) => ({ label: p, teams: teams.filter((t) => t.pool === p).map((t) => t.name) }))
-  // The knockout can only start once every group match is played (saved).
+  // The knockout can only start once every group match is played (saved); the
+  // tournament can only finish once the knockout is played too.
   const groupReady = groupMatches.length > 0 && groupMatches.every((m) => m.locked)
+  const koReady = koMatches.length > 0 && koMatches.every((m) => m.locked)
 
   const onSimulateScores = () =>
     setGroupMatches((ms) => ms.map((m, i) => ({ ...m, hs: (i * 3 + 1) % 5, as: (i * 2) % 4, locked: true })))
 
-  // Spotlight tour target for the current step (organizer side only).
-  const tour =
-    !tourOn || view === 'public'
-      ? null
-      : step === 0
-        ? { sel: '[data-tour="ctl-0"]', text: 'Cliquez ici pour lancer le tirage des poules.' }
-        : step === 1
-          ? { sel: '[data-tour="ctl-1"]', text: 'Générez le calendrier des matchs.' }
-          : step === 2 && !groupReady
-            ? { sel: '[data-tour="tab-scores"]', text: 'Ouvrez l’onglet Scores et enregistrez chaque match.' }
-            : step === 2
-              ? { sel: '[data-tour="ctl-2"]', text: 'Les scores sont saisis : générez la phase finale.' }
-              : step === 3
-                ? { sel: '[data-tour="ctl-3"]', text: 'Dernière étape : terminez le tournoi.' }
-                : { sel: '[data-tour="view-public"]', text: 'Tournoi terminé ! Découvrez le résultat côté public.' }
+  // Spotlight tour target for the current step (organizer side only). Tab-aware:
+  // if the relevant control lives on a hidden tab, point at the tab first.
+  const tour: { sel: string; text: string } | null = (() => {
+    if (!tourOn || view === 'public') return null
+    const onDash = managerTab === 'dashboard'
+    const onScores = managerTab === 'scores'
+    const goDash = { sel: '[data-tour="tab-dashboard"]', text: 'Ouvrez le Tableau de bord pour continuer.' }
+    const goScores = { sel: '[data-tour="tab-scores"]', text: 'Ouvrez l’onglet Scores pour saisir les matchs.' }
+    if (step === 0) return onDash ? { sel: '[data-tour="ctl-0"]', text: 'Cliquez ici pour lancer le tirage des poules.' } : goDash
+    if (step === 1) return onDash ? { sel: '[data-tour="ctl-1"]', text: 'Générez le calendrier des matchs.' } : goDash
+    if (step === 2 && !groupReady)
+      return onScores
+        ? { sel: '[data-tour="scores-area"]', text: 'Le plus rapide : cliquez « Remplir automatiquement » (ou saisissez les scores un par un).' }
+        : goScores
+    if (step === 2)
+      return !sawAfterGroups
+        ? { sel: '[data-tour="view-public"]', text: 'Scores enregistrés ! Allez voir le classement se remplir côté public.' }
+        : onDash
+          ? { sel: '[data-tour="ctl-2"]', text: 'Maintenant, générez la phase finale.' }
+          : goDash
+    if (step === 3 && !koReady)
+      return onScores
+        ? { sel: '[data-tour="tab-scores"]', text: 'Saisissez les scores des demi-finales et de la finale.' }
+        : goScores
+    if (step === 3)
+      return !sawAfterFinals
+        ? { sel: '[data-tour="view-public"]', text: 'Allez voir l’arbre de la phase finale côté public, avant de terminer.' }
+        : onDash
+          ? { sel: '[data-tour="ctl-3"]', text: 'Dernière étape : terminez le tournoi.' }
+          : goDash
+    return { sel: '[data-tour="view-public"]', text: 'Tournoi terminé ! Découvrez le résultat complet côté public.' }
+  })()
 
   const editArr = (id: string, fn: (m: DemoMatch) => DemoMatch) => {
     setGroupMatches((a) => a.map((m) => (m.id === id ? fn(m) : m)))
@@ -87,6 +111,7 @@ export function DemoExplorer() {
       setKoMatches(buildKnockout(computeGroups(teams, groupMatches)))
       setStep(3)
     } else if (i === 3) {
+      if (!koReady) return
       setStep(4)
     }
   }
@@ -95,6 +120,19 @@ export function DemoExplorer() {
     setStep(0)
     setGroupMatches([])
     setKoMatches([])
+    setManagerTab('dashboard')
+    setSawAfterGroups(false)
+    setSawAfterFinals(false)
+  }
+
+  // Switching to the public side after a milestone marks it as "seen", so the
+  // tour can send the visitor to admire the result before moving on.
+  const selectView = (v: View) => {
+    if (v === 'public') {
+      if (groupReady) setSawAfterGroups(true)
+      if (koReady) setSawAfterFinals(true)
+    }
+    setView(v)
   }
 
   const onAddTeam = (name: string) => {
@@ -116,11 +154,12 @@ export function DemoExplorer() {
               key={v.key}
               type="button"
               data-tour={v.key === 'public' ? 'view-public' : undefined}
-              onClick={() => setView(v.key)}
+              onClick={() => selectView(v.key)}
               aria-pressed={view === v.key}
               className={cn(
                 'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
                 view === v.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                v.key === 'public' && view === 'organisateur' && step >= 1 && 'ring-2 ring-primary/40',
               )}
             >
               {v.label}
@@ -131,6 +170,11 @@ export function DemoExplorer() {
         <p className="text-xs text-primary">
           Déroulez le tournoi côté organisateur (tirage, calendrier, scores), puis basculez côté public.
         </p>
+        {!tourOn && view === 'organisateur' && (
+          <Button size="sm" variant="secondary" onClick={() => setTourOn(true)}>
+            <Sparkles className="size-4" /> Lancer le guide pas à pas
+          </Button>
+        )}
       </div>
 
       <div className="mt-8">
@@ -138,8 +182,11 @@ export function DemoExplorer() {
           <ManagerShowcase
             teams={teams}
             step={step}
+            tab={managerTab}
             matches={editableMatches}
             canKnockout={groupReady}
+            canFinish={koReady}
+            onTab={setManagerTab}
             onScore={onScore}
             onToggleLock={onToggleLock}
             onStep={onStep}

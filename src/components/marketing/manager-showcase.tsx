@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { nameById, type DemoMatch, type DemoTeam, type Step } from '@/lib/marketing/demo-engine'
 
-type TabKey = 'dashboard' | 'scores' | 'teams'
+export type TabKey = 'dashboard' | 'scores' | 'teams'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: 'Tableau de bord' },
@@ -50,13 +50,17 @@ function Stepper({ value, onDelta, disabled }: { value: number; onDelta: (d: num
 
 /**
  * Interactive (non-persistent) organizer dashboard driving the shared simulation.
- * Mirrors the real DashboardClient / ScoresClient / TeamsClient.
+ * Mirrors the real DashboardClient / ScoresClient / TeamsClient. The active tab is
+ * lifted to the parent so the guided tour can keep its highlight on a visible tab.
  */
 export function ManagerShowcase({
   teams,
   step,
+  tab,
   matches,
   canKnockout,
+  canFinish,
+  onTab,
   onScore,
   onToggleLock,
   onStep,
@@ -68,8 +72,11 @@ export function ManagerShowcase({
 }: {
   teams: DemoTeam[]
   step: Step
+  tab: TabKey
   matches: DemoMatch[]
   canKnockout: boolean
+  canFinish: boolean
+  onTab: (t: TabKey) => void
   onScore: (id: string, side: 'hs' | 'as', d: number) => void
   onToggleLock: (id: string) => void
   onStep: (i: number) => void
@@ -79,7 +86,6 @@ export function ManagerShowcase({
   onTogglePaid: (id: number) => void
   onToggleConfirmed: (id: number) => void
 }) {
-  const [tab, setTab] = useState<TabKey>('dashboard')
   const [newName, setNewName] = useState('')
 
   const stats = [
@@ -96,29 +102,6 @@ export function ManagerShowcase({
     onAddTeam(name)
     setNewName('')
   }
-
-  // Progressive coach: guide the visitor to do each step themselves (point to
-  // the right place + track progress), rather than a one-click do-it-all button.
-  const groupMatches = matches.filter((m) => m.phase === 'group')
-  const savedGroup = groupMatches.filter((m) => m.locked).length
-  const totalGroup = groupMatches.length
-
-  const coach: { n: number; text: string; nav: { label: string; to: TabKey } | null } =
-    step === 0
-      ? { n: 1, text: 'Dans le centre de contrôle, cliquez sur « Tirage des poules ».', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
-      : step === 1
-        ? { n: 2, text: 'Cliquez sur « Générer le calendrier » dans le centre de contrôle.', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
-        : step === 2 && !canKnockout
-          ? {
-              n: 3,
-              text: `Saisissez le score de chaque match dans l'onglet Scores, puis enregistrez (${savedGroup}/${totalGroup} faits).`,
-              nav: { label: 'Aller aux scores', to: 'scores' },
-            }
-          : step === 2
-            ? { n: 3, text: 'Tous les scores sont saisis. Cliquez « Phase finale » dans le centre de contrôle.', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
-            : step === 3
-              ? { n: 4, text: 'Saisissez les scores des demi-finales, puis cliquez « Terminer le tournoi ».', nav: { label: 'Aller aux scores', to: 'scores' } }
-              : { n: 4, text: 'Tournoi terminé. Basculez côté public pour voir le résultat.', nav: null }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
@@ -137,8 +120,8 @@ export function ManagerShowcase({
             <button
               key={t.key}
               type="button"
-              data-tour={t.key === 'scores' ? 'tab-scores' : undefined}
-              onClick={() => setTab(t.key)}
+              data-tour={t.key === 'dashboard' ? 'tab-dashboard' : t.key === 'scores' ? 'tab-scores' : undefined}
+              onClick={() => onTab(t.key)}
               aria-pressed={tab === t.key}
               className={cn(
                 '-mb-px shrink-0 cursor-pointer border-b-2 px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
@@ -152,22 +135,21 @@ export function ManagerShowcase({
       </div>
 
       <div className="space-y-6 bg-secondary/30 p-5 sm:p-7">
-        {/* Guided next-step coach */}
-        <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-              {coach.n}
-            </span>
-            <div>
-              <div className="text-xs font-medium uppercase tracking-wide text-primary">Étape {coach.n} / 4</div>
-              <p className="mt-0.5 text-sm text-foreground">{coach.text}</p>
-            </div>
+        {/* Quiet progress strip (the spotlight carries the instruction) */}
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-2.5">
+          <span className="shrink-0 text-xs font-medium text-muted-foreground">
+            {step >= 4 ? 'Tournoi terminé' : `Étape ${step + 1} / 4`}
+          </span>
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
+            <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${(step / 4) * 100}%` }} />
           </div>
-          {coach.nav && (
-            <Button size="sm" variant="secondary" onClick={() => setTab(coach.nav!.to)} className="shrink-0">
-              {coach.nav.label}
-            </Button>
-          )}
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex shrink-0 cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <RotateCcw className="size-3.5" /> Réinitialiser
+          </button>
         </div>
 
         {tab === 'dashboard' && (
@@ -182,24 +164,14 @@ export function ManagerShowcase({
             </div>
 
             <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <h4 className="font-bold text-primary">Centre de contrôle</h4>
-                <button
-                  type="button"
-                  onClick={onReset}
-                  className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <RotateCcw className="size-3.5" /> Réinitialiser
-                </button>
-              </div>
+              <h4 className="mb-1 font-bold text-primary">Centre de contrôle</h4>
               <p className="mb-4 text-xs text-muted-foreground">
                 Déroulez le tournoi étape par étape. Cliquez l’étape disponible pour la valider.
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {CONTROL_STEPS.map((c, i) => {
+                  const blocked = i === step && ((i === 2 && !canKnockout) || (i === 3 && !canFinish))
                   const done = i < step
-                  // "Phase finale" (i === 2) stays blocked until every group score is saved.
-                  const blocked = i === step && i === 2 && !canKnockout
                   const available = i === step && !blocked
                   return (
                     <button
@@ -225,9 +197,11 @@ export function ManagerShowcase({
                           ? 'Fait'
                           : available
                             ? 'Cliquez pour valider'
-                            : blocked
+                            : blocked && i === 2
                               ? 'Saisissez les scores de poule'
-                              : 'Verrouillé'}
+                              : blocked && i === 3
+                                ? 'Saisissez les scores de la finale'
+                                : 'Verrouillé'}
                       </span>
                     </button>
                   )
@@ -245,54 +219,58 @@ export function ManagerShowcase({
           ) : (
             <div className="space-y-4">
               {matches.some((m) => m.phase === 'group' && !m.locked) && (
-                <div className="flex justify-end">
-                  <Button type="button" size="sm" variant="secondary" onClick={onSimulateScores}>
-                    Simuler les scores
+                <div
+                  data-tour="scores-area"
+                  className="flex flex-col items-start justify-between gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] p-4 sm:flex-row sm:items-center"
+                >
+                  <p className="text-sm text-foreground">Pas envie de tout saisir match par match ?</p>
+                  <Button type="button" size="sm" onClick={onSimulateScores} className="shrink-0">
+                    Remplir automatiquement
                   </Button>
                 </div>
               )}
               <div className="grid gap-3 sm:grid-cols-2">
-              {matches.map((m) => {
-                const home = nameById(teams, m.homeId)
-                const away = nameById(teams, m.awayId)
-                const ready = Boolean(home && away)
-                return (
-                  <div key={m.id} className={cn('rounded-lg border border-border p-4', m.locked ? 'bg-muted/40' : 'bg-card')}>
-                    <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="flex items-center gap-2">
-                        <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{m.code}</span>
-                        {m.time} · Terrain {m.court}
-                      </span>
-                      <span>{m.pool ? `Poule ${m.pool}` : m.bracketLabel}</span>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={cn('min-w-0 truncate text-sm', !home && 'italic text-muted-foreground')}>
-                          {home ?? 'À déterminer'}
+                {matches.map((m) => {
+                  const home = nameById(teams, m.homeId)
+                  const away = nameById(teams, m.awayId)
+                  const ready = Boolean(home && away)
+                  return (
+                    <div key={m.id} className={cn('rounded-lg border border-border p-4', m.locked ? 'bg-muted/40' : 'bg-card')}>
+                      <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                          <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{m.code}</span>
+                          {m.time} · Terrain {m.court}
                         </span>
-                        <Stepper value={m.hs} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'hs', d)} />
+                        <span>{m.pool ? `Poule ${m.pool}` : m.bracketLabel}</span>
                       </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={cn('min-w-0 truncate text-sm', !away && 'italic text-muted-foreground')}>
-                          {away ?? 'À déterminer'}
-                        </span>
-                        <Stepper value={m.as} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'as', d)} />
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={cn('min-w-0 truncate text-sm', !home && 'italic text-muted-foreground')}>
+                            {home ?? 'À déterminer'}
+                          </span>
+                          <Stepper value={m.hs} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'hs', d)} />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={cn('min-w-0 truncate text-sm', !away && 'italic text-muted-foreground')}>
+                            {away ?? 'À déterminer'}
+                          </span>
+                          <Stepper value={m.as} disabled={m.locked || !ready} onDelta={(d) => onScore(m.id, 'as', d)} />
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center justify-end">
+                        {m.locked ? (
+                          <Button type="button" size="sm" variant="secondary" onClick={() => onToggleLock(m.id)}>
+                            <Pencil className="size-3.5" /> Modifier
+                          </Button>
+                        ) : (
+                          <Button type="button" size="sm" disabled={!ready} onClick={() => onToggleLock(m.id)}>
+                            Enregistrer
+                          </Button>
+                        )}
                       </div>
                     </div>
-                    <div className="mt-4 flex items-center justify-end">
-                      {m.locked ? (
-                        <Button type="button" size="sm" variant="secondary" onClick={() => onToggleLock(m.id)}>
-                          <Pencil className="size-3.5" /> Modifier
-                        </Button>
-                      ) : (
-                        <Button type="button" size="sm" disabled={!ready} onClick={() => onToggleLock(m.id)}>
-                          Enregistrer
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
               </div>
             </div>
           ))}

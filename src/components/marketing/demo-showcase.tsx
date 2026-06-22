@@ -43,7 +43,9 @@ export function DemoShowcase({
   groupMatches: PublicMatch[]
   knockout: PublicMatch[]
 }) {
-  const [tab, setTab] = useState<TabKey>('poules')
+  const [tab, setTab] = useState<TabKey>(() =>
+    step >= 3 ? 'finale' : step >= 2 ? 'calendrier' : step >= 1 ? 'tirage' : 'poules',
+  )
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
@@ -87,7 +89,14 @@ export function DemoShowcase({
           (step >= 1 ? <AnimatedDraw pools={pools} /> : <Pending>Le tirage au sort n’a pas encore eu lieu.</Pending>)}
         {tab === 'poules' &&
           (step >= 1 ? (
-            <GroupStandings groups={groups} qualifiersPerGroup={QUALIFIERS} />
+            <div>
+              {groups.every((g) => g.standings.every((s) => s.played === 0)) && (
+                <p className="mb-4 rounded-lg border border-border bg-card px-4 py-2 text-center text-xs text-muted-foreground">
+                  Les classements se rempliront au fil des scores saisis côté organisateur.
+                </p>
+              )}
+              <GroupStandings groups={groups} qualifiersPerGroup={QUALIFIERS} />
+            </div>
           ) : (
             <Pending>Les poules s’afficheront après le tirage.</Pending>
           ))}
