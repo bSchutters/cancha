@@ -4,7 +4,15 @@ import { createClient } from '../actions'
 
 export const dynamic = 'force-dynamic'
 
-export default function NewClientPage() {
+export default async function NewClientPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const sp = await searchParams
+  const str = (k: string) => (typeof sp[k] === 'string' ? (sp[k] as string) : undefined)
+  // Pre-fill from a lead when converting (org name + manager email).
+  const initial = { name: str('name'), email: str('email'), leadId: str('lead') }
   return (
     <div className="mx-auto max-w-3xl">
       <Link href="/console/clients" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -15,7 +23,7 @@ export default function NewClientPage() {
         Crée l’organisation et le compte organisateur en une fois.
       </p>
       <div className="mt-6">
-        <ClientForm action={createClient} />
+        <ClientForm action={createClient} initial={initial} />
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -175,6 +176,18 @@ function LeadCard({
           >
             Enregistrer la note
           </button>
+          {lead.status !== 'converted' && (
+            <div className="border-t border-border pt-2">
+              <Link
+                href={`/console/clients/new?lead=${lead.id}&name=${encodeURIComponent(
+                  lead.organization || lead.name,
+                )}&email=${encodeURIComponent(lead.email)}`}
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Convertir en client →
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>

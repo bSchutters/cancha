@@ -23,14 +23,17 @@ function slugify(s: string): string {
 
 type Action = (prev: CreateClientState, formData: FormData) => Promise<CreateClientState>
 
-export function ClientForm({ action }: { action: Action }) {
+type Initial = { name?: string; email?: string; leadId?: string }
+
+export function ClientForm({ action, initial }: { action: Action; initial?: Initial }) {
   const [state, formAction, pending] = useActionState(action, {})
-  const [name, setName] = useState('')
-  const [slug, setSlug] = useState('')
+  const [name, setName] = useState(initial?.name ?? '')
+  const [slug, setSlug] = useState(initial?.name ? slugify(initial.name) : '')
   const [slugTouched, setSlugTouched] = useState(false)
 
   return (
     <form action={formAction} className="max-w-xl space-y-6">
+      {initial?.leadId && <input type="hidden" name="leadId" value={initial.leadId} />}
       <section className="rounded-2xl border border-border bg-card p-5">
         <h2 className="text-sm font-medium">Organisation</h2>
         <div className="mt-4 space-y-4">
@@ -100,6 +103,7 @@ export function ClientForm({ action }: { action: Action }) {
               name="email"
               type="email"
               required
+              defaultValue={initial?.email ?? ''}
               autoComplete="off"
               className={fieldClass}
               placeholder="organisateur@club.be"

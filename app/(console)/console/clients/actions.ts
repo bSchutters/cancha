@@ -122,6 +122,22 @@ export async function createClient(
     return { error: 'Création du compte organisateur impossible. Réessayez.' }
   }
 
+  // If this client was created from a lead, mark that lead converted (non-fatal).
+  const leadId = formData.get('leadId')
+  if (typeof leadId === 'string' && /^\d+$/.test(leadId)) {
+    try {
+      await payload.update({
+        collection: 'leads',
+        id: Number(leadId),
+        data: { status: 'converted' },
+        overrideAccess: true,
+      })
+      revalidatePath('/console/leads')
+    } catch (err) {
+      console.error('[createClient] lead convert mark failed:', err instanceof Error ? err.message : err)
+    }
+  }
+
   revalidatePath('/console/clients')
   redirect('/console/clients')
 }
