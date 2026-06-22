@@ -73,8 +73,14 @@ export function DemoExplorer() {
 
   // Spotlight tour target for the current step (organizer side only). Tab-aware:
   // if the relevant control lives on a hidden tab, point at the tab first.
-  const tour: { sel: string; text: string; action?: { label: string; onClick: () => void } } | null = (() => {
-    if (!tourOn || view === 'public') return null
+  const tour: { sel: string; text: string; action?: { label: string; onClick: () => void }; dim?: boolean } | null = (() => {
+    if (!tourOn) return null
+    if (view === 'public')
+      return {
+        sel: '[data-tour="view-organisateur"]',
+        text: 'Quand vous avez vu le résultat, revenez côté organisateur pour continuer le guide.',
+        dim: false,
+      }
     const onDash = managerTab === 'dashboard'
     const onScores = managerTab === 'scores'
     const goDash = { sel: '[data-tour="tab-dashboard"]', text: 'Ouvrez le Tableau de bord pour continuer.' }
@@ -176,7 +182,7 @@ export function DemoExplorer() {
             <button
               key={v.key}
               type="button"
-              data-tour={v.key === 'public' ? 'view-public' : undefined}
+              data-tour={v.key === 'public' ? 'view-public' : 'view-organisateur'}
               onClick={() => selectView(v.key)}
               aria-pressed={view === v.key}
               className={cn(
@@ -230,7 +236,9 @@ export function DemoExplorer() {
         )}
       </div>
 
-      {tour && <Spotlight selector={tour.sel} text={tour.text} action={tour.action} onSkip={() => setTourOn(false)} />}
+      {tour && (
+        <Spotlight selector={tour.sel} text={tour.text} action={tour.action} dim={tour.dim} onSkip={() => setTourOn(false)} />
+      )}
     </div>
   )
 }

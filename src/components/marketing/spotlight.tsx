@@ -14,11 +14,13 @@ export function Spotlight({
   selector,
   text,
   action,
+  dim = true,
   onSkip,
 }: {
   selector: string
   text: string
   action?: { label: string; onClick: () => void }
+  dim?: boolean
   onSkip: () => void
 }) {
   const [rect, setRect] = useState<DOMRect | null>(null)
@@ -69,7 +71,7 @@ export function Spotlight({
           top: rect.top - pad,
           width: rect.width + pad * 2,
           height: rect.height + pad * 2,
-          boxShadow: '0 0 0 2px var(--primary), 0 0 0 9999px rgba(15, 20, 30, 0.55)',
+          boxShadow: dim ? '0 0 0 2px var(--primary), 0 0 0 9999px rgba(15, 20, 30, 0.55)' : '0 0 0 2px var(--primary)',
         }}
       >
         <div
