@@ -27,6 +27,9 @@ export function DemoExplorer() {
     setMatches((ms) => ms.map((m, idx) => (idx === i && !m.locked ? { ...m, [side]: Math.max(0, m[side] + d) } : m)))
   const onToggleLock = (i: number) =>
     setMatches((ms) => ms.map((m, idx) => (idx === i ? { ...m, locked: !m.locked } : m)))
+  // Reset clears the tournament: matches back to unplayed, which empties the
+  // public standings/calendar too (the two sides stay in sync).
+  const onReset = () => setMatches((ms) => ms.map((m) => ({ ...m, hs: 0, as: 0, locked: false })))
 
   return (
     <div>
@@ -55,7 +58,7 @@ export function DemoExplorer() {
 
       <div className="mt-8">
         {view === 'organisateur' ? (
-          <ManagerShowcase matches={matches} onDelta={onDelta} onToggleLock={onToggleLock} />
+          <ManagerShowcase matches={matches} onDelta={onDelta} onToggleLock={onToggleLock} onReset={onReset} />
         ) : (
           <DemoShowcase matches={matches} />
         )}

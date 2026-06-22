@@ -79,10 +79,12 @@ export function ManagerShowcase({
   matches,
   onDelta,
   onToggleLock,
+  onReset,
 }: {
   matches: DemoMatch[]
   onDelta: (i: number, side: 'hs' | 'as', d: number) => void
   onToggleLock: (i: number) => void
+  onReset: () => void
 }) {
   const [tab, setTab] = useState<TabKey>('dashboard')
   const [teams, setTeams] = useState<Team[]>(INITIAL_TEAMS)
@@ -153,15 +155,16 @@ export function ManagerShowcase({
             <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
               <div className="mb-1 flex items-center justify-between gap-2">
                 <h4 className="font-bold text-primary">Centre de contrôle</h4>
-                {doneSteps > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setDoneSteps(0)}
-                    className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    <RotateCcw className="size-3.5" /> Réinitialiser
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDoneSteps(0)
+                    onReset()
+                  }}
+                  className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <RotateCcw className="size-3.5" /> Réinitialiser
+                </button>
               </div>
               <p className="mb-4 text-xs text-muted-foreground">
                 Déroulez le tournoi étape par étape. Cliquez l’étape disponible pour la valider.
