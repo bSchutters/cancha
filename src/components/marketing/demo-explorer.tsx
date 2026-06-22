@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ManagerShowcase } from './manager-showcase'
 import { DemoShowcase } from './demo-showcase'
+import { Spotlight } from './spotlight'
 import {
   INITIAL_TEAMS,
   POOLS,
@@ -38,6 +39,7 @@ export function DemoExplorer() {
   const [groupMatches, setGroupMatches] = useState<DemoMatch[]>([])
   const [koMatches, setKoMatches] = useState<DemoMatch[]>([])
   const [seq, setSeq] = useState(100)
+  const [tourOn, setTourOn] = useState(true)
 
   const groups = computeGroups(teams, groupMatches)
   const ko = resolveKnockout(koMatches)
@@ -48,6 +50,22 @@ export function DemoExplorer() {
 
   const onSimulateScores = () =>
     setGroupMatches((ms) => ms.map((m, i) => ({ ...m, hs: (i * 3 + 1) % 5, as: (i * 2) % 4, locked: true })))
+
+  // Spotlight tour target for the current step (organizer side only).
+  const tour =
+    !tourOn || view === 'public'
+      ? null
+      : step === 0
+        ? { sel: '[data-tour="ctl-0"]', text: 'Cliquez ici pour lancer le tirage des poules.' }
+        : step === 1
+          ? { sel: '[data-tour="ctl-1"]', text: 'Générez le calendrier des matchs.' }
+          : step === 2 && !groupReady
+            ? { sel: '[data-tour="tab-scores"]', text: 'Ouvrez l’onglet Scores et enregistrez chaque match.' }
+            : step === 2
+              ? { sel: '[data-tour="ctl-2"]', text: 'Les scores sont saisis : générez la phase finale.' }
+              : step === 3
+                ? { sel: '[data-tour="ctl-3"]', text: 'Dernière étape : terminez le tournoi.' }
+                : { sel: '[data-tour="view-public"]', text: 'Tournoi terminé ! Découvrez le résultat côté public.' }
 
   const editArr = (id: string, fn: (m: DemoMatch) => DemoMatch) => {
     setGroupMatches((a) => a.map((m) => (m.id === id ? fn(m) : m)))
@@ -97,6 +115,7 @@ export function DemoExplorer() {
             <button
               key={v.key}
               type="button"
+              data-tour={v.key === 'public' ? 'view-public' : undefined}
               onClick={() => setView(v.key)}
               aria-pressed={view === v.key}
               className={cn(
@@ -140,6 +159,8 @@ export function DemoExplorer() {
           />
         )}
       </div>
+
+      {tour && <Spotlight selector={tour.sel} text={tour.text} onSkip={() => setTourOn(false)} />}
     </div>
   )
 }

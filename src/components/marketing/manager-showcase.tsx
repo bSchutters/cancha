@@ -137,6 +137,7 @@ export function ManagerShowcase({
             <button
               key={t.key}
               type="button"
+              data-tour={t.key === 'scores' ? 'tab-scores' : undefined}
               onClick={() => setTab(t.key)}
               aria-pressed={tab === t.key}
               className={cn(
@@ -204,6 +205,7 @@ export function ManagerShowcase({
                     <button
                       key={c.label}
                       type="button"
+                      data-tour={`ctl-${i}`}
                       disabled={!available}
                       onClick={() => onStep(i)}
                       className={cn(
