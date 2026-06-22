@@ -46,7 +46,7 @@ export function DemoShowcase() {
         </div>
 
         {/* Tab bar (mirrors TournamentView) */}
-        <nav className="mt-4 flex gap-1 overflow-x-auto">
+        <nav className="mt-4 flex flex-wrap gap-1">
           {TABS.map((t) => (
             <button
               key={t.key}
@@ -70,7 +70,7 @@ export function DemoShowcase() {
       <div className="bg-secondary/30 p-5 sm:p-7">
         {tab === 'tirage' && <AnimatedDraw />}
         {tab === 'poules' && (
-          <GroupStandings groups={DEMO_GROUPS} qualifiersPerGroup={DEMO_QUALIFIERS} compact />
+          <GroupStandings groups={DEMO_GROUPS} qualifiersPerGroup={DEMO_QUALIFIERS} />
         )}
         {tab === 'calendrier' && <MatchesByRound matches={DEMO_GROUP_MATCHES} />}
         {tab === 'finale' && <Bracket matches={DEMO_KNOCKOUT} />}
