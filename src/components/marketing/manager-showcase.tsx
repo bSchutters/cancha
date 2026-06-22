@@ -56,10 +56,12 @@ export function ManagerShowcase({
   teams,
   step,
   matches,
+  canKnockout,
   onScore,
   onToggleLock,
   onStep,
   onReset,
+  onSimulateScores,
   onAddTeam,
   onTogglePaid,
   onToggleConfirmed,
@@ -67,10 +69,12 @@ export function ManagerShowcase({
   teams: DemoTeam[]
   step: Step
   matches: DemoMatch[]
+  canKnockout: boolean
   onScore: (id: string, side: 'hs' | 'as', d: number) => void
   onToggleLock: (id: string) => void
   onStep: (i: number) => void
   onReset: () => void
+  onSimulateScores: () => void
   onAddTeam: (name: string) => void
   onTogglePaid: (id: number) => void
   onToggleConfirmed: (id: number) => void
@@ -152,7 +156,9 @@ export function ManagerShowcase({
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {CONTROL_STEPS.map((c, i) => {
                   const done = i < step
-                  const available = i === step
+                  // "Phase finale" (i === 2) stays blocked until every group score is saved.
+                  const blocked = i === step && i === 2 && !canKnockout
+                  const available = i === step && !blocked
                   return (
                     <button
                       key={c.label}
@@ -172,7 +178,13 @@ export function ManagerShowcase({
                       </span>
                       <span className="text-sm font-medium">{c.label}</span>
                       <span className="text-xs text-muted-foreground">
-                        {done ? 'Fait' : available ? 'Cliquez pour valider' : 'Verrouillé'}
+                        {done
+                          ? 'Fait'
+                          : available
+                            ? 'Cliquez pour valider'
+                            : blocked
+                              ? 'Saisissez les scores de poule'
+                              : 'Verrouillé'}
                       </span>
                     </button>
                   )
@@ -188,7 +200,15 @@ export function ManagerShowcase({
               Générez le calendrier dans le centre de contrôle pour saisir les scores.
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-4">
+              {matches.some((m) => m.phase === 'group' && !m.locked) && (
+                <div className="flex justify-end">
+                  <Button type="button" size="sm" variant="secondary" onClick={onSimulateScores}>
+                    Simuler les scores
+                  </Button>
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
               {matches.map((m) => {
                 const home = nameById(teams, m.homeId)
                 const away = nameById(teams, m.awayId)
@@ -230,6 +250,7 @@ export function ManagerShowcase({
                   </div>
                 )
               })}
+              </div>
             </div>
           ))}
 

@@ -43,6 +43,11 @@ export function DemoExplorer() {
   const ko = resolveKnockout(koMatches)
   const editableMatches = [...groupMatches, ...ko]
   const drawnPools = POOLS.map((p) => ({ label: p, teams: teams.filter((t) => t.pool === p).map((t) => t.name) }))
+  // The knockout can only start once every group match is played (saved).
+  const groupReady = groupMatches.length > 0 && groupMatches.every((m) => m.locked)
+
+  const onSimulateScores = () =>
+    setGroupMatches((ms) => ms.map((m, i) => ({ ...m, hs: (i * 3 + 1) % 5, as: (i * 2) % 4, locked: true })))
 
   const editArr = (id: string, fn: (m: DemoMatch) => DemoMatch) => {
     setGroupMatches((a) => a.map((m) => (m.id === id ? fn(m) : m)))
@@ -60,6 +65,7 @@ export function DemoExplorer() {
       setGroupMatches(buildGroupMatches(teams))
       setStep(2)
     } else if (i === 2) {
+      if (!groupReady) return
       setKoMatches(buildKnockout(computeGroups(teams, groupMatches)))
       setStep(3)
     } else if (i === 3) {
@@ -114,10 +120,12 @@ export function DemoExplorer() {
             teams={teams}
             step={step}
             matches={editableMatches}
+            canKnockout={groupReady}
             onScore={onScore}
             onToggleLock={onToggleLock}
             onStep={onStep}
             onReset={onReset}
+            onSimulateScores={onSimulateScores}
             onAddTeam={onAddTeam}
             onTogglePaid={onTogglePaid}
             onToggleConfirmed={onToggleConfirmed}
