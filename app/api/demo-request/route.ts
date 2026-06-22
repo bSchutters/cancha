@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { z } from 'zod'
+import { getPayloadClient } from '@/lib/payload'
 
 // Demo-request lead form (apex landing). Sends a qualified lead to OWNER_EMAIL
 // via Resend, reusing the same transactional-email env as registrations.
@@ -49,34 +50,63 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true })
   }
 
+  // 1) Persist the lead first — this is the source of truth, so a prospect is
+  // never lost even if the email notification fails or Resend isn't configured.
+  let saved = false
+  try {
+    const payload = await getPayloadClient()
+    await payload.create({
+      collection: 'leads',
+      data: {
+        name: data.name,
+        email: data.email,
+        organization: data.organization,
+        sport: data.sport,
+        teams: data.teams,
+        message: data.message,
+        status: 'new',
+        source: 'demo-request',
+      },
+      overrideAccess: true,
+    })
+    saved = true
+  } catch {
+    // Swallow: fall through to the email attempt below.
+  }
+
+  // 2) Best-effort email notification to the owner.
+  let emailed = false
   const to = process.env.OWNER_EMAIL
   const from = process.env.RESEND_FROM_EMAIL
   const key = process.env.RESEND_API_KEY
-  if (!to || !from || !key) {
-    return NextResponse.json({ error: 'email_not_configured' }, { status: 500 })
+  if (to && from && key) {
+    const lines = [
+      `Nom : ${data.name}`,
+      `Email : ${data.email}`,
+      data.organization && `Organisation : ${data.organization}`,
+      data.sport && `Sport : ${data.sport}`,
+      data.teams && `Nombre d’équipes : ${data.teams}`,
+      data.message && `\nMessage :\n${data.message}`,
+    ].filter(Boolean)
+    try {
+      const resend = new Resend(key)
+      await resend.emails.send({
+        from: `Cancha <${from}>`,
+        to,
+        replyTo: data.email,
+        subject: `Demande de démo - ${data.name}${data.organization ? ` (${data.organization})` : ''}`,
+        text: lines.join('\n'),
+      })
+      emailed = true
+    } catch {
+      // Swallow: the lead is already saved; the owner will see it in /console.
+    }
   }
 
-  const lines = [
-    `Nom : ${data.name}`,
-    `Email : ${data.email}`,
-    data.organization && `Organisation : ${data.organization}`,
-    data.sport && `Sport : ${data.sport}`,
-    data.teams && `Nombre d’équipes : ${data.teams}`,
-    data.message && `\nMessage :\n${data.message}`,
-  ].filter(Boolean)
-
-  try {
-    const resend = new Resend(key)
-    await resend.emails.send({
-      from: `Cancha <${from}>`,
-      to,
-      replyTo: data.email,
-      subject: `Demande de démo - ${data.name}${data.organization ? ` (${data.organization})` : ''}`,
-      text: lines.join('\n'),
-    })
-  } catch {
-    return NextResponse.json({ error: 'send_failed' }, { status: 502 })
+  // Only fail if the lead was neither stored nor announced — then the client
+  // shows its contact-email fallback.
+  if (!saved && !emailed) {
+    return NextResponse.json({ error: 'unavailable' }, { status: 502 })
   }
-
   return NextResponse.json({ ok: true })
 }
