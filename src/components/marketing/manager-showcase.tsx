@@ -97,27 +97,28 @@ export function ManagerShowcase({
     setNewName('')
   }
 
-  // Guided "what to do next" coach so a first-time visitor never gets stuck.
-  const coach: { n: number; text: string; label: string | null; run: (() => void) | null } =
+  // Progressive coach: guide the visitor to do each step themselves (point to
+  // the right place + track progress), rather than a one-click do-it-all button.
+  const groupMatches = matches.filter((m) => m.phase === 'group')
+  const savedGroup = groupMatches.filter((m) => m.locked).length
+  const totalGroup = groupMatches.length
+
+  const coach: { n: number; text: string; nav: { label: string; to: TabKey } | null } =
     step === 0
-      ? { n: 1, text: 'Lancez le tirage des poules pour répartir les équipes.', label: 'Faire le tirage', run: () => onStep(0) }
+      ? { n: 1, text: 'Dans le centre de contrôle, cliquez sur « Tirage des poules ».', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
       : step === 1
-        ? { n: 2, text: 'Générez le calendrier des matchs.', label: 'Générer le calendrier', run: () => onStep(1) }
+        ? { n: 2, text: 'Cliquez sur « Générer le calendrier » dans le centre de contrôle.', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
         : step === 2 && !canKnockout
           ? {
               n: 3,
-              text: 'Saisissez les scores des poules pour débloquer la phase finale, ou simulez-les.',
-              label: 'Simuler les scores',
-              run: () => {
-                onSimulateScores()
-                setTab('scores')
-              },
+              text: `Saisissez le score de chaque match dans l'onglet Scores, puis enregistrez (${savedGroup}/${totalGroup} faits).`,
+              nav: { label: 'Aller aux scores', to: 'scores' },
             }
           : step === 2
-            ? { n: 3, text: 'Scores enregistrés. Vous pouvez générer la phase finale.', label: 'Générer la phase finale', run: () => onStep(2) }
+            ? { n: 3, text: 'Tous les scores sont saisis. Cliquez « Phase finale » dans le centre de contrôle.', nav: { label: 'Centre de contrôle', to: 'dashboard' } }
             : step === 3
-              ? { n: 4, text: 'Dernière étape : terminez le tournoi (ou saisissez les scores des demi-finales).', label: 'Terminer le tournoi', run: () => onStep(3) }
-              : { n: 4, text: 'Tournoi terminé. Basculez côté public pour voir le résultat.', label: null, run: null }
+              ? { n: 4, text: 'Saisissez les scores des demi-finales, puis cliquez « Terminer le tournoi ».', nav: { label: 'Aller aux scores', to: 'scores' } }
+              : { n: 4, text: 'Tournoi terminé. Basculez côté public pour voir le résultat.', nav: null }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
@@ -161,9 +162,9 @@ export function ManagerShowcase({
               <p className="mt-0.5 text-sm text-foreground">{coach.text}</p>
             </div>
           </div>
-          {coach.label && coach.run && (
-            <Button size="sm" onClick={coach.run} className="shrink-0">
-              {coach.label}
+          {coach.nav && (
+            <Button size="sm" variant="secondary" onClick={() => setTab(coach.nav!.to)} className="shrink-0">
+              {coach.nav.label}
             </Button>
           )}
         </div>
@@ -208,7 +209,7 @@ export function ManagerShowcase({
                       className={cn(
                         'flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors',
                         done && 'border-primary/30 bg-primary/5',
-                        available && 'cursor-pointer border-primary bg-card hover:bg-primary/5',
+                        available && 'cursor-pointer border-primary bg-card ring-2 ring-primary/40 hover:bg-primary/5',
                         !done && !available && 'border-border bg-card opacity-60',
                       )}
                     >
