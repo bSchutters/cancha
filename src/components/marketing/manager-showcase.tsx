@@ -97,6 +97,28 @@ export function ManagerShowcase({
     setNewName('')
   }
 
+  // Guided "what to do next" coach so a first-time visitor never gets stuck.
+  const coach: { n: number; text: string; label: string | null; run: (() => void) | null } =
+    step === 0
+      ? { n: 1, text: 'Lancez le tirage des poules pour répartir les équipes.', label: 'Faire le tirage', run: () => onStep(0) }
+      : step === 1
+        ? { n: 2, text: 'Générez le calendrier des matchs.', label: 'Générer le calendrier', run: () => onStep(1) }
+        : step === 2 && !canKnockout
+          ? {
+              n: 3,
+              text: 'Saisissez les scores des poules pour débloquer la phase finale, ou simulez-les.',
+              label: 'Simuler les scores',
+              run: () => {
+                onSimulateScores()
+                setTab('scores')
+              },
+            }
+          : step === 2
+            ? { n: 3, text: 'Scores enregistrés. Vous pouvez générer la phase finale.', label: 'Générer la phase finale', run: () => onStep(2) }
+            : step === 3
+              ? { n: 4, text: 'Dernière étape : terminez le tournoi (ou saisissez les scores des demi-finales).', label: 'Terminer le tournoi', run: () => onStep(3) }
+              : { n: 4, text: 'Tournoi terminé. Basculez côté public pour voir le résultat.', label: null, run: null }
+
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
       <div className="border-b border-border px-5 py-4 sm:px-6">
@@ -128,6 +150,24 @@ export function ManagerShowcase({
       </div>
 
       <div className="space-y-6 bg-secondary/30 p-5 sm:p-7">
+        {/* Guided next-step coach */}
+        <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+              {coach.n}
+            </span>
+            <div>
+              <div className="text-xs font-medium uppercase tracking-wide text-primary">Étape {coach.n} / 4</div>
+              <p className="mt-0.5 text-sm text-foreground">{coach.text}</p>
+            </div>
+          </div>
+          {coach.label && coach.run && (
+            <Button size="sm" onClick={coach.run} className="shrink-0">
+              {coach.label}
+            </Button>
+          )}
+        </div>
+
         {tab === 'dashboard' && (
           <>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
