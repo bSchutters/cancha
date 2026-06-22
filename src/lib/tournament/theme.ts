@@ -14,6 +14,7 @@
  */
 
 export type BaseColorKey =
+  | 'paper'
   | 'slate'
   | 'gray'
   | 'zinc'
@@ -121,6 +122,52 @@ function tintedBase(
 
 /** Canonical shadcn/ui base color palettes (light + dark), oklch. */
 export const BASE_COLORS: Record<BaseColorKey, BaseColor> = {
+  // Cup Generator house palette: cream paper + ink-blue, matching the marketing
+  // landing. This is the default, so a brand-new tournament looks like the site
+  // out of the box; a client can still pick any other base color + accent.
+  paper: {
+    key: 'paper',
+    label: 'Papier (Cup Generator)',
+    swatch: '#35527D',
+    light: {
+      background: '#FAF9F5',
+      foreground: '#1A1A18',
+      card: '#FFFFFF',
+      cardForeground: '#1A1A18',
+      popover: '#FFFFFF',
+      popoverForeground: '#1A1A18',
+      primary: '#35527D',
+      primaryForeground: '#FFFFFF',
+      secondary: '#F0EDE4',
+      secondaryForeground: '#1A1A18',
+      muted: '#F0EDE4',
+      mutedForeground: '#5F5B54',
+      accent: '#ECEAE2',
+      accentForeground: '#1A1A18',
+      border: '#E6E1D6',
+      input: '#E6E1D6',
+      ring: '#35527D',
+    },
+    dark: {
+      background: '#1A1A18',
+      foreground: '#FAF9F5',
+      card: '#232320',
+      cardForeground: '#FAF9F5',
+      popover: '#232320',
+      popoverForeground: '#FAF9F5',
+      primary: '#9DB8E0',
+      primaryForeground: '#15233B',
+      secondary: '#2B2B27',
+      secondaryForeground: '#FAF9F5',
+      muted: '#2B2B27',
+      mutedForeground: '#B4AEA3',
+      accent: '#2B2B27',
+      accentForeground: '#FAF9F5',
+      border: 'oklch(1 0 0 / 12%)',
+      input: 'oklch(1 0 0 / 15%)',
+      ring: '#9DB8E0',
+    },
+  },
   neutral: {
     key: 'neutral',
     label: 'Neutral',
@@ -344,6 +391,7 @@ export const BASE_COLORS: Record<BaseColorKey, BaseColor> = {
 
 /** Display order in the picker (matches the shadcn/Tailwind base-color list). */
 export const BASE_COLOR_KEYS: BaseColorKey[] = [
+  'paper',
   'slate',
   'gray',
   'zinc',
@@ -354,7 +402,7 @@ export const BASE_COLOR_KEYS: BaseColorKey[] = [
   'mist',
   'olive',
 ]
-export const DEFAULT_BASE_COLOR: BaseColorKey = 'neutral'
+export const DEFAULT_BASE_COLOR: BaseColorKey = 'paper'
 
 /** Named radius presets (shadcn-create style). Stored as the key; mapped to rem. */
 export const RADIUS_PRESETS = {
@@ -426,6 +474,7 @@ export const FONTS: FontOption[] = [
   { value: 'Lato', label: 'Lato', fallback: 'sans-serif' },
   { value: 'Raleway', label: 'Raleway', fallback: 'sans-serif' },
   { value: 'Oswald', label: 'Oswald', fallback: 'sans-serif' },
+  { value: 'Newsreader', label: 'Newsreader', fallback: 'serif' },
   { value: 'Playfair Display', label: 'Playfair Display', fallback: 'serif' },
   { value: 'Merriweather', label: 'Merriweather', fallback: 'serif' },
 ]
@@ -586,9 +635,14 @@ export function buildThemeCss(theme: OrgTheme, scope = '.tournament-scope'): str
     .filter(Boolean)
     .join(';')
 
-  // Light mode: nudge the page background just below white so white cards/popovers
-  // visibly separate from it (the shadcn look). Dark mode is untouched.
-  const lightPalette: Palette = { ...base.light, background: 'oklch(0.985 0 0)' }
+  // Light mode: for the pure-white shadcn palettes, nudge the page background just
+  // below white so white cards/popovers visibly separate from it. Palettes that
+  // already ship a tinted background (e.g. the cream "paper" default) are left as
+  // is. Dark mode is untouched.
+  const lightPalette: Palette =
+    base.light.background === 'oklch(1 0 0)'
+      ? { ...base.light, background: 'oklch(0.985 0 0)' }
+      : base.light
 
   // When theming the document root, the dark selector is `.dark` (html itself),
   // not `.dark :root` (which would never match). Element scopes nest normally.

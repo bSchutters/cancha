@@ -87,7 +87,7 @@ export const Organizations: CollectionConfig = {
           name: 'base_color',
           type: 'select',
           label: 'Couleur de base',
-          defaultValue: 'neutral',
+          defaultValue: 'paper',
           options: BASE_COLOR_KEYS.map((k) => ({ label: BASE_COLORS[k].label, value: k })),
           admin: { description: 'Palette neutre (fonds, bordures, texte).' },
         },

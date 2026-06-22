@@ -145,10 +145,11 @@
 } */
 
 @theme inline {
-  /* Per-org fonts (set on .tournament-scope) override the defaults; fall back to
-     the bundled brand fonts when an organization hasn't chosen any. */
-  --font-marjorie: var(--font-heading, "Marjorie", sans-serif);
-  --font-nugros: var(--font-body, "Nugros", sans-serif);
+  /* Per-org fonts (set on .tournament-scope) override the defaults; otherwise fall
+     back to the Cup Generator house faces (Newsreader/Geist, loaded via next/font
+     in the layout), then to the bundled brand fonts. */
+  --font-marjorie: var(--font-heading, var(--font-product-heading), "Marjorie", serif);
+  --font-nugros: var(--font-body, var(--font-product-body), "Nugros", sans-serif);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -186,6 +187,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Product headings use the heading font (editorial serif by default, or the
+   org's chosen heading font). Scoped out of the marketing shell, which sets its
+   own heading font inline on each heading. */
+.tournament-scope :is(h1, h2, h3, h4):not(.marketing-scope *) {
+  font-family: var(--font-heading, var(--font-product-heading), "Marjorie", serif);
 }
 
 :root {
