@@ -99,7 +99,7 @@ export function DemoExplorer() {
           : goDash
     if (step === 3 && !koReady)
       return onScores
-        ? { sel: '[data-tour="tab-scores"]', text: 'Saisissez les scores des demi-finales et de la finale.' }
+        ? { sel: '[data-tour="scores-area"]', text: 'Le plus rapide : cliquez « Remplir automatiquement » pour jouer la phase finale (ou saisissez les scores).' }
         : goScores
     if (step === 3)
       return !sawAfterFinals
