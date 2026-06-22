@@ -19,7 +19,7 @@ export function renderOgImage({ eyebrow, title }: { eyebrow: string; title: stri
           fontFamily: 'Georgia, serif',
         }}
       >
-        <div style={{ display: 'flex', fontSize: 34, fontWeight: 600, color: '#1A1A18' }}>
+        <div style={{ display: 'flex', fontSize: 34, fontWeight: 600, color: '#35527D' }}>
           Cancha
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
