@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { display, focusRing } from './theme'
-import { SPORTS, PROFILES } from '@/lib/marketing/content'
+import { SPORTS, PROFILES, CONTACT_EMAIL } from '@/lib/marketing/content'
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -62,6 +62,12 @@ export function MarketingFooter() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6">
           <span>© 2026 Cup Generator</span>
           <div className="flex items-center gap-5">
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className={cn('text-sm text-muted-foreground transition-colors hover:text-foreground', focusRing)}
+            >
+              Contact
+            </a>
             <FooterLink href="/mentions-legales">Mentions légales</FooterLink>
             <FooterLink href="/login">Connexion</FooterLink>
           </div>

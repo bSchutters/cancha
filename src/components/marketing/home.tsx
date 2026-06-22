@@ -113,12 +113,12 @@ export function HomeSections() {
               style={display}
               className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
             >
-              Vos tournois,{' '}
-              <span className="font-medium italic text-primary">du tirage au trophée.</span>
+              Organisez vos tournois{' '}
+              <span className="font-medium italic text-primary">sans y passer vos soirées.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Fini les tableurs et les groupes WhatsApp. Créez votre tournoi, la plateforme gère
-              tirage, calendrier et classements en direct.
+              Inscriptions, tirage au sort, calendrier multi-terrains et classements en direct : tout
+              est géré pour vous. Fini Excel et les groupes WhatsApp.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Button asChild size="lg">

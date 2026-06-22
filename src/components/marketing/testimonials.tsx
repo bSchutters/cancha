@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { display } from './theme'
 import { Reveal } from './motion'
 import { TESTIMONIALS } from '@/lib/marketing/content'
@@ -11,9 +13,35 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-/** Testimonials grid. Content is placeholder until real reviews are collected. */
+/**
+ * Testimonials when we have real ones; until then, an honest "founding
+ * organizers" offer (no fabricated reviews).
+ */
 export function Testimonials() {
-  if (TESTIMONIALS.length === 0) return null
+  if (TESTIMONIALS.length === 0) {
+    return (
+      <section className="border-y border-border bg-secondary/50">
+        <div className="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
+          <Reveal>
+            <span className="text-sm font-medium text-primary">Lancement</span>
+            <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Soyez parmi nos premiers organisateurs
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              Cup Generator se lance. Les premiers clubs et comités qui l’adoptent bénéficient d’un
+              accompagnement personnalisé pour leur premier tournoi et de conditions de lancement.
+            </p>
+            <div className="mt-8">
+              <Button asChild size="lg">
+                <Link href="#contact">Demander une démo</Link>
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="border-y border-border bg-secondary/50">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">

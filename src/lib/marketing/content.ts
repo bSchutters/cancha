@@ -140,7 +140,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Combien ça coûte ?',
-    a: 'Cup Generator est en lancement : la mise en place de vos premiers tournois est gratuite. Contactez-nous pour une démo et une offre adaptée à votre événement.',
+    a: 'Vous payez un petit montant par équipe inscrite : pas d’abonnement, pas de frais d’installation, et vous ne payez que si votre tournoi a lieu. Contactez-nous pour une estimation adaptée à votre tournoi.',
   },
   {
     q: 'Les équipes et le public peuvent-ils suivre en direct ?',
@@ -171,31 +171,12 @@ export const COMPARISON: ComparisonRow[] = [
 
 export type Testimonial = { quote: string; name: string; role: string; org: string }
 
-// PLACEHOLDERS : témoignages fictifs à remplacer par de vrais avis avant le lancement
-// (produit en pré-lancement, aucun client réel à ce jour).
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      'Le planning des terrains, qui me prenait une soirée entière sur Excel, était prêt en quelques minutes. Un vrai soulagement.',
-    name: 'Julien Lemmens',
-    role: 'Responsable du tournoi',
-    org: 'FC Sporting Wavre',
-  },
-  {
-    quote:
-      'Le tirage animé sur grand écran a impressionné les capitaines. Notre tournoi a tout de suite eu un côté professionnel.',
-    name: 'Sophie Delvaux',
-    role: 'Membre du comité des fêtes',
-    org: 'Comité des fêtes de Gembloux',
-  },
-  {
-    quote:
-      'Les classements se mettaient à jour tout seuls. Plus de calculs de dernière minute, la remise des prix a été immédiate.',
-    name: 'Thomas Bauwens',
-    role: 'Coordinateur jeunes',
-    org: 'Académie de Jodoigne',
-  },
-]
+// Empty until real reviews are collected (pre-launch). While empty, the
+// Testimonials section shows an honest "premiers organisateurs" offer instead.
+export const TESTIMONIALS: Testimonial[] = []
+
+// Public contact address: lead-form fallback + footer. TODO: confirm the real inbox.
+export const CONTACT_EMAIL = 'contact@cupgenerator.be'
 
 // Pricing model: pay-per-team (no subscription, no upfront). No hard rate is shown
 // here yet; it is intentionally left to a quote until the exact amount is fixed.

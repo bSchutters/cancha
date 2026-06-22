@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowRight, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CONTACT_EMAIL } from '@/lib/marketing/content'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -110,7 +111,11 @@ export function DemoForm() {
 
       {status === 'error' && (
         <p className="mt-4 text-sm text-destructive" role="alert">
-          Une erreur est survenue. Réessayez, ou écrivez-nous directement.
+          Une erreur est survenue. Réessayez, ou écrivez-nous à{' '}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
+            {CONTACT_EMAIL}
+          </a>
+          .
         </p>
       )}
 
