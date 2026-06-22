@@ -3,6 +3,8 @@ import { BRAND, fontVars } from './theme'
 import { MarketingNav } from './nav'
 import { MarketingFooter } from './footer'
 import { SmoothScroll } from './motion'
+import { StickyCta } from './sticky-cta'
+import { Analytics } from './analytics'
 
 /**
  * Wrapper for every marketing page: scopes the brand theme (cream + ink-blue) and
@@ -20,6 +22,8 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
         <MarketingFooter />
       </SmoothScroll>
+      <StickyCta />
+      <Analytics />
     </div>
   )
 }

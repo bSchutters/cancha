@@ -4,6 +4,7 @@ import { resolveTenantId } from '@/lib/tournament/tenant'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { SPORTS, PROFILES } from '@/lib/marketing/content'
+import { GUIDES } from '@/lib/marketing/guides'
 
 // Per-host sitemap: the tenant is resolved from the request headers, so each
 // organization's subdomain/custom domain serves a sitemap listing only that
@@ -32,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } else {
     // Apex (no tenant): the marketing site. List the static + SEO pages here,
     // where they are canonical.
-    for (const path of ['/tarifs', '/faq', '/a-propos']) {
+    for (const path of ['/demo', '/tarifs', '/comparatif', '/faq', '/a-propos', '/ressources']) {
       entries.push({ url: `${base}${path}`, changeFrequency: 'monthly', priority: 0.6 })
     }
     for (const s of SPORTS) {
@@ -40,6 +41,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
     for (const p of PROFILES) {
       entries.push({ url: `${base}/organisateurs/${p.slug}`, changeFrequency: 'monthly', priority: 0.6 })
+    }
+    for (const g of GUIDES) {
+      entries.push({ url: `${base}/ressources/${g.slug}`, changeFrequency: 'monthly', priority: 0.5 })
     }
   }
 

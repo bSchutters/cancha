@@ -152,6 +152,51 @@ export const FAQ: { q: string; a: string }[] = [
   },
 ]
 
+export type ComparisonRow = { criterion: string; excel: string; generic: string; cupgenerator: string }
+
+export const COMPARISON_INTRO =
+  'Beaucoup d’organisateurs gèrent encore leur tournoi sur tableur ou avec un outil généraliste. Voici comment ces approches se comparent à Cup Generator sur les tâches qui comptent vraiment.'
+
+export const COMPARISON: ComparisonRow[] = [
+  { criterion: 'Inscriptions en ligne', excel: 'Saisie manuelle, erreurs fréquentes', generic: 'Formulaire de base', cupgenerator: 'Formulaire dédié, liste centralisée' },
+  { criterion: 'Tirage au sort', excel: 'À faire à la main', generic: 'Rarement intégré', cupgenerator: 'Tirage animé, affiché en direct' },
+  { criterion: 'Planning multi-terrains', excel: 'Très long à construire', generic: 'Souvent limité', cupgenerator: 'Généré automatiquement' },
+  { criterion: 'Recalcul après retard', excel: 'Tout reprendre à la main', generic: 'Variable selon l’outil', cupgenerator: 'Horaires recalés en un clic' },
+  { criterion: 'Scores et classements', excel: 'Formules fragiles, erreurs de calcul', generic: 'Mise à jour manuelle', cupgenerator: 'Classements en direct, automatiques' },
+  { criterion: 'Affichage en salle', excel: 'Non prévu', generic: 'Rarement disponible', cupgenerator: 'Écran TV et tableau live' },
+  { criterion: 'Gestion des arbitres', excel: 'Sur papier', generic: 'Peu adapté', cupgenerator: 'Saisie des scores par terrain' },
+  { criterion: 'Sponsors et marque', excel: 'Aucun', generic: 'Limité', cupgenerator: 'Logos et couleurs personnalisés' },
+  { criterion: 'Prise en main', excel: 'Familier mais laborieux', generic: 'Courbe d’apprentissage variable', cupgenerator: 'Pensé pour les organisateurs' },
+]
+
+export type Testimonial = { quote: string; name: string; role: string; org: string }
+
+// PLACEHOLDERS : témoignages fictifs à remplacer par de vrais avis avant le lancement
+// (produit en pré-lancement, aucun client réel à ce jour).
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      'Le planning des terrains, qui me prenait une soirée entière sur Excel, était prêt en quelques minutes. Un vrai soulagement.',
+    name: 'Julien Lemmens',
+    role: 'Responsable du tournoi',
+    org: 'FC Sporting Wavre',
+  },
+  {
+    quote:
+      'Le tirage animé sur grand écran a impressionné les capitaines. Notre tournoi a tout de suite eu un côté professionnel.',
+    name: 'Sophie Delvaux',
+    role: 'Membre du comité des fêtes',
+    org: 'Comité des fêtes de Gembloux',
+  },
+  {
+    quote:
+      'Les classements se mettaient à jour tout seuls. Plus de calculs de dernière minute, la remise des prix a été immédiate.',
+    name: 'Thomas Bauwens',
+    role: 'Coordinateur jeunes',
+    org: 'Académie de Jodoigne',
+  },
+]
+
 export const PRICING = [
   {
     name: 'Lancement',

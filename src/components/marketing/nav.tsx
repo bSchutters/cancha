@@ -5,9 +5,9 @@ import { display, focusRing } from './theme'
 
 const LINKS = [
   { href: '/#features', label: 'Fonctionnalités' },
+  { href: '/demo', label: 'Démo' },
   { href: '/tarifs', label: 'Tarifs' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/a-propos', label: 'À propos' },
+  { href: '/ressources', label: 'Ressources' },
 ]
 
 export function MarketingNav() {

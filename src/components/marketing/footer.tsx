@@ -14,7 +14,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 export function MarketingFooter() {
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div>
           <span style={display} className="text-lg font-medium tracking-tight">
             Cup <span className="text-primary">Generator</span>
@@ -27,7 +27,14 @@ export function MarketingFooter() {
         <nav className="flex flex-col gap-3">
           <span className="text-sm font-medium text-foreground">Produit</span>
           <FooterLink href="/#features">Fonctionnalités</FooterLink>
+          <FooterLink href="/demo">Démo</FooterLink>
           <FooterLink href="/tarifs">Tarifs</FooterLink>
+          <FooterLink href="/comparatif">Comparatif</FooterLink>
+        </nav>
+
+        <nav className="flex flex-col gap-3">
+          <span className="text-sm font-medium text-foreground">Ressources</span>
+          <FooterLink href="/ressources">Guides</FooterLink>
           <FooterLink href="/faq">FAQ</FooterLink>
           <FooterLink href="/a-propos">À propos</FooterLink>
         </nav>

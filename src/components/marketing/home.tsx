@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { display, focusRing } from './theme'
 import { Reveal, Parallax } from './motion'
 import { CtaSection } from './cta-section'
+import { Testimonials } from './testimonials'
 
 const PROCESS = [
   { icon: ClipboardList, title: 'Inscriptions', desc: 'Les équipes s’inscrivent en ligne, vous validez en un clic.' },
@@ -114,13 +115,13 @@ export function HomeSections() {
                 </Link>
               </Button>
               <Link
-                href="#features"
+                href="/demo"
                 className={cn(
                   'inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-primary',
                   focusRing,
                 )}
               >
-                Découvrir les fonctionnalités
+                Voir la démo en direct
                 <ArrowRight className="size-4" />
               </Link>
             </div>
@@ -309,6 +310,8 @@ export function HomeSections() {
           </div>
         </div>
       </section>
+
+      <Testimonials />
 
       {/* Audience */}
       <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
