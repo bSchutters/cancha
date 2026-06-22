@@ -8,6 +8,21 @@ import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
+// The active Lenis instance (null under reduced motion / before mount). Lets
+// programmatic scrolls go THROUGH Lenis instead of fighting it with native
+// smooth scroll. See smoothScrollTo / the Spotlight tour.
+let activeLenis: Lenis | null = null
+
+/** Scroll an element into view through Lenis when active; native fallback otherwise. */
+export function smoothScrollTo(el: Element, { immediate = false }: { immediate?: boolean } = {}) {
+  const target = el as HTMLElement
+  if (activeLenis && !immediate) {
+    activeLenis.scrollTo(target, { offset: -window.innerHeight / 2 + target.offsetHeight / 2 })
+  } else {
+    el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth', block: 'center' })
+  }
+}
+
 /**
  * Lenis smooth scroll, synced to GSAP's ticker + ScrollTrigger. Scoped to the
  * marketing shell only (never mounted on /manage or /admin). Native scroll under
@@ -17,15 +32,23 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true })
+    // `anchors: true` lets Lenis own in-page #hash jumps (smooth, not native).
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true, anchors: true })
+    activeLenis = lenis
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
     gsap.ticker.lagSmoothing(0)
 
+    // Recompute trigger positions once Lenis drives the scroll and again after
+    // the display font swaps in (the swap shifts layout / start-end pixels).
+    requestAnimationFrame(() => ScrollTrigger.refresh())
+    document.fonts?.ready.then(() => ScrollTrigger.refresh())
+
     return () => {
       gsap.ticker.remove(tick)
       lenis.destroy()
+      activeLenis = null
     }
   }, [])
 

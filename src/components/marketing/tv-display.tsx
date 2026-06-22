@@ -82,6 +82,8 @@ export function TvDisplayDemo() {
   const [i, setI] = useState(0)
 
   useEffect(() => {
+    // Don't auto-advance content for visitors who asked for reduced motion.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const id = setInterval(() => setI((v) => (v + 1) % PANELS.length), 3800)
     return () => clearInterval(id)
   }, [])
