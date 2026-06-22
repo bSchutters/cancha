@@ -167,6 +167,7 @@ export const COMPARISON: ComparisonRow[] = [
   { criterion: 'Gestion des arbitres', excel: 'Sur papier', generic: 'Peu adapté', cupgenerator: 'Saisie des scores par terrain' },
   { criterion: 'Sponsors et marque', excel: 'Aucun', generic: 'Limité', cupgenerator: 'Logos et couleurs personnalisés' },
   { criterion: 'Prise en main', excel: 'Familier mais laborieux', generic: 'Courbe d’apprentissage variable', cupgenerator: 'Pensé pour les organisateurs' },
+  { criterion: 'Coût', excel: 'Gratuit mais chronophage', generic: 'Souvent un abonnement', cupgenerator: 'Par équipe, sans abonnement' },
 ]
 
 export type Testimonial = { quote: string; name: string; role: string; org: string }
@@ -189,5 +190,30 @@ export const PRICING_POINTS = [
 export const PRICING_STEPS = [
   { title: 'Créez votre tournoi', desc: 'Configuration, format et page publique : gratuit, sans carte bancaire.' },
   { title: 'Les équipes s’inscrivent', desc: 'Vous suivez les inscriptions et validez les équipes en temps réel.' },
-  { title: 'Vous payez par équipe', desc: 'Un petit montant par équipe confirmée, dégressif selon le volume.' },
+  { title: 'Vous payez par équipe', desc: 'Un montant par équipe confirmée, dégressif selon le volume.' },
 ]
+
+// Pay-per-team, degressive (marginal rate per bracket). The total is always
+// shown up front (see the estimator) so there is no "meter" anxiety.
+export const PRICE_TIERS: { from: number; to: number | null; rate: number }[] = [
+  { from: 1, to: 8, rate: 5 },
+  { from: 9, to: 16, rate: 4 },
+  { from: 17, to: 32, rate: 3 },
+  { from: 33, to: null, rate: 2 },
+]
+
+/** Lifetime discount for the first "founding" organizers. */
+export const FOUNDER_DISCOUNT = 0.3
+
+/** Total price for a tournament of `teams` teams (degressive per-team). */
+export function priceForTeams(teams: number): number {
+  let total = 0
+  let prev = 0
+  for (const t of PRICE_TIERS) {
+    const cap = t.to ?? teams
+    if (teams <= prev) break
+    total += (Math.min(teams, cap) - prev) * t.rate
+    prev = cap
+  }
+  return total
+}
