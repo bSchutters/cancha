@@ -5,7 +5,10 @@ import { ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { MarketingShell } from '@/components/marketing/shell'
 import { CtaSection } from '@/components/marketing/cta-section'
+import { Breadcrumbs } from '@/components/marketing/structured-data'
 import { display, focusRing } from '@/components/marketing/theme'
+import { getRequestBaseUrl } from '@/lib/tournament/seo'
+import { BRAND_NAME } from '@/lib/site'
 import { GUIDES } from '@/lib/marketing/guides'
 
 export function generateStaticParams() {
@@ -27,18 +30,23 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const { slug } = await params
   const g = GUIDES.find((x) => x.slug === slug)
   if (!g) notFound()
+  const base = await getRequestBaseUrl()
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: g.title,
     description: g.metaDescription,
-    author: { '@type': 'Organization', name: 'Cup Generator' },
+    author: { '@type': 'Organization', name: BRAND_NAME },
   }
 
   return (
     <MarketingShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <Breadcrumbs
+        baseUrl={base}
+        items={[{ name: 'Accueil', href: '/' }, { name: 'Ressources', href: '/ressources' }, { name: g.title }]}
+      />
 
       <article className="mx-auto max-w-2xl px-4 py-20 sm:px-6 lg:py-24">
         <Link

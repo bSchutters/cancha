@@ -8,6 +8,8 @@ export type SportContent = {
   eyebrow: string
   h1: string
   intro: string
+  // Distinct, sport-specific formats so each page has unique crawlable content.
+  formats: string[]
 }
 
 export const SPORTS: SportContent[] = [
@@ -18,6 +20,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Gérez votre tournoi de futsal, du tirage au trophée',
     intro:
       'Poules, calendrier multi-terrains, phase finale et classements en direct : Cup Generator gère votre tournoi de futsal de l’inscription des équipes au coup de sifflet final.',
+    formats: [
+      'Futsal à 5 contre 5, avec ou sans gardien tournant',
+      'Poules puis tableau à élimination directe',
+      'Matchs courts enchaînés sur un ou plusieurs terrains',
+    ],
   },
   {
     slug: 'football',
@@ -26,6 +33,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Votre tournoi de football, organisé sans Excel',
     intro:
       'Foot à 5, à 7 ou à 11 : créez vos poules, générez le calendrier sur plusieurs terrains et suivez scores et classements en temps réel, sur une seule plateforme.',
+    formats: [
+      'Foot à 5, à 7 ou à 11',
+      'Phase de poules puis phase finale',
+      'Plusieurs terrains gérés en parallèle',
+    ],
   },
   {
     slug: 'padel',
@@ -34,6 +46,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Organisez votre tournoi de padel sans prise de tête',
     intro:
       'Inscriptions des paires, tirage des poules, planning des courts et tableau final : tout est automatisé pour que vous profitiez du tournoi au lieu de gérer un fichier Excel.',
+    formats: [
+      'Tournoi par paires (messieurs, dames ou mixte)',
+      'Poules puis tableau final',
+      'Planning réparti sur tous vos courts',
+    ],
   },
   {
     slug: 'volley',
@@ -42,6 +59,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Votre tournoi de volley, géré de A à Z',
     intro:
       'Des poules à la phase finale, Cup Generator répartit les matchs sur vos terrains, calcule les classements et affiche tout en direct sur place.',
+    formats: [
+      'Équipes en 4 contre 4 ou 6 contre 6',
+      'Classement aux sets et aux points',
+      'Rotation des matchs sur plusieurs terrains',
+    ],
   },
   {
     slug: 'basket',
@@ -50,6 +72,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Organisez votre tournoi de basket en quelques clics',
     intro:
       'Inscriptions en ligne, tirage au sort, calendrier multi-terrains et classements automatiques : concentrez-vous sur le jeu, la plateforme s’occupe de la logistique.',
+    formats: [
+      'Basket 3x3 ou 5x5',
+      'Poules puis élimination directe',
+      'Calendrier multi-terrains sur la journée',
+    ],
   },
   {
     slug: 'ping-pong',
@@ -58,6 +85,11 @@ export const SPORTS: SportContent[] = [
     h1: 'Votre tournoi de tennis de table, simplifié',
     intro:
       'Poules, tableaux et classements se génèrent automatiquement. Saisissez les scores, l’affichage et le classement final se mettent à jour en direct.',
+    formats: [
+      'Simples ou doubles',
+      'Poules puis tableau final',
+      'Plusieurs tables jouées en parallèle',
+    ],
   },
 ]
 
