@@ -37,7 +37,23 @@ export function Spotlight({
     const measure = () => {
       const t = document.querySelector(selector)
       const r = t?.getBoundingClientRect() ?? null
-      setRect(r && r.width > 0 ? r : null)
+      const next = r && r.width > 0 ? r : null
+      // Only re-render when the geometry actually changed: getBoundingClientRect
+      // returns a fresh object every tick, so without this guard the 100ms poll
+      // would re-render 10x/sec for the whole tour even on a static page.
+      setRect((prev) => {
+        if (!prev && !next) return prev
+        if (
+          prev &&
+          next &&
+          prev.top === next.top &&
+          prev.left === next.left &&
+          prev.width === next.width &&
+          prev.height === next.height
+        )
+          return prev
+        return next
+      })
     }
     measure()
     const id = setInterval(measure, 100)

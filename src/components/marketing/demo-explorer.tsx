@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -47,14 +47,26 @@ export function DemoExplorer() {
   const [sawAfterGroups, setSawAfterGroups] = useState(false)
   const [sawAfterFinals, setSawAfterFinals] = useState(false)
 
-  const groups = computeGroups(teams, groupMatches)
-  const ko = resolveKnockout(koMatches)
+  // Pure functions of state: memoize so unrelated re-renders (tab switch, tour
+  // step, typing a team name) don't recompute standings + knockout resolution.
+  const groups = useMemo(() => computeGroups(teams, groupMatches), [teams, groupMatches])
+  const ko = useMemo(() => resolveKnockout(koMatches), [koMatches])
+  const drawnPools = useMemo(
+    () => POOLS.map((p) => ({ label: p, teams: teams.filter((t) => t.pool === p).map((t) => t.name) })),
+    [teams],
+  )
   const editableMatches = [...groupMatches, ...ko]
-  const drawnPools = POOLS.map((p) => ({ label: p, teams: teams.filter((t) => t.pool === p).map((t) => t.name) }))
   // The knockout can only start once every group match is played (saved); the
-  // tournament can only finish once the knockout is played too.
+  // tournament can only finish once the knockout is played AND the final has two
+  // resolved participants (a tied semifinal leaves the final unfilled).
   const groupReady = groupMatches.length > 0 && groupMatches.every((m) => m.locked)
-  const koReady = koMatches.length > 0 && koMatches.every((m) => m.locked)
+  const finalMatch = ko.find((m) => m.id === 'F')
+  const koReady =
+    koMatches.length > 0 &&
+    koMatches.every((m) => m.locked) &&
+    finalMatch != null &&
+    finalMatch.homeId != null &&
+    finalMatch.awayId != null
 
   const onSimulateScores = () =>
     setGroupMatches((ms) => ms.map((m, i) => ({ ...m, hs: (i * 3 + 1) % 5, as: (i * 2) % 4, locked: true })))

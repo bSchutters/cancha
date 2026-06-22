@@ -39,6 +39,9 @@ export const BRAND: CSSProperties = {
   '--input': '#E6E1D6',
   '--ring': '#35527D',
   '--radius': '0.75rem',
+  // Marketing pages are always light (cream), even though the app shell defaults
+  // to a dark next-themes class on <html> — anchor native controls/scrollbars.
+  colorScheme: 'light',
   fontFamily: 'var(--font-geist-brand), ui-sans-serif, system-ui, sans-serif',
 } as CSSProperties
 
