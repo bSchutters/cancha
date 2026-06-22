@@ -115,7 +115,6 @@ export function ManagerShowcase({
               {step === 0 ? 'Inscriptions' : step >= 4 ? 'Terminé' : 'En cours'}
             </span>
           </div>
-          <span className="text-xs text-muted-foreground">Tableau de bord organisateur</span>
         </div>
         <nav className="mt-4 flex flex-wrap gap-1">
           {TABS.map((t) => (

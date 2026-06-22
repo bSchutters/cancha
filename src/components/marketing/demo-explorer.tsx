@@ -23,9 +23,9 @@ import {
 
 type View = 'organisateur' | 'public'
 
-const VIEWS: { key: View; label: string; caption: string }[] = [
-  { key: 'organisateur', label: 'Côté organisateur', caption: 'Votre poste de pilotage : du tirage aux scores, étape par étape.' },
-  { key: 'public', label: 'Côté public', caption: 'Ce que voient les équipes et les spectateurs, en direct.' },
+const VIEWS: { key: View; label: string }[] = [
+  { key: 'organisateur', label: 'Côté organisateur' },
+  { key: 'public', label: 'Côté public' },
 ]
 
 /**
@@ -172,8 +172,6 @@ export function DemoExplorer() {
   const onToggleConfirmed = (id: number) =>
     setTeams((ts) => ts.map((t) => (t.id === id ? { ...t, confirmed: !t.confirmed } : t)))
 
-  const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0]
-
   return (
     <div>
       <div className="flex flex-col items-center gap-3">
@@ -194,10 +192,6 @@ export function DemoExplorer() {
             </button>
           ))}
         </div>
-        <p className="text-sm text-muted-foreground">{current.caption}</p>
-        <p className="text-xs text-primary">
-          Déroulez le tournoi côté organisateur (tirage, calendrier, scores), puis basculez côté public.
-        </p>
         {!tourOn && view === 'organisateur' && (
           <Button size="sm" variant="secondary" onClick={() => setTourOn(true)}>
             <Sparkles className="size-4" /> Lancer le guide pas à pas

@@ -20,8 +20,7 @@ export default function DemoPage() {
           Les deux faces de votre tournoi
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Côté organisateur, votre poste de pilotage. Côté public, ce que voient les équipes en
-          direct. Basculez de l’un à l’autre, sur des données d’exemple.
+          Côté organisateur, votre poste de pilotage. Côté public, ce que voient les équipes en direct.
         </p>
       </section>
 
