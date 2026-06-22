@@ -1,12 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/payload/access'
-
-export const LEAD_STATUSES = [
-  { label: 'Nouveau', value: 'new' },
-  { label: 'Contacté', value: 'contacted' },
-  { label: 'Converti', value: 'converted' },
-  { label: 'Perdu', value: 'lost' },
-] as const
+import { LEAD_STATUSES } from '@/lib/leads-status'
 
 /**
  * Inbound demo-request leads. Created (with overrideAccess) by the public
@@ -41,7 +35,7 @@ export const Leads: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'new',
-      options: [...LEAD_STATUSES],
+      options: LEAD_STATUSES.map((s) => ({ label: s.label, value: s.value })),
     },
     {
       name: 'source',

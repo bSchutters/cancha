@@ -1,32 +1,33 @@
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
+import { LEAD_STATUS_LABEL } from '@/lib/leads-status'
 
 export const dynamic = 'force-dynamic'
 
+// Pre-event + live states (excludes draft / finished / archived).
 const ACTIVE_TOURNAMENT_STATUSES = ['registration', 'registration_closed', 'draw_done', 'live']
 
-const STATUS_LABEL: Record<string, string> = {
-  new: 'Nouveau',
-  contacted: 'Contacté',
-  converted: 'Converti',
-  lost: 'Perdu',
-}
-
-function StatCard({ label, value, href }: { label: string; value: number; href: string }) {
-  return (
-    <Link
-      href={href}
-      className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/30"
-    >
+function StatCard({ label, value, href }: { label: string; value: number; href?: string }) {
+  const inner = (
+    <>
       <p className="text-3xl font-semibold tracking-tight">{value}</p>
       <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+    </>
+  )
+  const base = 'rounded-2xl border border-border bg-card p-5'
+  return href ? (
+    <Link href={href} className={cn(base, 'transition-colors hover:border-primary/30')}>
+      {inner}
     </Link>
+  ) : (
+    <div className={base}>{inner}</div>
   )
 }
 
 export default async function ConsoleDashboard() {
   const payload = await getPayloadClient()
-  const [newLeads, activeClients, liveTournaments, recent] = await Promise.all([
+  const [newLeads, clients, activeTournaments, recent] = await Promise.all([
     payload.count({ collection: 'leads', where: { status: { equals: 'new' } }, overrideAccess: true }),
     payload.count({ collection: 'organizations', overrideAccess: true }),
     payload.count({
@@ -53,8 +54,8 @@ export default async function ConsoleDashboard() {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <StatCard label="Leads à traiter" value={newLeads.totalDocs} href="/console/leads" />
-        <StatCard label="Clients" value={activeClients.totalDocs} href="/console/clients" />
-        <StatCard label="Tournois en cours" value={liveTournaments.totalDocs} href="/console/clients" />
+        <StatCard label="Clients" value={clients.totalDocs} href="/console/clients" />
+        <StatCard label="Tournois actifs" value={activeTournaments.totalDocs} />
       </div>
 
       <section className="mt-8">
@@ -76,7 +77,7 @@ export default async function ConsoleDashboard() {
                     {l.organization && <p className="truncate text-xs text-muted-foreground">{l.organization}</p>}
                   </div>
                   <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                    {STATUS_LABEL[l.status] ?? l.status}
+                    {LEAD_STATUS_LABEL[l.status] ?? l.status}
                   </span>
                 </li>
               ))}

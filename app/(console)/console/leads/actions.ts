@@ -3,9 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
-
-const STATUSES = ['new', 'contacted', 'converted', 'lost'] as const
-type Status = (typeof STATUSES)[number]
+import { LEAD_STATUS_VALUES, type LeadStatus } from '@/lib/leads-status'
 
 async function assertSuperAdmin() {
   const user = await getSessionUser()
@@ -21,9 +19,9 @@ function assertId(id: unknown): asserts id is number {
 export async function setLeadStatus(id: number, status: string) {
   await assertSuperAdmin()
   assertId(id)
-  if (!STATUSES.includes(status as Status)) throw new Error('invalid status')
+  if (!LEAD_STATUS_VALUES.includes(status)) throw new Error('invalid status')
   const payload = await getPayloadClient()
-  await payload.update({ collection: 'leads', id, data: { status: status as Status }, overrideAccess: true })
+  await payload.update({ collection: 'leads', id, data: { status: status as LeadStatus }, overrideAccess: true })
   revalidatePath('/console/leads')
 }
 

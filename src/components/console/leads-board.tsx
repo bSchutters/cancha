@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { LEAD_STATUSES, LEAD_STATUS_LABEL, LEAD_STATUS_VALUES } from '@/lib/leads-status'
 
 export type Lead = {
   id: number
@@ -19,13 +20,13 @@ export type Lead = {
 }
 
 const COLUMNS = [
-  { value: 'new', label: 'Nouveau', dot: 'bg-primary' },
-  { value: 'contacted', label: 'Contacté', dot: 'bg-amber-500' },
-  { value: 'converted', label: 'Converti', dot: 'bg-emerald-500' },
-  { value: 'lost', label: 'Perdu', dot: 'bg-muted-foreground/50' },
+  { value: 'new', dot: 'bg-primary' },
+  { value: 'contacted', dot: 'bg-amber-500' },
+  { value: 'converted', dot: 'bg-emerald-500' },
+  { value: 'lost', dot: 'bg-muted-foreground/50' },
 ] as const
 
-const KNOWN_STATUSES = new Set<string>(COLUMNS.map((c) => c.value))
+const KNOWN_STATUSES = new Set<string>(LEAD_STATUS_VALUES)
 
 function fmtDate(iso: string): string {
   try {
@@ -71,7 +72,7 @@ export function LeadsBoard({
             <div className="mb-3 flex items-center justify-between px-1">
               <span className="flex items-center gap-2 text-sm font-medium">
                 <span className={cn('size-2 rounded-full', col.dot)} />
-                {col.label}
+                {LEAD_STATUS_LABEL[col.value]}
               </span>
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{items.length}</span>
             </div>
@@ -100,6 +101,9 @@ function LeadCard({
   const [notes, setNotes] = useState(lead.notes)
   const [pending, start] = useTransition()
   const meta = [lead.sport, lead.teams].filter(Boolean).join(' · ')
+  const convertHref = `/console/clients/new?lead=${lead.id}&name=${encodeURIComponent(
+    lead.organization || lead.name,
+  )}&email=${encodeURIComponent(lead.email)}`
 
   return (
     <div className={cn('rounded-xl border border-border bg-card p-3 shadow-sm', pending && 'opacity-60')}>
@@ -132,9 +136,9 @@ function LeadCard({
           }}
           className={cn(fieldClass, 'cursor-pointer')}
         >
-          {COLUMNS.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
+          {LEAD_STATUSES.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
             </option>
           ))}
         </select>
@@ -146,6 +150,11 @@ function LeadCard({
         >
           {open ? 'Masquer' : 'Détails'}
         </button>
+        {lead.status !== 'converted' && (
+          <Link href={convertHref} className="shrink-0 text-xs font-medium text-primary hover:underline">
+            → Client
+          </Link>
+        )}
       </div>
 
       {open && (
@@ -176,18 +185,6 @@ function LeadCard({
           >
             Enregistrer la note
           </button>
-          {lead.status !== 'converted' && (
-            <div className="border-t border-border pt-2">
-              <Link
-                href={`/console/clients/new?lead=${lead.id}&name=${encodeURIComponent(
-                  lead.organization || lead.name,
-                )}&email=${encodeURIComponent(lead.email)}`}
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                Convertir en client →
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </div>

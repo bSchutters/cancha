@@ -7,6 +7,14 @@ import { Button } from '@/components/ui/button'
 
 type CreateClientState = { error?: string }
 
+// Readable strong password (no ambiguous chars) for the initial hand-off.
+function genPassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
+  const arr = new Uint32Array(16)
+  crypto.getRandomValues(arr)
+  return Array.from(arr, (n) => chars[n % chars.length]).join('')
+}
+
 const fieldClass =
   'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40'
 const labelClass = 'mb-1.5 block text-sm font-medium text-foreground'
@@ -30,6 +38,9 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
   const [name, setName] = useState(initial?.name ?? '')
   const [slug, setSlug] = useState(initial?.name ? slugify(initial.name) : '')
   const [slugTouched, setSlugTouched] = useState(false)
+  // Lazy init generates once per mount. Server and client produce different
+  // random values, so the input is marked suppressHydrationWarning.
+  const [password, setPassword] = useState(genPassword)
 
   return (
     <form action={formAction} className="max-w-xl space-y-6">
@@ -110,16 +121,28 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
             />
           </div>
           <div>
-            <label htmlFor="cf-password" className={labelClass}>
-              Mot de passe initial
-            </label>
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor="cf-password" className="text-sm font-medium text-foreground">
+                Mot de passe initial
+              </label>
+              <button
+                type="button"
+                onClick={() => setPassword(genPassword())}
+                className="text-xs text-primary hover:underline"
+              >
+                Régénérer
+              </button>
+            </div>
             <input
               id="cf-password"
               name="password"
               type="text"
               required
               minLength={12}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               autoComplete="off"
+              suppressHydrationWarning
               className={cn(fieldClass, 'font-mono')}
               placeholder="12 caractères minimum"
             />

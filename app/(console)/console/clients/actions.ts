@@ -55,6 +55,24 @@ export async function createClient(
 
   const payload = await getPayloadClient()
 
+  // If converting from a lead, validate it up front and refuse double-conversion
+  // (a stale link / double-submit must not spawn a second org+user).
+  const rawLeadId = formData.get('leadId')
+  let leadIdNum: number | null = null
+  if (typeof rawLeadId === 'string' && rawLeadId !== '') {
+    if (/^\d+$/.test(rawLeadId)) {
+      leadIdNum = Number(rawLeadId)
+      const lead = await payload
+        .findByID({ collection: 'leads', id: leadIdNum, depth: 0, overrideAccess: true })
+        .catch(() => null)
+      if (lead && (lead as { status?: string }).status === 'converted') {
+        return { error: 'Ce lead a déjà été converti en client.' }
+      }
+    } else {
+      console.warn('[createClient] ignoring malformed leadId:', rawLeadId)
+    }
+  }
+
   const slugTaken = await payload.find({
     collection: 'organizations',
     where: { slug: { equals: slug } },
@@ -123,21 +141,21 @@ export async function createClient(
   }
 
   // If this client was created from a lead, mark that lead converted (non-fatal).
-  const leadId = formData.get('leadId')
-  if (typeof leadId === 'string' && /^\d+$/.test(leadId)) {
+  if (leadIdNum !== null) {
     try {
       await payload.update({
         collection: 'leads',
-        id: Number(leadId),
+        id: leadIdNum,
         data: { status: 'converted' },
         overrideAccess: true,
       })
-      revalidatePath('/console/leads')
     } catch (err) {
       console.error('[createClient] lead convert mark failed:', err instanceof Error ? err.message : err)
     }
+    revalidatePath('/console/leads')
   }
 
+  revalidatePath('/console')
   revalidatePath('/console/clients')
   redirect('/console/clients')
 }
