@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/#features', label: 'Fonctionnalités' },
   { href: '/demo', label: 'Aperçu' },
   { href: '/tarifs', label: 'Tarifs' },
+  { href: '/comparatif', label: 'Comparatif' },
   { href: '/ressources', label: 'Ressources' },
 ]
 
@@ -17,7 +18,7 @@ export function MarketingNav() {
         <Link href="/" style={display} className={cn('text-xl font-medium tracking-tight', focusRing)}>
           Cup <span className="text-primary">Generator</span>
         </Link>
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-6 lg:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}

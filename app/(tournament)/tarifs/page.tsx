@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { Check, Sparkles, ShieldCheck } from 'lucide-react'
+import Link from 'next/link'
+import { Building2, Check, ShieldCheck, Sparkles } from 'lucide-react'
 import { MarketingShell } from '@/components/marketing/shell'
 import { Reveal } from '@/components/marketing/motion'
 import { CtaSection } from '@/components/marketing/cta-section'
 import { PriceEstimator } from '@/components/marketing/price-estimator'
+import { Button } from '@/components/ui/button'
 import { display } from '@/components/marketing/theme'
 import { PRICING_POINTS, PRICING_STEPS, PRICE_TIERS } from '@/lib/marketing/content'
 
@@ -31,6 +33,27 @@ export default function TarifsPage() {
           Pas d’abonnement, pas de frais d’installation. Un montant par équipe inscrite, dégressif
           au volume, et vous ne payez que si votre tournoi a bien lieu.
         </p>
+      </section>
+
+      {/* Launch offer (prominent) */}
+      <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6">
+        <Reveal className="overflow-hidden rounded-3xl border border-primary/30 bg-primary p-8 text-center text-primary-foreground sm:p-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            <Sparkles className="size-3.5" /> Offre de lancement
+          </span>
+          <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            -30% à vie pour les premiers organisateurs
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-primary-foreground/85">
+            Places limitées. Les premiers clubs et comités qui adoptent Cup Generator gardent ce
+            tarif réduit sur tous leurs futurs tournois.
+          </p>
+          <div className="mt-6">
+            <Button asChild size="lg" variant="secondary">
+              <Link href="#contact">En profiter</Link>
+            </Button>
+          </div>
+        </Reveal>
       </section>
 
       {/* Interactive estimator */}
@@ -70,21 +93,9 @@ export default function TarifsPage() {
         </div>
       </section>
 
-      {/* Launch offer */}
+      {/* Guarantee + custom/large tournaments */}
       <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6">
         <Reveal className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-primary/20 bg-primary/[0.06] p-6">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Sparkles className="size-5" />
-            </span>
-            <h3 style={display} className="mt-3 text-lg font-medium">
-              Tarif Organisateur fondateur
-            </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Les premiers organisateurs bénéficient de 30% de réduction, garantis à vie sur tous
-              leurs tournois.
-            </p>
-          </div>
           <div className="rounded-2xl border border-border bg-card p-6">
             <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <ShieldCheck className="size-5" />
@@ -95,6 +106,21 @@ export default function TarifsPage() {
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Si votre tournoi ne se déroule pas comme prévu, on vous rembourse. Le risque est pour
               nous, pas pour vous.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Building2 className="size-5" />
+            </span>
+            <h3 style={display} className="mt-3 text-lg font-medium">
+              Grands tournois & sur mesure
+            </h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Au-delà de 48 équipes, format multi-jours, fédération ou salle :{' '}
+              <Link href="#contact" className="font-medium text-primary underline underline-offset-2">
+                on construit une offre adaptée
+              </Link>
+              .
             </p>
           </div>
         </Reveal>

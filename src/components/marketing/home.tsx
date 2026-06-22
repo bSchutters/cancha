@@ -2,6 +2,7 @@ import Link from 'next/link'
 import {
   ArrowRight,
   CalendarClock,
+  Check,
   ClipboardList,
   Dices,
   Flag,
@@ -18,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Bracket } from '@/components/tournament/Bracket'
 import { MatchCard } from '@/components/tournament/MatchList'
 import { DEMO_KNOCKOUT, DEMO_GROUP_MATCHES } from '@/lib/marketing/demo-data'
+import { COMPARISON } from '@/lib/marketing/content'
 import { display, focusRing } from './theme'
 import { Reveal, Parallax } from './motion'
 import { CtaSection } from './cta-section'
@@ -333,6 +335,59 @@ export function HomeSections() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Comparison teaser */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-5xl px-4 py-24 sm:px-6">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 style={display} className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Pourquoi pas juste un tableur ?
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Excel fait illusion jusqu’au jour J. Là où ça compte, la différence est nette.
+            </p>
+          </Reveal>
+
+          <Reveal className="mt-10 overflow-x-auto rounded-3xl border border-border bg-card">
+            <table className="w-full min-w-[560px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left">
+                  <th className="p-4 font-medium text-muted-foreground">Tâche</th>
+                  <th className="p-4 font-medium text-muted-foreground">Tableur Excel / papier</th>
+                  <th className="p-4 font-medium text-primary">Cup Generator</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON.slice(0, 5).map((row) => (
+                  <tr key={row.criterion} className="border-b border-border last:border-b-0">
+                    <td className="p-4 font-medium text-foreground">{row.criterion}</td>
+                    <td className="p-4 text-muted-foreground">{row.excel}</td>
+                    <td className="bg-primary/[0.04] p-4">
+                      <span className="flex items-start gap-2">
+                        <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <span className="font-medium text-foreground">{row.cupgenerator}</span>
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Reveal>
+
+          <Reveal className="mt-6 text-center">
+            <Link
+              href="/comparatif"
+              className={cn(
+                'inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-foreground',
+                focusRing,
+              )}
+            >
+              Voir le comparatif complet
+              <ArrowRight className="size-4" />
+            </Link>
+          </Reveal>
         </div>
       </section>
 
