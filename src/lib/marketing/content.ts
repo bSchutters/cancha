@@ -197,41 +197,16 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ]
 
-export const PRICING = [
-  {
-    name: 'Lancement',
-    price: 'Gratuit',
-    tagline: 'Pour vos premiers tournois',
-    features: [
-      'Toutes les fonctionnalités',
-      'Mise en place accompagnée',
-      'Page publique + affichage TV',
-      'Support par email',
-    ],
-    highlighted: true,
-  },
-  {
-    name: 'Club',
-    price: 'Sur devis',
-    tagline: 'Pour les organisateurs réguliers',
-    features: [
-      'Tournois illimités',
-      'Marque et domaine personnalisés',
-      'Gestion des sponsors',
-      'Accompagnement prioritaire',
-    ],
-    highlighted: false,
-  },
-  {
-    name: 'Sur mesure',
-    price: 'Contact',
-    tagline: 'Fédérations, salles, événements',
-    features: [
-      'Volume et besoins spécifiques',
-      'Intégrations dédiées',
-      'Formation des équipes',
-      'Accord cadre',
-    ],
-    highlighted: false,
-  },
+// Pricing model: pay-per-team (no subscription, no upfront). No hard rate is shown
+// here yet; it is intentionally left to a quote until the exact amount is fixed.
+export const PRICING_POINTS = [
+  { title: 'Sans abonnement', desc: 'Aucun frais mensuel, aucun engagement dans la durée.' },
+  { title: 'Sans frais d’installation', desc: 'Créer et configurer votre tournoi est gratuit.' },
+  { title: 'Vous payez à l’usage', desc: 'Un montant par équipe inscrite, uniquement si votre tournoi a lieu.' },
+]
+
+export const PRICING_STEPS = [
+  { title: 'Créez votre tournoi', desc: 'Configuration, format et page publique : gratuit, sans carte bancaire.' },
+  { title: 'Les équipes s’inscrivent', desc: 'Vous suivez les inscriptions et validez les équipes en temps réel.' },
+  { title: 'Vous payez par équipe', desc: 'Un petit montant par équipe confirmée, dégressif selon le volume.' },
 ]

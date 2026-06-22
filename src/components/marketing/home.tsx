@@ -8,12 +8,16 @@ import {
   Globe,
   Handshake,
   LayoutGrid,
+  type LucideIcon,
   Megaphone,
   Radio,
   Trophy,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Bracket } from '@/components/tournament/Bracket'
+import { MatchCard } from '@/components/tournament/MatchList'
+import { DEMO_KNOCKOUT, DEMO_GROUP_MATCHES } from '@/lib/marketing/demo-data'
 import { display, focusRing } from './theme'
 import { Reveal, Parallax } from './motion'
 import { CtaSection } from './cta-section'
@@ -26,24 +30,33 @@ const PROCESS = [
   { icon: Radio, title: 'En direct', desc: 'Scores, classements et phase finale calculés en temps réel.' },
 ]
 
-const FEATURES = [
+type Feature = {
+  icon: LucideIcon
+  title: string
+  desc: string
+  wide?: boolean
+  tint?: boolean
+  preview?: 'bracket' | 'matches'
+}
+
+const FEATURES: Feature[] = [
   {
     icon: Trophy,
     title: 'Phase finale & classements',
     desc: 'Poules, arbre, barrages et classement final calculés en direct.',
     wide: true,
-    tint: true,
+    preview: 'bracket',
   },
   {
     icon: LayoutGrid,
     title: 'Multi-terrains',
     desc: 'Le calendrier se répartit sur plusieurs terrains, retards gérés.',
     wide: true,
-    tint: false,
+    preview: 'matches',
   },
-  { icon: Flag, title: 'Arbitres', desc: 'Affectation manuelle ou aléatoire à la génération.', tint: false },
+  { icon: Flag, title: 'Arbitres', desc: 'Affectation manuelle ou aléatoire à la génération.' },
   { icon: Handshake, title: 'Classement fair-play', desc: 'Le fair-play est suivi et classé, en plus des résultats.', tint: true },
-  { icon: Megaphone, title: 'Sponsors & couleurs', desc: 'Vos sponsors et votre identité sur chaque page.', tint: false },
+  { icon: Megaphone, title: 'Sponsors & couleurs', desc: 'Vos sponsors et votre identité sur chaque page.' },
   { icon: Globe, title: 'Page publique', desc: 'Une page par tournoi : équipes, calendrier et résultats en ligne.', tint: true },
 ]
 
@@ -121,7 +134,7 @@ export function HomeSections() {
                   focusRing,
                 )}
               >
-                Voir la démo en direct
+                Voir un aperçu interactif
                 <ArrowRight className="size-4" />
               </Link>
             </div>
@@ -305,6 +318,18 @@ export function HomeSections() {
                   {f.title}
                 </h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+                {f.preview === 'bracket' && (
+                  <div className="mt-5 overflow-x-auto rounded-xl border border-border bg-background p-3">
+                    <Bracket matches={DEMO_KNOCKOUT} size="sm" />
+                  </div>
+                )}
+                {f.preview === 'matches' && (
+                  <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                    {DEMO_GROUP_MATCHES.slice(0, 2).map((m) => (
+                      <MatchCard key={String(m.id)} match={m} />
+                    ))}
+                  </div>
+                )}
               </Reveal>
             ))}
           </div>

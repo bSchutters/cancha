@@ -5,7 +5,7 @@ import { display, focusRing } from './theme'
 
 const LINKS = [
   { href: '/#features', label: 'Fonctionnalités' },
-  { href: '/demo', label: 'Démo' },
+  { href: '/demo', label: 'Aperçu' },
   { href: '/tarifs', label: 'Tarifs' },
   { href: '/ressources', label: 'Ressources' },
 ]

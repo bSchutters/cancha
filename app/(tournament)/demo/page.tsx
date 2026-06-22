@@ -5,9 +5,9 @@ import { CtaSection } from '@/components/marketing/cta-section'
 import { display } from '@/components/marketing/theme'
 
 export const metadata: Metadata = {
-  title: 'Démo en direct',
+  title: 'Aperçu interactif',
   description:
-    'Essayez Cup Generator : lancez un tirage au sort animé, parcourez les poules, le calendrier et le classement, sur des données d’exemple.',
+    'Aperçu interactif de Cup Generator : lancez un tirage au sort animé, parcourez les poules, le calendrier et la phase finale, sur des données d’exemple.',
   alternates: { canonical: '/demo' },
 }
 
@@ -15,7 +15,7 @@ export default function DemoPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-3xl px-4 pb-10 pt-20 text-center sm:px-6 lg:pt-24">
-        <span className="text-sm font-medium text-primary">Démo interactive</span>
+        <span className="text-sm font-medium text-primary">Aperçu interactif</span>
         <h1 style={display} className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
           Cliquez, ça tourne pour de vrai
         </h1>

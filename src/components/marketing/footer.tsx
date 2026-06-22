@@ -27,7 +27,7 @@ export function MarketingFooter() {
         <nav className="flex flex-col gap-3">
           <span className="text-sm font-medium text-foreground">Produit</span>
           <FooterLink href="/#features">Fonctionnalités</FooterLink>
-          <FooterLink href="/demo">Démo</FooterLink>
+          <FooterLink href="/demo">Aperçu interactif</FooterLink>
           <FooterLink href="/tarifs">Tarifs</FooterLink>
           <FooterLink href="/comparatif">Comparatif</FooterLink>
         </nav>
