@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { PublicGroup, PublicMatch } from '@/lib/tournament/public-view'
 import { GroupStandings } from '@/components/tournament/GroupStandings'
 import { MatchesByRound } from '@/components/tournament/MatchList'
@@ -11,11 +12,11 @@ import { QUALIFIERS, type Step } from '@/lib/marketing/demo-engine'
 
 type TabKey = 'tirage' | 'poules' | 'calendrier' | 'finale'
 
-const TABS: { key: TabKey; label: string }[] = [
-  { key: 'tirage', label: 'Tirage' },
-  { key: 'poules', label: 'Poules' },
-  { key: 'calendrier', label: 'Calendrier' },
-  { key: 'finale', label: 'Phase finale' },
+const TABS: { key: TabKey; labelKey: string }[] = [
+  { key: 'tirage', labelKey: 'draw' },
+  { key: 'poules', labelKey: 'pools' },
+  { key: 'calendrier', labelKey: 'calendar' },
+  { key: 'finale', labelKey: 'finals' },
 ]
 
 function Pending({ children }: { children: React.ReactNode }) {
@@ -43,6 +44,7 @@ export function DemoShowcase({
   groupMatches: PublicMatch[]
   knockout: PublicMatch[]
 }) {
+  const tr = useT()
   const [tab, setTab] = useState<TabKey>(() =>
     step >= 3 ? 'finale' : step >= 2 ? 'calendrier' : step >= 1 ? 'tirage' : 'poules',
   )
@@ -52,17 +54,17 @@ export function DemoShowcase({
       <div className="border-b border-border px-5 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h3 className="text-lg font-bold sm:text-xl">Tournoi démo</h3>
+            <h3 className="text-lg font-bold sm:text-xl">{tr('demo.sandbox.title')}</h3>
             <div className="mt-0.5 flex items-center gap-1.5 text-xs text-primary">
               <span className="relative flex size-2">
                 <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75 motion-safe:animate-ping" />
                 <span className="relative inline-flex size-2 rounded-full bg-primary" />
               </span>
-              En direct
+              {tr('demo.sandbox.live')}
             </div>
           </div>
           <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
-            8 équipes · 2 poules
+            {tr('demo.sandbox.summary')}
           </span>
         </div>
 
@@ -78,7 +80,7 @@ export function DemoShowcase({
                 tab === t.key ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
-              {t.label}
+              {tr(`demo.sandbox.public.tab.${t.labelKey}`)}
             </button>
           ))}
         </nav>
@@ -86,25 +88,29 @@ export function DemoShowcase({
 
       <div className="bg-secondary/30 p-5 sm:p-7">
         {tab === 'tirage' &&
-          (step >= 1 ? <AnimatedDraw pools={pools} /> : <Pending>Le tirage au sort n’a pas encore eu lieu.</Pending>)}
+          (step >= 1 ? (
+            <AnimatedDraw pools={pools} />
+          ) : (
+            <Pending>{tr('demo.sandbox.public.pending.draw')}</Pending>
+          ))}
         {tab === 'poules' &&
           (step >= 1 ? (
             <div>
               {groups.every((g) => g.standings.every((s) => s.played === 0)) && (
                 <p className="mb-4 rounded-lg border border-border bg-card px-4 py-2 text-center text-xs text-muted-foreground">
-                  Les classements se rempliront au fil des scores saisis côté organisateur.
+                  {tr('demo.sandbox.public.pools.fillNote')}
                 </p>
               )}
               <GroupStandings groups={groups} qualifiersPerGroup={QUALIFIERS} />
             </div>
           ) : (
-            <Pending>Les poules s’afficheront après le tirage.</Pending>
+            <Pending>{tr('demo.sandbox.public.pending.pools')}</Pending>
           ))}
         {tab === 'calendrier' &&
           (step >= 2 ? (
             <MatchesByRound matches={groupMatches} />
           ) : (
-            <Pending>Le calendrier sera publié une fois généré.</Pending>
+            <Pending>{tr('demo.sandbox.public.pending.calendar')}</Pending>
           ))}
         {tab === 'finale' &&
           (step >= 3 ? (
@@ -112,12 +118,10 @@ export function DemoShowcase({
               <DemoBracket matches={knockout} />
             </div>
           ) : (
-            <Pending>La phase finale démarre après les poules.</Pending>
+            <Pending>{tr('demo.sandbox.public.pending.finals')}</Pending>
           ))}
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Aperçu sur données d’exemple, avec les composants réels du produit.
-        </p>
+        <p className="mt-6 text-center text-xs text-muted-foreground">{tr('demo.sandbox.public.footnote')}</p>
       </div>
     </div>
   )

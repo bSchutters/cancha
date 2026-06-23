@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { Button } from '@/components/ui/button'
 import { ManagerShowcase, type TabKey } from './manager-showcase'
 import { DemoShowcase } from './demo-showcase'
@@ -24,10 +25,7 @@ import {
 
 type View = 'organisateur' | 'public'
 
-const VIEWS: { key: View; label: string }[] = [
-  { key: 'organisateur', label: 'Côté organisateur' },
-  { key: 'public', label: 'Côté public' },
-]
+const VIEWS: View[] = ['organisateur', 'public']
 
 /**
  * Drives a coherent end-to-end tournament simulation and shares it between the
@@ -36,6 +34,7 @@ const VIEWS: { key: View; label: string }[] = [
  * knockout, visible on both sides live.
  */
 export function DemoExplorer() {
+  const tr = useT()
   const [view, setView] = useState<View>('organisateur')
   const [teams, setTeams] = useState<DemoTeam[]>(INITIAL_TEAMS)
   const [step, setStep] = useState<Step>(0)
@@ -91,40 +90,40 @@ export function DemoExplorer() {
     if (view === 'public')
       return {
         sel: '[data-tour="view-organisateur"]',
-        text: 'Quand vous avez vu le résultat, revenez côté organisateur pour continuer le guide.',
+        text: tr('demo.sandbox.tour.backToOrganiser'),
         dim: false,
       }
     const onDash = managerTab === 'dashboard'
     const onScores = managerTab === 'scores'
-    const goDash = { sel: '[data-tour="tab-dashboard"]', text: 'Ouvrez le Tableau de bord pour continuer.' }
-    const goScores = { sel: '[data-tour="tab-scores"]', text: 'Ouvrez l’onglet Scores pour saisir les matchs.' }
-    if (step === 0) return onDash ? { sel: '[data-tour="ctl-0"]', text: 'Cliquez ici pour lancer le tirage des poules.' } : goDash
-    if (step === 1) return onDash ? { sel: '[data-tour="ctl-1"]', text: 'Générez le calendrier des matchs.' } : goDash
+    const goDash = { sel: '[data-tour="tab-dashboard"]', text: tr('demo.sandbox.tour.goDash') }
+    const goScores = { sel: '[data-tour="tab-scores"]', text: tr('demo.sandbox.tour.goScores') }
+    if (step === 0) return onDash ? { sel: '[data-tour="ctl-0"]', text: tr('demo.sandbox.tour.step0') } : goDash
+    if (step === 1) return onDash ? { sel: '[data-tour="ctl-1"]', text: tr('demo.sandbox.tour.step1') } : goDash
     if (step === 2 && !groupReady)
       return onScores
-        ? { sel: '[data-tour="scores-area"]', text: 'Le plus rapide : cliquez « Remplir automatiquement » (ou saisissez les scores un par un).' }
+        ? { sel: '[data-tour="scores-area"]', text: tr('demo.sandbox.tour.step2Scores') }
         : goScores
     if (step === 2)
       return !sawAfterGroups
-        ? { sel: '[data-tour="view-public"]', text: 'Scores enregistrés ! Allez voir le classement se remplir côté public.' }
+        ? { sel: '[data-tour="view-public"]', text: tr('demo.sandbox.tour.step2SeePublic') }
         : onDash
-          ? { sel: '[data-tour="ctl-2"]', text: 'Maintenant, générez la phase finale.' }
+          ? { sel: '[data-tour="ctl-2"]', text: tr('demo.sandbox.tour.step2Finals') }
           : goDash
     if (step === 3 && !koReady)
       return onScores
-        ? { sel: '[data-tour="scores-area"]', text: 'Le plus rapide : cliquez « Remplir automatiquement » pour jouer la phase finale (ou saisissez les scores).' }
+        ? { sel: '[data-tour="scores-area"]', text: tr('demo.sandbox.tour.step3Scores') }
         : goScores
     if (step === 3)
       return !sawAfterFinals
-        ? { sel: '[data-tour="view-public"]', text: 'Allez voir l’arbre de la phase finale côté public, avant de terminer.' }
+        ? { sel: '[data-tour="view-public"]', text: tr('demo.sandbox.tour.step3SeePublic') }
         : onDash
-          ? { sel: '[data-tour="ctl-3"]', text: 'Dernière étape : terminez le tournoi.' }
+          ? { sel: '[data-tour="ctl-3"]', text: tr('demo.sandbox.tour.step3Finish') }
           : goDash
     return {
       sel: '[data-tour="reset"]',
-      text: 'Bravo, le tournoi est terminé ! Réinitialisez pour tout réessayer librement, à votre rythme.',
+      text: tr('demo.sandbox.tour.done'),
       action: {
-        label: 'Réinitialiser et explorer',
+        label: tr('demo.sandbox.tour.resetAction'),
         onClick: () => {
           onReset()
           setTourOn(false)
@@ -191,23 +190,23 @@ export function DemoExplorer() {
         <div className="inline-flex gap-1 rounded-full border border-border bg-card p-1">
           {VIEWS.map((v) => (
             <button
-              key={v.key}
+              key={v}
               type="button"
-              data-tour={v.key === 'public' ? 'view-public' : 'view-organisateur'}
-              onClick={() => selectView(v.key)}
-              aria-pressed={view === v.key}
+              data-tour={v === 'public' ? 'view-public' : 'view-organisateur'}
+              onClick={() => selectView(v)}
+              aria-pressed={view === v}
               className={cn(
                 'cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
-                view === v.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                view === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              {v.label}
+              {v === 'organisateur' ? tr('demo.sandbox.view.organisateur') : tr('demo.sandbox.view.public')}
             </button>
           ))}
         </div>
         {!tourOn && view === 'organisateur' && (
           <Button size="sm" variant="secondary" onClick={() => setTourOn(true)}>
-            <Sparkles className="size-4" /> Lancer le guide pas à pas
+            <Sparkles className="size-4" /> {tr('demo.sandbox.startTour')}
           </Button>
         )}
       </div>
@@ -245,11 +244,9 @@ export function DemoExplorer() {
 
       {/* Marketing CTA, clearly outside the demo mockup */}
       <div className="mt-6 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
-        <p className="text-sm text-muted-foreground">
-          Vous tenez le pilotage. Sur votre vrai tournoi, on configure tout avec vous.
-        </p>
+        <p className="text-sm text-muted-foreground">{tr('demo.sandbox.cta.text')}</p>
         <Button asChild size="sm" className="shrink-0">
-          <Link href="#contact">Demander une démo</Link>
+          <Link href="#contact">{tr('demo.sandbox.cta.button')}</Link>
         </Button>
       </div>
 
