@@ -7,6 +7,7 @@ import { resolveTenant, resolveTournamentTenant, type ResolvedTenant } from '@/l
 import { getRequestBaseUrl, socialMetadata, tenantBaseUrl } from '@/lib/tournament/seo'
 import { TournamentView } from '@/components/tournament/TournamentView'
 import { TournamentJsonLd } from '@/components/tournament/TournamentJsonLd'
+import { LOCALES, LOCALE_HREFLANG, DEFAULT_LOCALE, isLocale } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,28 +18,31 @@ export const dynamic = 'force-dynamic'
  * (resolveTenant / resolveTournamentTenant are request-cached, so the repeated
  * calls across both functions collapse to one lookup each.)
  */
-async function tournamentCanonical(payload: Payload, slug: string, hostOrg: ResolvedTenant | null) {
+async function tournamentCanonical(payload: Payload, slug: string, hostOrg: ResolvedTenant | null, lang: string) {
   const org = hostOrg ?? (await resolveTournamentTenant(payload, slug))
   const base = await getRequestBaseUrl()
-  return { org, canonical: `${tenantBaseUrl(org, base)}/${slug}` }
+  const hostBase = tenantBaseUrl(org, base)
+  const current = isLocale(lang) ? lang : DEFAULT_LOCALE
+  return { org, hostBase, canonical: `${hostBase}/${current}/${slug}` }
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ lang: string; slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
+  const { lang, slug } = await params
   const payload = await getPayloadClient()
   const hostOrg = await resolveTenant(payload)
   const t = await getCachedPublicTournament(payload, slug, hostOrg?.id ?? null)
   if (!t) return { title: 'Tournoi introuvable', robots: { index: false, follow: false } }
   const description = t.description ?? `Suivez le tournoi ${t.name} en direct.`
-  const { org, canonical } = await tournamentCanonical(payload, slug, hostOrg)
+  const { org, hostBase, canonical } = await tournamentCanonical(payload, slug, hostOrg, lang)
+  const languages = Object.fromEntries(LOCALES.map((l) => [LOCALE_HREFLANG[l], `${hostBase}/${l}/${slug}`]))
   return {
     title: t.name,
     description,
-    alternates: { canonical },
+    alternates: { canonical, languages },
     // og:image/twitter:image are produced by the opengraph-image route.
     ...socialMetadata({ org, title: t.name, description, path: canonical, images: [], card: 'summary_large_image' }),
   }
@@ -47,15 +51,15 @@ export async function generateMetadata({
 export default async function TournamentPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ lang: string; slug: string }>
 }) {
-  const { slug } = await params
+  const { lang, slug } = await params
   const payload = await getPayloadClient()
   const hostOrg = await resolveTenant(payload)
   const tournament = await getCachedPublicTournament(payload, slug, hostOrg?.id ?? null)
   if (!tournament) notFound()
 
-  const { org, canonical } = await tournamentCanonical(payload, slug, hostOrg)
+  const { org, canonical } = await tournamentCanonical(payload, slug, hostOrg, lang)
 
   return (
     <>

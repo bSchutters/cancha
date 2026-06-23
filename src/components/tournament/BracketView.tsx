@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { Id } from '@/lib/tournament/types'
 
 export interface BracketMatchView {
@@ -41,6 +44,7 @@ function TeamRow({
   loser: boolean
   tab: boolean
 }) {
+  const t = useT()
   return (
     <div className={cn('flex items-center justify-between gap-2', winner && 'font-bold', loser && 'text-muted-foreground')}>
       <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-muted-foreground')}>
@@ -49,10 +53,10 @@ function TeamRow({
             <Image src={logo} alt="" fill sizes="16px" unoptimized className="object-contain" />
           </span>
         )}
-        <span className={cn('truncate', loser && 'line-through')}>{name ?? 'À déterminer'}</span>
+        <span className={cn('truncate', loser && 'line-through')}>{name ?? t('product.match.tbd')}</span>
         {tab && (
           <span className="shrink-0 rounded-sm bg-emerald-400/20 px-1 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-300">
-            tab
+            {t('product.match.penaltyShort')}
           </span>
         )}
       </span>
@@ -73,6 +77,7 @@ export function BracketView({
   size?: keyof typeof SIZES
   className?: string
 }) {
+  const t = useT()
   const s = SIZES[size]
 
   const isPetite = (m: BracketMatchView) => (m.bracketLabel ?? '').toLowerCase().includes('petite')
@@ -92,7 +97,7 @@ export function BracketView({
   }
   const columns = [...rounds.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([round, list]) => ({ key: `r${round}`, label: list[0]?.bracketLabel ?? `Tour ${round}`, matches: list }))
+    .map(([round, list]) => ({ key: `r${round}`, label: list[0]?.bracketLabel ?? `${t('product.bracketRound')} ${round}`, matches: list }))
 
   const matchBox = (m: BracketMatchView) => {
     const decided = m.status === 'finished' && m.scoreHome != null && m.scoreAway != null
@@ -139,7 +144,7 @@ export function BracketView({
       {petite.length > 0 && (
         <div className="border-t border-border pt-3">
           <h4 className={cn('mb-2 font-bold uppercase tracking-wide text-orange-700 dark:text-orange-300/70', s.head)}>
-            {petite[0]?.bracketLabel ?? 'Petite finale (3e place)'}
+            {petite[0]?.bracketLabel ?? t('product.bracket.thirdPlace')}
           </h4>
           <div className={cn('flex flex-wrap', s.gap)}>
             {petite.map((m) => (

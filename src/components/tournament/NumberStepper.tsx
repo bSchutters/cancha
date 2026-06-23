@@ -2,6 +2,7 @@
 
 import { Minus, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { Button } from '@/components/ui/button'
 
 /**
@@ -25,6 +26,7 @@ export function NumberStepper({
   className?: string
   size?: 'sm' | 'md'
 }) {
+  const t = useT()
   const clamp = (n: number) => Math.min(max, Math.max(min, n))
   const current = value ?? min
   const btn = size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'
@@ -42,7 +44,7 @@ export function NumberStepper({
           btn,
           'rounded-md border border-border bg-card text-foreground hover:border-border hover:bg-accent hover:text-accent-foreground disabled:opacity-30',
         )}
-        aria-label="Diminuer"
+        aria-label={t('product.stepper.decrease')}
       >
         <Minus className="h-4 w-4" />
       </Button>
@@ -61,7 +63,7 @@ export function NumberStepper({
           'rounded-md border border-border bg-transparent text-center font-semibold tabular-nums text-foreground outline-none focus:border-border',
           'placeholder:text-muted-foreground disabled:opacity-40',
         )}
-        aria-label="Valeur"
+        aria-label={t('product.stepper.value')}
       />
       <Button
         type="button"
@@ -73,7 +75,7 @@ export function NumberStepper({
           btn,
           'rounded-md border border-border bg-card text-foreground hover:border-border hover:bg-accent hover:text-accent-foreground disabled:opacity-30',
         )}
-        aria-label="Augmenter"
+        aria-label={t('product.stepper.increase')}
       >
         <Plus className="h-4 w-4" />
       </Button>

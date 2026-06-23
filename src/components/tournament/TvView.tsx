@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useT } from '@/i18n/use-t'
+import type { Translate } from '@/i18n'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { BracketView } from './BracketView'
@@ -33,7 +35,10 @@ function PanelHeader({ title, meta }: { title: string; meta?: string[] }) {
 }
 
 /** The next set of simultaneous matches to play, across all phases. */
-function currentSlot(data: PublicTournament): { label: string; time: string | null; matches: PublicMatch[] } | null {
+function currentSlot(
+  data: PublicTournament,
+  t: Translate,
+): { label: string; time: string | null; matches: PublicMatch[] } | null {
   const all = [...data.groupMatches, ...data.knockoutMatches, ...data.classificationMatches]
   const pending = all.filter((m) => m.status !== 'finished' && m.homeName && m.awayName)
   if (pending.length === 0) return null
@@ -43,7 +48,7 @@ function currentSlot(data: PublicTournament): { label: string; time: string | nu
   const first = pending[0]
   const key = `${first.phase}:${first.round}`
   const matches = pending.filter((m) => `${m.phase}:${m.round}` === key)
-  const label = first.groupLabel ? `Round ${first.round}` : (first.bracketLabel ?? 'Prochains matchs')
+  const label = first.groupLabel ? `${t('product.round')} ${first.round}` : (first.bracketLabel ?? t('product.tv.upcomingMatches'))
   return { label, time: first.scheduledTime ?? null, matches }
 }
 
@@ -88,7 +93,8 @@ function ScoreboardTeam({
 }
 
 function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
-  const slot = currentSlot(data)
+  const t = useT()
+  const slot = currentSlot(data, t)
   if (!slot) return null
   const n = slot.matches.length
   const big = n <= 2
@@ -98,7 +104,7 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
 
   return (
     <div className="flex h-full flex-col">
-      <PanelHeader title="Prochains matchs" meta={[slot.label, ...(slot.time ? [slot.time] : [])]} />
+      <PanelHeader title={t('product.tv.upcomingMatches')} meta={[slot.label, ...(slot.time ? [slot.time] : [])]} />
       <div className="flex flex-1 flex-col justify-center gap-4">
         {slot.matches.map((m) => {
           const decided = m.status === 'finished' && m.scoreHome != null && m.scoreAway != null
@@ -127,7 +133,7 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
                 </span>
               ) : (
                 <span className="shrink-0 rounded-md border border-border px-4 py-1 text-xl font-bold text-muted-foreground">
-                  VS
+                  {t('product.tv.vs')}
                 </span>
               )}
               <ScoreboardTeam name={m.awayName} logo={m.awayLogoUrl} side="away" nameSize={nameSize} logoSize={logoSize} winner={awayWin} />
@@ -139,36 +145,45 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
   )
 }
 
-type StatCol = { label: string; title: string; value: (s: PublicTournament['groups'][number]['standings'][number]) => string | number }
+type StatCol = { key: string; value: (s: PublicTournament['groups'][number]['standings'][number]) => string | number }
 
 const FULL_STATS: StatCol[] = [
-  { label: 'J', title: 'Joués', value: (s) => s.played },
-  { label: 'V', title: 'Victoires', value: (s) => s.wins },
-  { label: 'N', title: 'Nuls', value: (s) => s.draws },
-  { label: 'D', title: 'Défaites', value: (s) => s.losses },
-  { label: 'BP', title: 'Buts pour', value: (s) => s.goalsFor },
-  { label: 'BC', title: 'Buts contre', value: (s) => s.goalsAgainst },
-  { label: 'Diff', title: 'Différence', value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
+  { key: 'played', value: (s) => s.played },
+  { key: 'wins', value: (s) => s.wins },
+  { key: 'draws', value: (s) => s.draws },
+  { key: 'losses', value: (s) => s.losses },
+  { key: 'goalsFor', value: (s) => s.goalsFor },
+  { key: 'goalsAgainst', value: (s) => s.goalsAgainst },
+  { key: 'goalDiff', value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
 ]
 function StandingsGrid({ data, columns }: { data: PublicTournament; columns: string }) {
+  const t = useT()
   const stats = FULL_STATS
   const statCols = 'w-9 text-center tabular-nums'
   return (
     <div className={`grid ${columns} items-start gap-4`}>
       {data.groups.map((g) => (
         <div key={g.label} className="rounded-lg border border-border bg-card p-4">
-          <h3 className="mb-2 text-2xl font-bold">Poule {g.label}</h3>
+          <h3 className="mb-2 text-2xl font-bold">
+            {t('product.poolLabel')} {g.label}
+          </h3>
           <Table>
             <TableHeader>
               <TableRow className="border-0 text-sm font-semibold text-muted-foreground hover:bg-transparent">
                 <TableHead className="h-auto w-6 p-0" />
                 <TableHead className="h-auto p-0" />
                 {stats.map((c) => (
-                  <TableHead key={c.label} className={cn('h-auto p-0', statCols)} title={c.title}>
-                    {c.label}
+                  <TableHead
+                    key={c.key}
+                    className={cn('h-auto p-0', statCols)}
+                    title={t(`product.standings.${c.key}.title`)}
+                  >
+                    {t(`product.standings.${c.key}.short`)}
                   </TableHead>
                 ))}
-                <TableHead className={cn('h-auto p-0 text-foreground', statCols)}>Pts</TableHead>
+                <TableHead className={cn('h-auto p-0 text-foreground', statCols)}>
+                  {t('product.standings.points.short')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -196,7 +211,7 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
                       </span>
                     </TableCell>
                     {stats.map((c) => (
-                      <TableCell key={c.label} className={cn('p-0 py-0.5 text-muted-foreground', statCols)}>
+                      <TableCell key={c.key} className={cn('p-0 py-0.5 text-muted-foreground', statCols)}>
                         {c.value(s)}
                       </TableCell>
                     ))}
@@ -213,9 +228,10 @@ function StandingsGrid({ data, columns }: { data: PublicTournament; columns: str
 }
 
 function StandingsPanel({ data }: { data: PublicTournament }) {
+  const t = useT()
   return (
     <div className="flex h-full flex-col">
-      <PanelHeader title="Classements" />
+      <PanelHeader title={t('product.tv.standings')} />
       {/* Centre the tables vertically so short standings don't cling to the top. */}
       <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden">
         {/* 4 pools laid out on 2 rows while there is no bracket yet. */}
@@ -227,6 +243,7 @@ function StandingsPanel({ data }: { data: PublicTournament }) {
 
 /** Knockout bracket, full screen. */
 function BracketPanel({ data }: { data: PublicTournament }) {
+  const t = useT()
   // Pick a size that fits vertically: the tallest round drives the height, so a
   // 16-team bracket (round of 16 = 8 matches) must shrink, a final stays large.
   const byRound = new Map<number, number>()
@@ -241,7 +258,7 @@ function BracketPanel({ data }: { data: PublicTournament }) {
 
   return (
     <div className="flex h-full flex-col">
-      <PanelHeader title="Phase finale" />
+      <PanelHeader title={t('product.finalsPhase')} />
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto">
         <BracketView matches={data.knockoutMatches.map(toBracketView)} size={size} />
       </div>
@@ -257,6 +274,7 @@ function subtractMinutes(hhmm: string, min: number): string {
 }
 
 function ScheduleTeam({ name, logo, align }: { name: string | null; logo: string | null; align: 'right' | 'left' }) {
+  const tbdLabel = useT()('product.match.tbd')
   const known = Boolean(name)
   return (
     <span className={cn('flex min-w-0 flex-1 items-center gap-1.5', align === 'right' ? 'flex-row-reverse text-right' : '')}>
@@ -271,19 +289,20 @@ function ScheduleTeam({ name, logo, align }: { name: string | null; logo: string
         />
       </span>
       <span className={cn('min-w-0 truncate', known ? 'font-medium' : 'italic text-muted-foreground')}>
-        {name ?? 'À déterminer'}
+        {name ?? tbdLabel}
       </span>
     </span>
   )
 }
 
 /** Round/phase label of a match: "Round N" for pools, the bracket label for finals. */
-function matchRoundLabel(m: PublicMatch): string {
-  if (m.phase === 'group') return `Round ${m.round}`
-  return (m.bracketLabel ?? 'Phase finale').replace(/\s*\(.*\)$/, '')
+function matchRoundLabel(m: PublicMatch, t: Translate): string {
+  if (m.phase === 'group') return `${t('product.round')} ${m.round}`
+  return (m.bracketLabel ?? t('product.finalsPhase')).replace(/\s*\(.*\)$/, '')
 }
 
 function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }) {
+  const t = useT()
   const decided = m.status === 'finished' && m.scoreHome != null && m.scoreAway != null
   return (
     <div className="flex min-w-0 items-center gap-1.5 text-base">
@@ -292,7 +311,7 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
       )}
       {showLabel && m.phase !== 'group' && (
         <span className="shrink-0 rounded-sm bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
-          {matchRoundLabel(m)}
+          {matchRoundLabel(m, t)}
         </span>
       )}
       <ScheduleTeam name={m.homeName} logo={m.homeLogoUrl} align="right" />
@@ -301,7 +320,7 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
           {m.scoreHome}-{m.scoreAway}
         </span>
       ) : (
-        <span className="shrink-0 text-sm text-muted-foreground">vs</span>
+        <span className="shrink-0 text-sm text-muted-foreground">{t('product.versus')}</span>
       )}
       <ScheduleTeam name={m.awayName} logo={m.awayLogoUrl} align="left" />
       {m.court != null && (
@@ -313,6 +332,7 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
 
 /** Day programme: the full running order, one card per kickoff time. */
 function SchedulePanel({ data }: { data: PublicTournament }) {
+  const t = useT()
   const offset = data.scheduleOffsetMin
   const byTime = new Map<string, PublicMatch[]>()
   for (const m of data.programme) {
@@ -324,17 +344,17 @@ function SchedulePanel({ data }: { data: PublicTournament }) {
 
   return (
     <div className="flex h-full flex-col">
-      <PanelHeader title="Programme du jour" />
+      <PanelHeader title={t('product.tv.programme')} />
       {offset > 0 && (
         <p className="mb-3 text-center">
           <span className="rounded-md bg-red-500/20 px-4 py-1 text-lg font-bold text-red-700 dark:text-red-300">
-            Retard +{offset} min
+            {t('product.tv.delay')} +{offset} min
           </span>
         </p>
       )}
       <div className={cn('grid min-h-0 flex-1 content-start gap-4 overflow-hidden', cols)}>
         {[...byTime.entries()].map(([time, ms]) => {
-          const labels = new Set(ms.map(matchRoundLabel))
+          const labels = new Set(ms.map((m) => matchRoundLabel(m, t)))
           const single = labels.size === 1 ? [...labels][0] : null
           const sorted = [...ms].sort((a, b) => (a.court ?? 99) - (b.court ?? 99))
           return (
@@ -377,6 +397,7 @@ export function TvView({
   views?: TvPanelKey[]
   org?: { name: string; logoUrl: string | null }
 }) {
+  const t = useT()
   const data = useTournamentLive(slug, initial, 15000)
   const viewsKey = views?.join(',') ?? ''
 
@@ -393,7 +414,7 @@ export function TvView({
     }
 
     const list: Array<() => React.ReactNode> = []
-    const hasPending = currentSlot(data) != null
+    const hasPending = currentSlot(data, t) != null
     const hasBracket = data.knockoutMatches.length > 0
 
     // "Prochains matchs" stays in the rotation as long as anything is unplayed
@@ -448,7 +469,7 @@ export function TvView({
               key={i}
               type="button"
               onClick={() => selectPanel(i)}
-              aria-label={`Vue ${i + 1}`}
+              aria-label={`${t('product.tv.view')} ${i + 1}`}
               className="h-2 w-10 cursor-pointer overflow-hidden rounded-full bg-foreground/20 transition-transform hover:scale-110 hover:bg-foreground/30"
             >
               {i === safeIndex && (
@@ -466,7 +487,7 @@ export function TvView({
       {data.sponsors.length > 0 && (
         <footer className="mt-6 rounded-lg border border-border bg-card px-8 py-4 text-center">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
-            Sponsors &amp; partenaires
+            {t('product.tv.sponsorsPartners')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
             {data.sponsors.map((sp) =>

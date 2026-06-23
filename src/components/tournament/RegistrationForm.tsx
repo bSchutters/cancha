@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useT } from '@/i18n/use-t'
 import { validateImageFile } from '@/lib/tournament/upload-media'
 import {
   Form,
@@ -18,14 +19,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 
-const schema = z.object({
-  teamName: z.string().trim().min(2, 'Nom d’équipe trop court').max(80),
-  email: z.email('Email invalide'),
-  phone: z.string().trim().min(6, 'Téléphone invalide').max(40),
-  website: z.string().optional(), // honeypot
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = {
+  teamName: string
+  email: string
+  phone: string
+  website?: string // honeypot
+}
 
 export function RegistrationForm({
   slug,
@@ -36,9 +35,20 @@ export function RegistrationForm({
   payment: { iban: string | null; amount: number | null; communication: string | null } | null
   closed?: boolean
 }) {
+  const t = useT()
   const [submitted, setSubmitted] = useState(false)
   const [waitlisted, setWaitlisted] = useState(false)
   const [logo, setLogo] = useState<File | null>(null)
+  const schema = useMemo(
+    () =>
+      z.object({
+        teamName: z.string().trim().min(2, t('product.reg.err.teamName')).max(80),
+        email: z.email(t('product.reg.err.email')),
+        phone: z.string().trim().min(6, t('product.reg.err.phone')).max(40),
+        website: z.string().optional(), // honeypot
+      }),
+    [t],
+  )
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { teamName: '', email: '', phone: '', website: '' },
@@ -59,14 +69,14 @@ export function RegistrationForm({
         const isWaitlist = Boolean(body?.data?.waitlisted)
         setWaitlisted(isWaitlist)
         setSubmitted(true)
-        toast.success(isWaitlist ? 'Ajouté à la liste d’attente.' : 'Inscription envoyée ! Vérifiez votre boîte mail.')
+        toast.success(isWaitlist ? t('product.reg.toast.waitlisted') : t('product.reg.toast.sent'))
         form.reset()
         setLogo(null)
       } else {
-        toast.error(body?.error?.message ?? 'Une erreur est survenue')
+        toast.error(body?.error?.message ?? t('product.reg.toast.error'))
       }
     } catch {
-      toast.error('Erreur réseau, réessayez')
+      toast.error(t('product.reg.toast.network'))
     }
   }
 
@@ -75,12 +85,10 @@ export function RegistrationForm({
       <div className="rounded-xl border border-primary/30 bg-primary/10 p-6 text-center">
         <h3 className="flex items-center justify-center gap-2 text-xl font-bold">
           <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-          {waitlisted ? 'Sur liste d’attente' : 'Inscription reçue'}
+          {waitlisted ? t('product.reg.success.waitlistTitle') : t('product.reg.success.title')}
         </h3>
         <p className="mt-2 text-muted-foreground">
-          {waitlisted
-            ? 'Le tournoi est complet. Votre équipe est sur la liste d’attente : nous vous contacterons si une place se libère.'
-            : 'Votre inscription est en attente de validation. Elle sera confirmée dès réception du paiement.'}
+          {waitlisted ? t('product.reg.success.waitlistBody') : t('product.reg.success.body')}
         </p>
       </div>
     )
@@ -88,22 +96,29 @@ export function RegistrationForm({
 
   return (
     <div className="rounded-xl border border-border bg-card p-6">
-      <h2 className="text-2xl font-bold">{closed ? 'Liste d’attente' : 'Inscrire mon équipe'}</h2>
+      <h2 className="text-2xl font-bold">
+        {closed ? t('product.reg.waitlistHeading') : t('product.reg.heading')}
+      </h2>
       {closed && (
         <div className="mt-3 rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-foreground">
-          Le tournoi est <span className="font-semibold">complet</span>. Vous pouvez vous inscrire sur la liste
-          d’attente : votre équipe sera repêchée si une place se libère.
+          {t('product.reg.closedBanner')}
         </div>
       )}
       {payment && (payment.amount || payment.iban) && (
         <div className="mt-4 rounded-lg bg-card/50 p-4 text-sm text-foreground">
-          <p className="font-semibold text-primary">Frais d’inscription</p>
-          {payment.amount && <p>Montant : {payment.amount} €</p>}
+          <p className="font-semibold text-primary">{t('product.reg.fees')}</p>
+          {payment.amount && (
+            <p>
+              {t('product.reg.amount')} : {payment.amount} €
+            </p>
+          )}
           {payment.iban && <p>IBAN : {payment.iban}</p>}
-          {payment.communication && <p>Communication : {payment.communication}</p>}
-          <p className="mt-1 text-muted-foreground">
-            L’inscription est validée manuellement après réception du paiement.
-          </p>
+          {payment.communication && (
+            <p>
+              {t('product.reg.communication')} : {payment.communication}
+            </p>
+          )}
+          <p className="mt-1 text-muted-foreground">{t('product.reg.manualValidation')}</p>
         </div>
       )}
       <Form {...form}>
@@ -113,7 +128,7 @@ export function RegistrationForm({
             name="teamName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom de l’équipe</FormLabel>
+                <FormLabel>{t('product.reg.teamName')}</FormLabel>
                 <FormControl>
                   <Input placeholder="Los Amigos FC" {...field} />
                 </FormControl>
@@ -126,7 +141,7 @@ export function RegistrationForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email du représentant</FormLabel>
+                <FormLabel>{t('product.reg.email')}</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="capitaine@email.com" {...field} />
                 </FormControl>
@@ -139,7 +154,7 @@ export function RegistrationForm({
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Téléphone du représentant</FormLabel>
+                <FormLabel>{t('product.reg.phone')}</FormLabel>
                 <FormControl>
                   <Input type="tel" placeholder="+32 4xx xx xx xx" {...field} />
                 </FormControl>
@@ -148,7 +163,7 @@ export function RegistrationForm({
             )}
           />
           <div className="space-y-2">
-            <FormLabel>Logo de l&apos;équipe (optionnel)</FormLabel>
+            <FormLabel>{t('product.reg.logo')}</FormLabel>
             <Input
               type="file"
               accept="image/*"
@@ -168,7 +183,7 @@ export function RegistrationForm({
           {/* Honeypot - hidden from humans, off-screen and aria-hidden. */}
           <div aria-hidden className="absolute left-[-9999px]" tabIndex={-1}>
             <label>
-              Ne pas remplir
+              {t('product.reg.honeypot')}
               <input type="text" tabIndex={-1} autoComplete="off" {...form.register('website')} />
             </label>
           </div>
@@ -178,7 +193,11 @@ export function RegistrationForm({
             className="w-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
           >
             {form.formState.isSubmitting && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-            {form.formState.isSubmitting ? 'Envoi…' : closed ? 'Rejoindre la liste d’attente' : 'M’inscrire'}
+            {form.formState.isSubmitting
+              ? t('product.reg.submitting')
+              : closed
+                ? t('product.reg.submitWaitlist')
+                : t('product.reg.submit')}
           </Button>
         </form>
       </Form>

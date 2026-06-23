@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { PublicMatch } from '@/lib/tournament/public-view'
 
 function TeamLine({
@@ -15,6 +18,7 @@ function TeamLine({
   winner: boolean
   penaltyWin: boolean
 }) {
+  const t = useT()
   return (
     <div className={cn('flex items-center justify-between gap-3', winner && 'font-bold')}>
       <span className={cn('flex min-w-0 items-center gap-1.5', !name && 'italic text-muted-foreground')}>
@@ -23,10 +27,10 @@ function TeamLine({
             <Image src={logo} alt={name} fill sizes="20px" unoptimized className="object-contain" />
           </span>
         )}
-        <span className="truncate">{name ?? 'À déterminer'}</span>
+        <span className="truncate">{name ?? t('product.match.tbd')}</span>
         {penaltyWin && (
           <span className="shrink-0 rounded-sm bg-emerald-400/20 px-1 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-300">
-            t.a.b.
+            {t('product.match.penaltyShort')}
           </span>
         )}
       </span>
@@ -36,6 +40,7 @@ function TeamLine({
 }
 
 export function MatchCard({ match, showMeta = true }: { match: PublicMatch; showMeta?: boolean }) {
+  const t = useT()
   const finished = match.status === 'finished'
   const decided = finished && match.scoreHome != null && match.scoreAway != null
   const homeWin = decided && (match.scoreHome! > match.scoreAway! || match.penaltyWinner === 'home')
@@ -50,11 +55,11 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
               <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-muted-foreground">{match.code}</span>
             )}
             {match.scheduledTime ?? ''}
-            {match.court != null ? ` · Terrain ${match.court}` : ''}
+            {match.court != null ? ` · ${t('product.court')} ${match.court}` : ''}
           </span>
           <span>
-            {match.groupLabel ? `Poule ${match.groupLabel}` : match.bracketLabel ?? ''}
-            {finished ? '' : ' · à venir'}
+            {match.groupLabel ? `${t('product.poolLabel')} ${match.groupLabel}` : match.bracketLabel ?? ''}
+            {finished ? '' : ` · ${t('product.match.upcoming')}`}
           </span>
         </div>
       )}
@@ -74,12 +79,17 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
           penaltyWin={match.penaltyWinner === 'away'}
         />
       </div>
-      {match.refereeName && <p className="mt-1 text-xs text-muted-foreground">Arbitre : {match.refereeName}</p>}
+      {match.refereeName && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t('product.match.referee')} : {match.refereeName}
+        </p>
+      )}
     </div>
   )
 }
 
 export function MatchesByRound({ matches }: { matches: PublicMatch[] }) {
+  const t = useT()
   const rounds = new Map<number, PublicMatch[]>()
   for (const m of matches) {
     const r = m.round ?? 0
@@ -94,7 +104,7 @@ export function MatchesByRound({ matches }: { matches: PublicMatch[] }) {
       {sortedRounds.map(([round, list]) => (
         <div key={round}>
           <h3 className="mb-2 flex items-baseline gap-2 text-lg font-bold">
-            Round {round}
+            {t('product.round')} {round}
             {list[0]?.scheduledTime && (
               <span className="text-sm font-normal text-muted-foreground">{list[0].scheduledTime}</span>
             )}
@@ -114,9 +124,10 @@ export function MatchesByRound({ matches }: { matches: PublicMatch[] }) {
 
 /** Finals (knockout + classification) grouped by their round label, for the calendar. */
 export function MatchesByLabel({ matches }: { matches: PublicMatch[] }) {
+  const t = useT()
   const byLabel = new Map<string, PublicMatch[]>()
   for (const m of matches) {
-    const label = m.bracketLabel ?? 'Phase finale'
+    const label = m.bracketLabel ?? t('product.finalsPhase')
     byLabel.set(label, [...(byLabel.get(label) ?? []), m])
   }
   // Order by the earliest scheduled time of each group.
