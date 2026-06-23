@@ -38,11 +38,17 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }))
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}): Promise<Metadata> {
+  const { lang } = await params
   const org = await resolveTenant(await getPayloadClient())
   const base = await getRequestBaseUrl()
   const siteName = org?.name ?? BRAND_NAME
   const description = SITE_DESCRIPTION
+  const home = isLocale(lang) ? `/${lang}` : '/fr'
   return {
     metadataBase: new URL(base),
     // Child pages set a bare title (e.g. the tournament name); it's framed with
@@ -50,8 +56,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: siteName, template: `%s | ${siteName}` },
     description,
     robots: 'index, follow',
-    alternates: { canonical: '/' },
-    ...socialMetadata({ org, title: siteName, description, path: '/' }),
+    alternates: { canonical: home },
+    ...socialMetadata({ org, title: siteName, description, path: home }),
   }
 }
 
