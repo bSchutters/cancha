@@ -18,21 +18,23 @@ import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
 import { ConfirmDialog } from './ConfirmDialog'
 import { TvScreensManager } from './TvScreensManager'
+import { useT } from '@/i18n/use-t'
+import type { Translate } from '@/i18n'
 import type { ManageTournament } from '@/lib/tournament/manage-view'
 
 /**
  * Status is informative, not a category you pick: it is derived from the actual
  * progress (data present) and the explicit registration/finished/archived flags.
  */
-function statusTag(t: ManageTournament): { label: string; tone: string } {
-  if (t.status === 'archived') return { label: 'Archivé', tone: 'bg-muted text-muted-foreground' }
-  if (t.status === 'finished') return { label: 'Terminé', tone: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' }
-  if (t.matches.some((m) => m.phase === 'knockout')) return { label: 'Phase finale', tone: 'bg-primary/20 text-primary' }
-  if (t.matches.some((m) => m.phase === 'group')) return { label: 'En cours', tone: 'bg-primary/20 text-primary' }
-  if (t.groups.length > 0) return { label: 'Tirage effectué', tone: 'bg-sky-500/15 text-sky-700 dark:text-sky-300' }
-  if (t.status === 'registration_closed') return { label: 'Inscriptions fermées', tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
-  if (t.status === 'registration') return { label: 'Inscriptions ouvertes', tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
-  return { label: 'Brouillon', tone: 'bg-muted text-muted-foreground' }
+function statusTag(t: ManageTournament, tr: Translate): { label: string; tone: string } {
+  if (t.status === 'archived') return { label: tr('product.dashStatus.archived'), tone: 'bg-muted text-muted-foreground' }
+  if (t.status === 'finished') return { label: tr('product.dashStatus.finished'), tone: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' }
+  if (t.matches.some((m) => m.phase === 'knockout')) return { label: tr('product.dashStatus.finals'), tone: 'bg-primary/20 text-primary' }
+  if (t.matches.some((m) => m.phase === 'group')) return { label: tr('product.dashStatus.live'), tone: 'bg-primary/20 text-primary' }
+  if (t.groups.length > 0) return { label: tr('product.dashStatus.drawDone'), tone: 'bg-sky-500/15 text-sky-700 dark:text-sky-300' }
+  if (t.status === 'registration_closed') return { label: tr('product.dashStatus.registrationClosed'), tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
+  if (t.status === 'registration') return { label: tr('product.dashStatus.registrationOpen'), tone: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' }
+  return { label: tr('product.dashStatus.draft'), tone: 'bg-muted text-muted-foreground' }
 }
 
 function Stat({ label, value }: { label: string; value: number | string }) {
@@ -45,6 +47,7 @@ function Stat({ label, value }: { label: string; value: number | string }) {
 }
 
 export function DashboardClient({ initial, isOwner = false }: { initial: ManageTournament; isOwner?: boolean }) {
+  const tr = useT()
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
   const [confirmReset, setConfirmReset] = useState(false)
@@ -52,7 +55,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
   const [offset, setOffset] = useState(initial.schedule.globalOffsetMin)
   const [drawMode, setDrawMode] = useState<'auto' | 'manual'>('auto')
   const t = initial
-  const tag = statusTag(t)
+  const tag = statusTag(t, tr)
 
   const capacity = t.format.numGroups * t.format.groupSize
   const drawDone = t.groups.length > 0
@@ -83,7 +86,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         router.refresh()
       } else {
         const body = await res.json()
-        toast.error(body?.errors?.[0]?.message ?? 'Erreur')
+        toast.error(body?.errors?.[0]?.message ?? tr('product.toast.error'))
       }
     } finally {
       setBusy(null)
@@ -104,14 +107,14 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       })
       const data = await res.json()
       if (res.ok) {
-        toast.success(`${label} : OK`)
+        toast.success(tr('product.dash.actionOk').replace('{label}', label))
         setConfirmReset(false)
         router.refresh()
       } else {
-        toast.error(data?.error?.message ?? `${label} : erreur`)
+        toast.error(data?.error?.message ?? tr('product.dash.actionError').replace('{label}', label))
       }
     } catch {
-      toast.error('Erreur réseau')
+      toast.error(tr('product.toast.network'))
     } finally {
       setBusy(null)
     }
@@ -129,67 +132,68 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         </div>
         <div className="flex items-center gap-3">
           <LocaleLink href={`/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
-            Vue TV ↗
+            {tr('product.dash.tvView')} ↗
           </LocaleLink>
           <LocaleLink href={`/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
-            Page publique ↗
+            {tr('product.dash.publicPage')} ↗
           </LocaleLink>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat
-          label={t.counts.waitlist > 0 ? `Inscrites (+${t.counts.waitlist} en attente)` : 'Inscrites'}
+          label={
+            t.counts.waitlist > 0
+              ? tr('product.dash.registeredWaitlist').replace('{count}', String(t.counts.waitlist))
+              : tr('product.dash.registered')
+          }
           value={capacity > 0 ? `${t.counts.active} / ${capacity}` : t.counts.active}
         />
-        <Stat label="Confirmées" value={t.counts.confirmed} />
-        <Stat label="Payées" value={t.counts.paid} />
-        <Stat label="Matchs" value={t.matches.length} />
+        <Stat label={tr('product.dash.confirmed')} value={t.counts.confirmed} />
+        <Stat label={tr('product.dash.paid')} value={t.counts.paid} />
+        <Stat label={tr('product.dash.matches')} value={t.matches.length} />
       </div>
 
       {/* Control zone */}
       <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
-        <h2 className="mb-1 flex items-center gap-2 font-bold text-primary">Centre de contrôle</h2>
-        <p className="mb-4 text-xs text-muted-foreground">
-          Déroulez le tournoi étape par étape. Chaque étape se verrouille une fois faite - réinitialisez pour
-          recommencer.
-        </p>
+        <h2 className="mb-1 flex items-center gap-2 font-bold text-primary">{tr('product.dash.controlCenter')}</h2>
+        <p className="mb-4 text-xs text-muted-foreground">{tr('product.dash.controlIntro')}</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <ControlButton
             icon={<Dices className="h-5 w-5" />}
-            label="Tirage des poules"
+            label={tr('product.dash.draw')}
             done={drawDone}
-            doneLabel="Tirage fait"
+            doneLabel={tr('product.dash.drawDone')}
             loading={busy === 'draw'}
             disabled={busy !== null || drawDone}
-            onClick={() => post('draw', 'Tirage')}
+            onClick={() => post('draw', tr('product.dash.lbl.draw'))}
           />
           <ControlButton
             icon={<CalendarClock className="h-5 w-5" />}
-            label="Générer le calendrier"
+            label={tr('product.dash.schedule')}
             done={scheduleDone}
-            doneLabel="Calendrier généré"
+            doneLabel={tr('product.dash.scheduleDone')}
             loading={busy === 'generate-schedule'}
             disabled={busy !== null || !drawDone || scheduleDone}
-            onClick={() => post('generate-schedule', 'Calendrier')}
+            onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
           />
           <ControlButton
             icon={<Trophy className="h-5 w-5" />}
-            label="Phase finale"
+            label={tr('product.dash.finals')}
             done={knockoutDone}
-            doneLabel="Arbre généré"
+            doneLabel={tr('product.dash.finalsDone')}
             loading={busy === 'generate-knockout'}
             disabled={busy !== null || !scheduleDone || knockoutDone}
-            onClick={() => post('generate-knockout', 'Phase finale')}
+            onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
           />
           <ControlButton
             icon={<Flag className="h-5 w-5" />}
-            label="Terminer le tournoi"
+            label={tr('product.dash.finish')}
             done={t.status === 'finished' || t.status === 'archived'}
-            doneLabel="Tournoi terminé"
+            doneLabel={tr('product.dash.finishDone')}
             loading={busy === 'patch'}
             disabled={busy !== null || t.status === 'finished' || t.status === 'archived' || !allMatchesPlayed}
-            title={allMatchesPlayed ? undefined : 'Tous les matchs doivent être joués'}
+            title={allMatchesPlayed ? undefined : tr('product.dash.allMatchesNeeded')}
             onClick={() => setConfirmFinish(true)}
           />
           <Button
@@ -199,7 +203,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             className="h-auto flex-col items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/5 p-4 text-left text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
           >
             <RotateCcw className="h-5 w-5" />
-            <span className="text-sm font-semibold">Réinitialiser</span>
+            <span className="text-sm font-semibold">{tr('product.dash.reset')}</span>
           </Button>
         </div>
 
@@ -208,38 +212,38 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
           {t.status === 'draft' && (
             <Button size="sm" variant="secondary" disabled={busy !== null}
-              onClick={() => patchTournament({ status: 'registration' }, 'Inscriptions ouvertes')}>
-              Ouvrir les inscriptions
+              onClick={() => patchTournament({ status: 'registration' }, tr('product.dash.msg.regOpened'))}>
+              {tr('product.dash.openReg')}
             </Button>
           )}
           {t.status === 'registration' && (
             <Button size="sm" variant="secondary" disabled={busy !== null}
-              onClick={() => patchTournament({ status: 'registration_closed' }, 'Inscriptions fermées')}>
-              Fermer les inscriptions
+              onClick={() => patchTournament({ status: 'registration_closed' }, tr('product.dash.msg.regClosed'))}>
+              {tr('product.dash.closeReg')}
             </Button>
           )}
           {t.status === 'registration_closed' && (
             <Button size="sm" variant="secondary" disabled={busy !== null}
-              onClick={() => patchTournament({ status: 'registration' }, 'Inscriptions rouvertes')}>
-              Rouvrir les inscriptions
+              onClick={() => patchTournament({ status: 'registration' }, tr('product.dash.msg.regReopened'))}>
+              {tr('product.dash.reopenReg')}
             </Button>
           )}
           {t.status === 'finished' && (
             <>
               <Button size="sm" variant="secondary" disabled={busy !== null}
-                onClick={() => patchTournament({ status: 'live' }, 'Tournoi rouvert')}>
-                Rouvrir le tournoi
+                onClick={() => patchTournament({ status: 'live' }, tr('product.dash.msg.reopened'))}>
+                {tr('product.dash.reopen')}
               </Button>
               <Button size="sm" variant="ghost" disabled={busy !== null}
-                onClick={() => patchTournament({ status: 'archived' }, 'Tournoi archivé')}>
-                Archiver
+                onClick={() => patchTournament({ status: 'archived' }, tr('product.dash.msg.archived'))}>
+                {tr('product.dash.archive')}
               </Button>
             </>
           )}
           {t.status === 'archived' && (
             <Button size="sm" variant="secondary" disabled={busy !== null}
-              onClick={() => patchTournament({ status: 'finished' }, 'Tournoi désarchivé')}>
-              Désarchiver
+              onClick={() => patchTournament({ status: 'finished' }, tr('product.dash.msg.unarchived'))}>
+              {tr('product.dash.unarchive')}
             </Button>
           )}
         </div>
@@ -248,8 +252,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         {/* Live delay control - the field shows the total currently applied. */}
         <div className="mt-4 border-t border-border pt-4">
           <p className="mb-2 text-sm text-muted-foreground">
-            Retard total appliqué : <span className="font-semibold text-foreground">+{t.schedule.globalOffsetMin} min</span>
-            <span className="text-muted-foreground"> - décale toutes les heures affichées (TV + public). N’affecte pas la saisie.</span>
+            {tr('product.dash.delayApplied')}{' '}
+            <span className="font-semibold text-foreground">+{t.schedule.globalOffsetMin} min</span>
+            <span className="text-muted-foreground"> {tr('product.dash.delayHint')}</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {[5, 10, 15].map((d) => (
@@ -261,12 +266,14 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             <NumberStepper value={offset} onChange={setOffset} min={0} max={240} />
             <Button
               disabled={busy !== null || offset === t.schedule.globalOffsetMin}
-              onClick={() => patchTournament({ global_offset_min: offset }, 'Retard appliqué')}
+              onClick={() => patchTournament({ global_offset_min: offset }, tr('product.dash.msg.delayApplied'))}
             >
-              Appliquer
+              {tr('product.dash.apply')}
             </Button>
             {offset !== t.schedule.globalOffsetMin && (
-              <span className="text-xs text-muted-foreground">→ deviendra +{offset} min</span>
+              <span className="text-xs text-muted-foreground">
+                {tr('product.dash.willBecome').replace('{offset}', String(offset))}
+              </span>
             )}
           </div>
         </div>
@@ -275,18 +282,15 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       {/* TV broadcast & public display */}
       <section className="rounded-xl border border-border bg-card p-5">
         <h2 className="mb-1 flex items-center gap-2 font-bold">
-          <Tv className="h-4 w-4 text-primary" /> Diffusion TV & affichage public
+          <Tv className="h-4 w-4 text-primary" /> {tr('product.dash.broadcast')}
         </h2>
-        <p className="mb-4 text-xs text-muted-foreground">
-          Gère les écrans/TV de la salle et choisis les vues affichées sur chacun ; plus le tirage animé et le
-          dévoilement des poules au public.
-        </p>
+        <p className="mb-4 text-xs text-muted-foreground">{tr('product.dash.broadcastIntro')}</p>
 
         <TvScreensManager tournamentId={t.id} slug={t.slug} initial={t.tvScreens} />
 
         <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-border pt-5">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-muted-foreground">Tirage au sort (TV)</p>
+            <p className="text-sm font-semibold text-muted-foreground">{tr('product.dash.drawTv')}</p>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-md border border-border bg-card p-0.5">
                 {(['auto', 'manual'] as const).map((m) => (
@@ -302,13 +306,13 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
                   >
-                    {m === 'auto' ? 'Auto' : 'Manuel'}
+                    {m === 'auto' ? tr('product.dash.auto') : tr('product.dash.manual')}
                   </Button>
                 ))}
               </div>
               <Button asChild size="sm" variant="secondary">
                 <LocaleLink href={`/${t.slug}/tv/draw?mode=${drawMode}`} target="_blank">
-                  Ouvrir le tirage ↗
+                  {tr('product.dash.openDraw')} ↗
                 </LocaleLink>
               </Button>
             </div>
@@ -316,16 +320,16 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
           {drawDone && (
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-muted-foreground">Poules sur la page publique</p>
+              <p className="text-sm font-semibold text-muted-foreground">{tr('product.dash.poolsPublic')}</p>
               {!t.drawRevealed ? (
                 <Button
                   size="sm"
                   className="gap-1 bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
                   disabled={busy !== null}
-                  title="Affiche les poules sur la page publique (après l’animation TV)"
-                  onClick={() => patchTournament({ draw_revealed: true }, 'Poules dévoilées')}
+                  title={tr('product.dash.revealHint')}
+                  onClick={() => patchTournament({ draw_revealed: true }, tr('product.dash.msg.poolsRevealed'))}
                 >
-                  <Eye className="h-4 w-4" /> Dévoiler les poules
+                  <Eye className="h-4 w-4" /> {tr('product.dash.revealPools')}
                 </Button>
               ) : (
                 <Button
@@ -333,9 +337,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                   variant="secondary"
                   className="gap-1"
                   disabled={busy !== null}
-                  onClick={() => patchTournament({ draw_revealed: false }, 'Poules masquées')}
+                  onClick={() => patchTournament({ draw_revealed: false }, tr('product.dash.msg.poolsHidden'))}
                 >
-                  <EyeOff className="h-4 w-4" /> Masquer les poules
+                  <EyeOff className="h-4 w-4" /> {tr('product.dash.hidePools')}
                 </Button>
               )}
             </div>
@@ -347,46 +351,44 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       {isOwner && t.devMode && (
         <section className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-5">
           <h2 className="mb-1 flex items-center gap-2 font-bold text-fuchsia-700 dark:text-fuchsia-300">
-            <FlaskConical className="h-4 w-4" /> Centre de contrôle dev
+            <FlaskConical className="h-4 w-4" /> {tr('product.dash.devCenter')}
           </h2>
-          <p className="mb-4 text-xs text-muted-foreground">
-            Outils de test (mode développeur). À désactiver en production via la configuration.
-          </p>
+          <p className="mb-4 text-xs text-muted-foreground">{tr('product.dash.devIntro')}</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <DevButton
               icon={<Users className="h-5 w-5" />}
-              label="Seed équipes test"
+              label={tr('product.dash.seedTeams')}
               done={seedDone}
-              doneLabel="Équipes seedées"
+              doneLabel={tr('product.dash.seedDone')}
               loading={busy === 'seed-teams'}
               disabled={busy !== null || seedDone}
-              onClick={() => post('dev', 'Seed équipes', { action: 'seed-teams' })}
+              onClick={() => post('dev', tr('product.dash.lbl.seed'), { action: 'seed-teams' })}
             />
             <DevButton
               icon={<Dices className="h-5 w-5" />}
-              label="Scores poules aléatoires"
+              label={tr('product.dash.randomGroupScores')}
               done={groupScoresDone}
-              doneLabel="Poules complètes"
+              doneLabel={tr('product.dash.groupsComplete')}
               loading={busy === 'random-group-scores'}
               disabled={busy !== null || groupMatches.length === 0 || groupScoresDone}
-              onClick={() => post('dev', 'Scores poules', { action: 'random-group-scores' })}
+              onClick={() => post('dev', tr('product.dash.lbl.groupScores'), { action: 'random-group-scores' })}
             />
             <DevButton
               icon={<ListChecks className="h-5 w-5" />}
-              label="Scores phase finale aléatoires"
+              label={tr('product.dash.randomFinalsScores')}
               done={finalsScoresDone}
-              doneLabel="Phase finale complète"
+              doneLabel={tr('product.dash.finalsComplete')}
               loading={busy === 'random-knockout-scores'}
               disabled={busy !== null || finalsMatches.length === 0 || finalsScoresDone}
-              onClick={() => post('dev', 'Scores phase finale', { action: 'random-knockout-scores' })}
+              onClick={() => post('dev', tr('product.dash.lbl.finalsScores'), { action: 'random-knockout-scores' })}
             />
             <DevButton
               icon={<Sparkles className="h-5 w-5" />}
-              label="Simuler tout le tournoi"
+              label={tr('product.dash.simulateAll')}
               primary
               loading={busy === 'simulate'}
               disabled={busy !== null}
-              onClick={() => post('dev', 'Simulation complète', { action: 'simulate' })}
+              onClick={() => post('dev', tr('product.dash.lbl.simulate'), { action: 'simulate' })}
             />
           </div>
         </section>
@@ -395,23 +397,20 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
       <Dialog open={confirmReset} onOpenChange={(o) => !o && setConfirmReset(false)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Réinitialiser « {t.name} » ?</DialogTitle>
-            <DialogDescription>
-              Tous les matchs seront supprimés, les poules effacées et le statut repassé à « Inscriptions ».
-              Cette action est irréversible. Les équipes inscrites sont conservées.
-            </DialogDescription>
+            <DialogTitle>{tr('product.dash.resetTitle').replace('{name}', t.name)}</DialogTitle>
+            <DialogDescription>{tr('product.dash.resetDesc')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setConfirmReset(false)} disabled={busy === 'reset'}>
-              Annuler
+              {tr('product.action.cancel')}
             </Button>
             <Button
               className="bg-red-500 font-bold text-white hover:bg-red-600"
-              onClick={() => post('reset', 'Réinitialisation')}
+              onClick={() => post('reset', tr('product.dash.lbl.reset'))}
               disabled={busy === 'reset'}
             >
               {busy === 'reset' && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-              Réinitialiser
+              {tr('product.dash.reset')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -419,13 +418,13 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
       <ConfirmDialog
         open={confirmFinish}
-        title={`Terminer « ${t.name} » ?`}
-        description="Le tournoi sera marqué comme terminé et les résultats verrouillés. Vous pourrez le rouvrir si besoin."
-        confirmLabel="Terminer le tournoi"
+        title={tr('product.dash.finishTitle').replace('{name}', t.name)}
+        description={tr('product.dash.finishDesc')}
+        confirmLabel={tr('product.dash.finish')}
         destructive={false}
         busy={busy === 'patch'}
         onConfirm={async () => {
-          await patchTournament({ status: 'finished' }, 'Tournoi terminé')
+          await patchTournament({ status: 'finished' }, tr('product.dash.msg.finished'))
           setConfirmFinish(false)
         }}
         onCancel={() => setConfirmFinish(false)}
