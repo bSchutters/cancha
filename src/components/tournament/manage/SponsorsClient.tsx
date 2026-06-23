@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ConfirmDialog } from './ConfirmDialog'
 import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
+import { useT } from '@/i18n/use-t'
 import type { Id } from '@/lib/tournament/types'
 import type { ManageSponsor } from '@/lib/tournament/manage-view'
 
@@ -32,10 +33,10 @@ function normalizeUrl(raw: string): { url: string | null; error: string | null }
   const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`
   try {
     const u = new URL(withScheme)
-    if (!u.hostname.includes('.')) return { url: null, error: 'URL invalide.' }
+    if (!u.hostname.includes('.')) return { url: null, error: 'urlInvalid' }
     return { url: u.toString(), error: null }
   } catch {
-    return { url: null, error: 'URL invalide.' }
+    return { url: null, error: 'urlInvalid' }
   }
 }
 
@@ -43,6 +44,7 @@ type Draft = { name: string; url: string }
 const emptyDraft: Draft = { name: '', url: '' }
 
 export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; sponsors: ManageSponsor[] }) {
+  const t = useT()
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [adding, setAdding] = useState(false)
@@ -59,7 +61,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
     if (!draft.name.trim()) return
     const { url, error } = normalizeUrl(draft.url)
     if (error) {
-      toast.error(error)
+      toast.error(t('product.urlInvalid'))
       return
     }
     setBusy(true)
@@ -68,7 +70,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
       if (file) {
         logoId = await uploadMedia(file)
         if (logoId == null) {
-          toast.error('Échec de l’upload du logo')
+          toast.error(t('product.sponsors.uploadFailed'))
           return
         }
       }
@@ -79,14 +81,14 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
         body: JSON.stringify({ tournament: tournamentId, name: draft.name.trim(), url: url ?? undefined, logo: logoId ?? undefined }),
       })
       if (res.ok) {
-        toast.success('Sponsor ajouté')
+        toast.success(t('product.sponsors.added'))
         setDraft(emptyDraft)
         setFile(null)
         if (fileRef.current) fileRef.current.value = ''
         setAdding(false)
         router.refresh()
       } else {
-        toast.error('Erreur lors de l’ajout')
+        toast.error(t('product.toast.addError'))
       }
     } finally {
       setBusy(false)
@@ -98,7 +100,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
     if (!editing) return
     const { url, error } = normalizeUrl(editDraft.url)
     if (error) {
-      toast.error(error)
+      toast.error(t('product.urlInvalid'))
       return
     }
     setBusy(true)
@@ -107,7 +109,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
       if (editFile) {
         const logoId = await uploadMedia(editFile)
         if (logoId == null) {
-          toast.error('Échec de l’upload du logo')
+          toast.error(t('product.sponsors.uploadFailed'))
           return
         }
         data.logo = logoId
@@ -119,12 +121,12 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
         body: JSON.stringify(data),
       })
       if (res.ok) {
-        toast.success('Sponsor modifié')
+        toast.success(t('product.sponsors.updated'))
         setEditing(null)
         setEditFile(null)
         router.refresh()
       } else {
-        toast.error('Erreur')
+        toast.error(t('product.toast.error'))
       }
     } finally {
       setBusy(false)
@@ -136,10 +138,10 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
     try {
       const res = await fetch(`/api/tournament-sponsors/${id}`, { method: 'DELETE', credentials: 'include' })
       if (res.ok) {
-        toast.success('Sponsor supprimé')
+        toast.success(t('product.sponsors.deleted'))
         router.refresh()
       } else {
-        toast.error('Suppression impossible')
+        toast.error(t('product.toast.deleteFailed'))
       }
     } finally {
       setBusy(false)
@@ -149,7 +151,9 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{sponsors.length} sponsor(s) · affichés en bandeau sur la TV</p>
+        <p className="text-sm text-muted-foreground">
+          {t('product.sponsors.count').replace('{count}', String(sponsors.length))}
+        </p>
         <Button
           size="sm"
           variant="secondary"
@@ -159,35 +163,35 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
             setFile(null)
           }}
         >
-          {adding ? 'Annuler' : '+ Ajouter un sponsor'}
+          {adding ? t('product.action.cancel') : t('product.sponsors.add')}
         </Button>
       </div>
 
       {adding && (
         <form onSubmit={create} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <Label>Nom</Label>
+            <Label>{t('product.field.name')}</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
           </div>
           <div className="space-y-1">
-            <Label>Site web (optionnel)</Label>
+            <Label>{t('product.field.websiteOptional')}</Label>
             <Input value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value })} placeholder="https://…" />
           </div>
           <div className="space-y-1">
-            <Label>Logo</Label>
+            <Label>{t('product.field.logo')}</Label>
             <Input ref={fileRef} type="file" accept="image/*" onChange={(e) => pickImage(e.target.files?.[0], setFile)} />
           </div>
           <div>
             <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
               {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-              Ajouter
+              {t('product.action.add')}
             </Button>
           </div>
         </form>
       )}
 
       {sponsors.length === 0 ? (
-        <p className="text-muted-foreground">Aucun sponsor.</p>
+        <p className="text-muted-foreground">{t('product.sponsors.empty')}</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {sponsors.map((sp) => (
@@ -198,7 +202,7 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
                     <Image src={sp.logoUrl} alt={sp.name} fill sizes="80px" unoptimized className="object-contain" />
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground">(pas de logo)</span>
+                  <span className="text-sm text-muted-foreground">{t('product.sponsors.noLogo')}</span>
                 )}
                 <span className="truncate font-medium">{sp.name}</span>
               </div>
@@ -208,14 +212,14 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
                   onClick={() => { setEditing(sp); setEditDraft({ name: sp.name, url: sp.url ?? '' }); setEditFile(null) }}
                   className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                 >
-                  Éditer
+                  {t('product.action.edit')}
                 </Button>
                 <Button
                   variant="link"
                   onClick={() => setConfirmDelete(sp)}
                   className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                 >
-                  Suppr.
+                  {t('product.action.deleteShort')}
                 </Button>
               </div>
             </div>
@@ -228,29 +232,29 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
           {editing && (
             <form onSubmit={saveEdit}>
               <DialogHeader>
-                <DialogTitle>Modifier « {editing.name} »</DialogTitle>
+                <DialogTitle>{t('product.editTitle').replace('{name}', editing.name)}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-3">
                 <div className="space-y-1">
-                  <Label>Nom</Label>
+                  <Label>{t('product.field.name')}</Label>
                   <Input value={editDraft.name} onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })} required />
                 </div>
                 <div className="space-y-1">
-                  <Label>Site web</Label>
+                  <Label>{t('product.field.website')}</Label>
                   <Input value={editDraft.url} onChange={(e) => setEditDraft({ ...editDraft, url: e.target.value })} placeholder="https://…" />
                 </div>
                 <div className="space-y-1">
-                  <Label>Remplacer le logo (optionnel)</Label>
+                  <Label>{t('product.sponsors.replaceLogo')}</Label>
                   <Input type="file" accept="image/*" onChange={(e) => pickImage(e.target.files?.[0], setEditFile)} />
                 </div>
               </div>
               <DialogFooter className="mt-5">
                 <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
-                  Annuler
+                  {t('product.action.cancel')}
                 </Button>
                 <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
                   {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-                  Enregistrer
+                  {t('product.action.save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -260,9 +264,9 @@ export function SponsorsClient({ tournamentId, sponsors }: { tournamentId: Id; s
 
       <ConfirmDialog
         open={!!confirmDelete}
-        title={confirmDelete ? `Supprimer « ${confirmDelete.name} » ?` : ''}
-        description="Ce sponsor sera définitivement supprimé."
-        confirmLabel="Supprimer"
+        title={confirmDelete ? t('product.confirmDeleteTitle').replace('{name}', confirmDelete.name) : ''}
+        description={t('product.sponsors.confirmDeleteDesc')}
+        confirmLabel={t('product.action.delete')}
         busy={busy}
         onConfirm={async () => {
           if (!confirmDelete) return

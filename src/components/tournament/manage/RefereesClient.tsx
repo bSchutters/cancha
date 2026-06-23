@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ConfirmDialog } from './ConfirmDialog'
+import { useT } from '@/i18n/use-t'
 import type { Id } from '@/lib/tournament/types'
 import type { ManageReferee } from '@/lib/tournament/manage-view'
 
@@ -16,6 +17,7 @@ type Draft = { name: string; contact: string }
 const emptyDraft: Draft = { name: '', contact: '' }
 
 export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; referees: ManageReferee[] }) {
+  const t = useT()
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [adding, setAdding] = useState(false)
@@ -36,12 +38,12 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
         body: JSON.stringify({ name: draft.name.trim(), contact: draft.contact.trim() || undefined, tournament: tournamentId }),
       })
       if (res.ok) {
-        toast.success('Arbitre ajouté')
+        toast.success(t('product.referees.added'))
         setDraft(emptyDraft)
         setAdding(false)
         router.refresh()
       } else {
-        toast.error('Erreur lors de l’ajout')
+        toast.error(t('product.toast.addError'))
       }
     } finally {
       setBusy(false)
@@ -60,11 +62,11 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
         body: JSON.stringify({ name: editDraft.name.trim(), contact: editDraft.contact.trim() || null }),
       })
       if (res.ok) {
-        toast.success('Arbitre modifié')
+        toast.success(t('product.referees.updated'))
         setEditing(null)
         router.refresh()
       } else {
-        toast.error('Erreur')
+        toast.error(t('product.toast.error'))
       }
     } finally {
       setBusy(false)
@@ -76,10 +78,10 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
     try {
       const res = await fetch(`/api/tournament-referees/${id}`, { method: 'DELETE', credentials: 'include' })
       if (res.ok) {
-        toast.success('Arbitre supprimé')
+        toast.success(t('product.referees.deleted'))
         router.refresh()
       } else {
-        toast.error('Suppression impossible')
+        toast.error(t('product.toast.deleteFailed'))
       }
     } finally {
       setBusy(false)
@@ -94,7 +96,9 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{referees.length} arbitre(s)</p>
+        <p className="text-sm text-muted-foreground">
+          {t('product.referees.count').replace('{count}', String(referees.length))}
+        </p>
         <Button
           size="sm"
           variant="secondary"
@@ -103,31 +107,31 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
             setDraft(emptyDraft)
           }}
         >
-          {adding ? 'Annuler' : '+ Ajouter un arbitre'}
+          {adding ? t('product.action.cancel') : t('product.referees.add')}
         </Button>
       </div>
 
       {adding && (
         <form onSubmit={create} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <Label>Nom</Label>
+            <Label>{t('product.field.name')}</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
           </div>
           <div className="space-y-1">
-            <Label>Contact (optionnel)</Label>
+            <Label>{t('product.field.contactOptional')}</Label>
             <Input value={draft.contact} onChange={(e) => setDraft({ ...draft, contact: e.target.value })} />
           </div>
           <div className="flex items-end">
             <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
               {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-              Ajouter
+              {t('product.action.add')}
             </Button>
           </div>
         </form>
       )}
 
       {referees.length === 0 ? (
-        <p className="text-muted-foreground">Aucun arbitre. L’affectation aux matchs se fait sur l’écran Saisie scores.</p>
+        <p className="text-muted-foreground">{t('product.referees.empty')}</p>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {referees.map((r) => (
@@ -142,14 +146,14 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
                   onClick={() => openEdit(r)}
                   className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                 >
-                  Éditer
+                  {t('product.action.edit')}
                 </Button>
                 <Button
                   variant="link"
                   onClick={() => setConfirmDelete(r)}
                   className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                 >
-                  Suppr.
+                  {t('product.action.deleteShort')}
                 </Button>
               </div>
             </li>
@@ -162,25 +166,25 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
           {editing && (
             <form onSubmit={saveEdit}>
               <DialogHeader>
-                <DialogTitle>Modifier « {editing.name} »</DialogTitle>
+                <DialogTitle>{t('product.editTitle').replace('{name}', editing.name)}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-3">
                 <div className="space-y-1">
-                  <Label>Nom</Label>
+                  <Label>{t('product.field.name')}</Label>
                   <Input value={editDraft.name} onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })} required />
                 </div>
                 <div className="space-y-1">
-                  <Label>Contact</Label>
+                  <Label>{t('product.field.contact')}</Label>
                   <Input value={editDraft.contact} onChange={(e) => setEditDraft({ ...editDraft, contact: e.target.value })} />
                 </div>
               </div>
               <DialogFooter className="mt-5">
                 <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
-                  Annuler
+                  {t('product.action.cancel')}
                 </Button>
                 <Button type="submit" disabled={busy} className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
                   {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-                  Enregistrer
+                  {t('product.action.save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -190,9 +194,9 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
 
       <ConfirmDialog
         open={!!confirmDelete}
-        title={confirmDelete ? `Supprimer « ${confirmDelete.name} » ?` : ''}
-        description="Cet arbitre sera définitivement supprimé."
-        confirmLabel="Supprimer"
+        title={confirmDelete ? t('product.confirmDeleteTitle').replace('{name}', confirmDelete.name) : ''}
+        description={t('product.referees.confirmDeleteDesc')}
+        confirmLabel={t('product.action.delete')}
         busy={busy}
         onConfirm={async () => {
           if (!confirmDelete) return
