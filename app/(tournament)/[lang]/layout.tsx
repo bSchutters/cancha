@@ -1,12 +1,14 @@
-import '../globals.css'
+import '../../globals.css'
 import type { Metadata, Viewport } from 'next'
+import { notFound } from 'next/navigation'
 import { Newsreader, Geist } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant, resolveLayoutTenant } from '@/lib/tournament/tenant'
 import { buildThemeCss, googleFontsHref } from '@/lib/tournament/theme'
 import { getRequestBaseUrl, socialMetadata } from '@/lib/tournament/seo'
-import { BRAND_NAME, SITE_DESCRIPTION, SITE_LOCALE } from '@/lib/site'
+import { BRAND_NAME, SITE_DESCRIPTION } from '@/lib/site'
+import { LOCALES, LOCALE_HREFLANG, isLocale } from '@/i18n/config'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -32,6 +34,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+export function generateStaticParams() {
+  return LOCALES.map((lang) => ({ lang }))
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const org = await resolveTenant(await getPayloadClient())
   const base = await getRequestBaseUrl()
@@ -51,9 +57,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TournamentLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params: Promise<{ lang: string }>
 }>) {
+  const { lang } = await params
+  if (!isLocale(lang)) notFound()
   // Theme from the host org, or fall back to the logged-in manager's org so the
   // /manage dashboard is themed on the app domain too.
   const org = await resolveLayoutTenant(await getPayloadClient())
@@ -63,7 +73,7 @@ export default async function TournamentLayout({
   const fontsHref = org ? googleFontsHref(org.theme.headingFont, org.theme.bodyFont) : null
 
   return (
-    <html lang={SITE_LOCALE} suppressHydrationWarning>
+    <html lang={LOCALE_HREFLANG[lang]} suppressHydrationWarning>
       {/* Single background layer: ONLY the <body> paints var(--background) (it
           propagates to the whole viewport canvas because <html> has no background).
           Never also paint <html> - two layers of the same colour seam into a band. */}
