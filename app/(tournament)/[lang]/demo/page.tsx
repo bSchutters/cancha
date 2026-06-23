@@ -5,6 +5,7 @@ import { CtaSection } from '@/components/marketing/cta-section'
 import { display } from '@/components/marketing/theme'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('demo.meta.title'),
     description: t('demo.meta.description'),
-    alternates: { canonical: `/${lang}/demo` },
+    alternates: localizedAlternates(lang, '/demo'),
   }
 }
 

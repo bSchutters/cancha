@@ -34,6 +34,15 @@ export function LanguageSwitcher() {
             <a
               href={hrefFor(loc)}
               hrefLang={loc}
+              onClick={(e) => {
+                // Keep ephemeral URL state (e.g. ?tab=, #hash) across the switch;
+                // usePathname (and so href) omits it. Plain href stays crawlable.
+                const { search, hash } = window.location
+                if (search || hash) {
+                  e.preventDefault()
+                  window.location.href = hrefFor(loc) + search + hash
+                }
+              }}
               className={cn('uppercase text-muted-foreground transition-colors hover:text-foreground')}
             >
               {loc}

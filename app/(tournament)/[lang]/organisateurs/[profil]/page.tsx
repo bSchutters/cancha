@@ -7,6 +7,7 @@ import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { PROFILES } from '@/lib/marketing/content'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export function generateStaticParams() {
   return PROFILES.map((p) => ({ profil: p.slug }))
@@ -23,7 +24,7 @@ export async function generateMetadata({
   return {
     title: t(`profiles.${profil}.eyebrow`),
     description: t(`profiles.${profil}.intro`),
-    alternates: { canonical: `/${lang}/organisateurs/${profil}` },
+    alternates: localizedAlternates(lang, `/organisateurs/${profil}`),
   }
 }
 

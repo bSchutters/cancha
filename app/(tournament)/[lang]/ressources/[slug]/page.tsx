@@ -13,6 +13,7 @@ import { GUIDES } from '@/lib/marketing/guides'
 import { GUIDE_KEY } from '../page'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }))
@@ -31,7 +32,7 @@ export async function generateMetadata({
   return {
     title: t(`resources.guides.${k}.title`),
     description: t(`resources.guides.${k}.metaDescription`),
-    alternates: { canonical: `/${lang}/ressources/${slug}` },
+    alternates: localizedAlternates(lang, `/ressources/${slug}`),
   }
 }
 

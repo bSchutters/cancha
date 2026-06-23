@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import { getPayloadClient } from '@/lib/payload'
 import { listPublicTournaments } from '@/lib/tournament/public-view'
 import { resolveTenant } from '@/lib/tournament/tenant'
@@ -98,7 +98,7 @@ function TournamentCard({
   highlighted?: boolean
 }) {
   return (
-    <Link
+    <LocaleLink
       href={`/${t.slug}`}
       className={`block rounded-xl border p-6 transition-colors ${
         highlighted
@@ -113,6 +113,6 @@ function TournamentCard({
       {formatEditionDate(t.editionDate) && (
         <p className="mt-2 text-sm text-muted-foreground">{formatEditionDate(t.editionDate)}</p>
       )}
-    </Link>
+    </LocaleLink>
   )
 }

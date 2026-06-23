@@ -9,6 +9,7 @@ import { buildThemeCss, googleFontsHref } from '@/lib/tournament/theme'
 import { getRequestBaseUrl, socialMetadata } from '@/lib/tournament/seo'
 import { BRAND_NAME, SITE_DESCRIPTION } from '@/lib/site'
 import { LOCALES, LOCALE_HREFLANG, isLocale } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -56,7 +57,7 @@ export async function generateMetadata({
     title: { default: siteName, template: `%s | ${siteName}` },
     description,
     robots: 'index, follow',
-    alternates: { canonical: home },
+    alternates: localizedAlternates(lang, ''),
     ...socialMetadata({ org, title: siteName, description, path: home }),
   }
 }

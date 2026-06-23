@@ -22,6 +22,7 @@ import {
 } from '@/components/marketing/feature-demos'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('fonctionnalites.meta.title'),
     description: t('fonctionnalites.meta.description'),
-    alternates: { canonical: `/${lang}/fonctionnalites` },
+    alternates: localizedAlternates(lang, '/fonctionnalites'),
   }
 }
 

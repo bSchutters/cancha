@@ -10,6 +10,7 @@ import { display } from '@/components/marketing/theme'
 import { PRICE_TIERS } from '@/lib/marketing/content'
 import { makeT, type Translate } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('tarifs.meta.title'),
     description: t('tarifs.meta.description'),
-    alternates: { canonical: `/${lang}/tarifs` },
+    alternates: localizedAlternates(lang, '/tarifs'),
   }
 }
 

@@ -41,7 +41,7 @@ export function MarketingFooter() {
           <span className="text-sm font-medium text-foreground">{t('footer.resources')}</span>
           <FooterLink href="/ressources">{t('nav.resources')}</FooterLink>
           <FooterLink href="/faq">FAQ</FooterLink>
-          <FooterLink href="/a-propos">À propos</FooterLink>
+          <FooterLink href="/a-propos">{t('apropos.eyebrow')}</FooterLink>
         </nav>
 
         <nav className="flex flex-col gap-3">

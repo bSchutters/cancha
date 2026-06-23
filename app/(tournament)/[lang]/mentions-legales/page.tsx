@@ -3,6 +3,7 @@ import { MarketingShell } from '@/components/marketing/shell'
 import { display } from '@/components/marketing/theme'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 // Placeholders to complete with real company details before launch (raison
 // sociale, BCE, adresse, hébergeur, contact RGPD) — translated copy lives in the
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('legal.meta.title'),
     description: t('legal.meta.description'),
-    alternates: { canonical: `/${lang}/mentions-legales` },
+    alternates: localizedAlternates(lang, '/mentions-legales'),
     robots: { index: false, follow: true },
   }
 }

@@ -11,6 +11,7 @@ import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { GUIDES } from '@/lib/marketing/guides'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export const GUIDE_KEY: Record<string, string> = {
   'organiser-tournoi-futsal': 'futsal',
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('resources.meta.title'),
     description: t('resources.meta.description'),
-    alternates: { canonical: `/${lang}/ressources` },
+    alternates: localizedAlternates(lang, '/ressources'),
   }
 }
 

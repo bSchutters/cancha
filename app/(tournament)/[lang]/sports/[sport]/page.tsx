@@ -7,6 +7,7 @@ import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { SPORTS } from '@/lib/marketing/content'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 export function generateStaticParams() {
   return SPORTS.map((s) => ({ sport: s.slug }))
@@ -23,7 +24,7 @@ export async function generateMetadata({
   return {
     title: t(`sports.${sport}.eyebrow`),
     description: t(`sports.${sport}.intro`),
-    alternates: { canonical: `/${lang}/sports/${sport}` },
+    alternates: localizedAlternates(lang, `/sports/${sport}`),
   }
 }
 

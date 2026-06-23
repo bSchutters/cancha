@@ -6,6 +6,7 @@ import { CtaSection } from '@/components/marketing/cta-section'
 import { display } from '@/components/marketing/theme'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { localizedAlternates } from '@/i18n/alternates'
 
 const ROWS = [
   'registrations',
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: t('comparatif.meta.title'),
     description: t('comparatif.meta.description'),
-    alternates: { canonical: `/${lang}/comparatif` },
+    alternates: localizedAlternates(lang, '/comparatif'),
   }
 }
 
