@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BracketView, type BracketMatchView } from '@/components/tournament/BracketView'
+import { useT } from '@/i18n/use-t'
 import type { ManageMatch, ManageTournament } from '@/lib/tournament/manage-view'
 
 function toBracketView(m: ManageMatch): BracketMatchView {
@@ -75,6 +76,7 @@ function Tabs<T extends string>({
 }
 
 function FairplayContent({ t }: { t: ManageTournament }) {
+  const tr = useT()
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const finished = t.status === 'finished' || t.status === 'archived'
@@ -89,10 +91,10 @@ function FairplayContent({ t }: { t: ManageTournament }) {
         body: JSON.stringify({ fairplay_winner_team: teamId ? Number(teamId) : null }),
       })
       if (res.ok) {
-        toast.success('Vainqueur fair-play enregistré')
+        toast.success(tr('product.results.fairplaySaved'))
         router.refresh()
       } else {
-        toast.error('Erreur')
+        toast.error(tr('product.toast.error'))
       }
     } finally {
       setSaving(false)
@@ -105,8 +107,8 @@ function FairplayContent({ t }: { t: ManageTournament }) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-8">#</TableHead>
-            <TableHead>Équipe</TableHead>
-            <TableHead className="text-right">Pts</TableHead>
+            <TableHead>{tr('product.standings.team')}</TableHead>
+            <TableHead className="text-right">{tr('product.standings.points.short')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -121,11 +123,11 @@ function FairplayContent({ t }: { t: ManageTournament }) {
           ))}
         </TableBody>
       </Table>
-      <p className="mt-3 text-xs text-muted-foreground">Privé - révélé publiquement seulement à la fin.</p>
+      <p className="mt-3 text-xs text-muted-foreground">{tr('product.results.fairplayNote')}</p>
       {finished && (
         <div className="mt-4">
           <p className="mb-1 flex items-center gap-1 text-xs text-muted-foreground">
-            <Award className="h-3.5 w-3.5 text-primary" /> Vainqueur du trophée fair-play
+            <Award className="h-3.5 w-3.5 text-primary" /> {tr('product.results.fairplayWinner')}
           </p>
           <Select
             defaultValue={t.fairplayWinnerId ? String(t.fairplayWinnerId) : undefined}
@@ -133,10 +135,10 @@ function FairplayContent({ t }: { t: ManageTournament }) {
             disabled={saving}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="- Désigner le vainqueur -" />
+              <SelectValue placeholder={tr('product.results.designateWinner')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__none__">- Aucun -</SelectItem>
+              <SelectItem value="__none__">{tr('product.results.none')}</SelectItem>
               {t.teams.map((team) => (
                 <SelectItem key={String(team.id)} value={String(team.id)}>
                   {team.name}
@@ -151,16 +153,17 @@ function FairplayContent({ t }: { t: ManageTournament }) {
 }
 
 function FinalRankingContent({ t }: { t: ManageTournament }) {
+  const tr = useT()
   if (t.finalRanking.length === 0) {
-    return <p className="text-xs text-muted-foreground">Disponible une fois la phase finale générée.</p>
+    return <p className="text-xs text-muted-foreground">{tr('product.results.finalRankingEmpty')}</p>
   }
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="w-8">#</TableHead>
-          <TableHead>Équipe</TableHead>
-          <TableHead className="text-right">Étape</TableHead>
+          <TableHead>{tr('product.standings.team')}</TableHead>
+          <TableHead className="text-right">{tr('product.results.stage')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -194,6 +197,7 @@ function FinalRankingContent({ t }: { t: ManageTournament }) {
 }
 
 function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
+  const tr = useT()
   const group = t.groups.find((g) => g.label === label)
   if (!group) return null
   return (
@@ -201,10 +205,10 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
       <TableHeader>
         <TableRow>
           <TableHead className="w-6">#</TableHead>
-          <TableHead>Équipe</TableHead>
-          <TableHead className="text-center">J</TableHead>
-          <TableHead className="text-center">Diff</TableHead>
-          <TableHead className="text-center">Pts</TableHead>
+          <TableHead>{tr('product.standings.team')}</TableHead>
+          <TableHead className="text-center">{tr('product.standings.played.short')}</TableHead>
+          <TableHead className="text-center">{tr('product.standings.goalDiff.short')}</TableHead>
+          <TableHead className="text-center">{tr('product.standings.points.short')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -239,6 +243,7 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
 }
 
 export function ManageResults({ t }: { t: ManageTournament }) {
+  const tr = useT()
   const hasBracket = t.matches.some((m) => m.phase === 'knockout')
   const [leftTab, setLeftTab] = useState<'fairplay' | 'final'>('fairplay')
   const [rightTab, setRightTab] = useState<'groups' | 'bracket'>(hasBracket ? 'bracket' : 'groups')
@@ -246,8 +251,8 @@ export function ManageResults({ t }: { t: ManageTournament }) {
   if (t.groups.length === 0 && !hasBracket) return null
 
   const rightTabs: { key: 'groups' | 'bracket'; label: string }[] = [
-    { key: 'groups', label: 'Poules' },
-    ...(hasBracket ? [{ key: 'bracket' as const, label: 'Arbre' }] : []),
+    { key: 'groups', label: tr('product.tab.pools') },
+    ...(hasBracket ? [{ key: 'bracket' as const, label: tr('product.tab.bracket') }] : []),
   ]
   const activeRight = rightTabs.find((x) => x.key === rightTab) ? rightTab : 'groups'
 
@@ -257,8 +262,8 @@ export function ManageResults({ t }: { t: ManageTournament }) {
       <div className="rounded-xl border border-border bg-card p-4">
         <Tabs
           tabs={[
-            { key: 'fairplay', label: 'Fair-play' },
-            { key: 'final', label: 'Classement final' },
+            { key: 'fairplay', label: tr('product.results.tab.fairplay') },
+            { key: 'final', label: tr('product.results.tab.final') },
           ]}
           active={leftTab}
           onChange={setLeftTab}
@@ -275,7 +280,7 @@ export function ManageResults({ t }: { t: ManageTournament }) {
           <div className="grid gap-4 sm:grid-cols-2">
             {t.groups.map((g) => (
               <div key={g.label} className="rounded-lg border border-border bg-muted/30 p-3">
-                <h4 className="mb-2 text-sm font-bold text-foreground">Poule {g.label}</h4>
+                <h4 className="mb-2 text-sm font-bold text-foreground">{tr('product.poolLabel')} {g.label}</h4>
                 <GroupTable t={t} label={g.label} />
               </div>
             ))}

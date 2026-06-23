@@ -7,6 +7,7 @@ import { Plus, Trash2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { Id } from '@/lib/tournament/types'
 
 interface Screen {
@@ -14,12 +15,7 @@ interface Screen {
   views: string[]
 }
 
-const PANELS: { value: string; label: string }[] = [
-  { value: 'prochains', label: 'Prochains matchs' },
-  { value: 'programme', label: 'Programme' },
-  { value: 'classements', label: 'Classements' },
-  { value: 'arbre', label: 'Arbre' },
-]
+const PANEL_VALUES = ['prochains', 'programme', 'classements', 'arbre']
 
 /**
  * TV screen manager: add/remove the room's TVs and pick which views each one
@@ -34,6 +30,7 @@ export function TvScreensManager({
   slug: string
   initial: Screen[]
 }) {
+  const t = useT()
   const [screens, setScreens] = useState<Screen[]>(initial)
   const [busy, setBusy] = useState(false)
 
@@ -49,10 +46,10 @@ export function TvScreensManager({
       })
       if (!res.ok) {
         const body = await res.json().catch(() => null)
-        toast.error(body?.errors?.[0]?.message ?? 'Erreur lors de l’enregistrement')
+        toast.error(body?.errors?.[0]?.message ?? t('product.toast.saveError'))
       }
     } catch {
-      toast.error('Erreur réseau')
+      toast.error(t('product.toast.network'))
     } finally {
       setBusy(false)
     }
@@ -76,14 +73,12 @@ export function TvScreensManager({
     <div className="space-y-3">
       <div className="flex items-center justify-end">
         <Button size="sm" variant="secondary" disabled={busy} onClick={addScreen}>
-          <Plus className="mr-1 h-4 w-4" /> Ajouter une TV
+          <Plus className="mr-1 h-4 w-4" /> {t('product.tvManager.addTv')}
         </Button>
       </div>
 
       {screens.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          Aucun écran. Ajoute une TV et choisis les vues à afficher (rotation si tu en coches plusieurs).
-        </p>
+        <p className="text-xs text-muted-foreground">{t('product.tvManager.empty')}</p>
       ) : (
         <div className="space-y-2">
           {screens.map((s, i) => (
@@ -97,14 +92,14 @@ export function TvScreensManager({
                   className="h-8 w-40"
                 />
                 <div className="flex flex-wrap gap-1">
-                  {PANELS.map((p) => {
-                    const on = s.views.includes(p.value)
+                  {PANEL_VALUES.map((value) => {
+                    const on = s.views.includes(value)
                     return (
                       <button
-                        key={p.value}
+                        key={value}
                         type="button"
                         disabled={busy}
-                        onClick={() => toggleView(i, p.value)}
+                        onClick={() => toggleView(i, value)}
                         className={cn(
                           'rounded-full border px-2.5 py-1 text-xs transition-colors',
                           on
@@ -112,7 +107,7 @@ export function TvScreensManager({
                             : 'border-border text-muted-foreground hover:text-foreground',
                         )}
                       >
-                        {p.label}
+                        {t(`product.tvManager.panel.${value}`)}
                       </button>
                     )
                   })}
@@ -123,10 +118,10 @@ export function TvScreensManager({
                     size="sm"
                     variant="secondary"
                     disabled={s.views.length === 0}
-                    title={s.views.length === 0 ? 'Choisis au moins une vue' : undefined}
+                    title={s.views.length === 0 ? t('product.tvManager.pickOne') : undefined}
                   >
                     <LocaleLink href={`/${slug}/tv?vues=${s.views.join(',')}`} target="_blank">
-                      <ExternalLink className="mr-1 h-4 w-4" /> Ouvrir
+                      <ExternalLink className="mr-1 h-4 w-4" /> {t('product.tvManager.open')}
                     </LocaleLink>
                   </Button>
                   <Button
@@ -134,7 +129,7 @@ export function TvScreensManager({
                     variant="ghost"
                     disabled={busy}
                     onClick={() => removeScreen(i)}
-                    title="Supprimer cette TV"
+                    title={t('product.tvManager.removeTv')}
                     className="text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
                   >
                     <Trash2 className="h-4 w-4" />
