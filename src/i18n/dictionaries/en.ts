@@ -1,6 +1,14 @@
 import type { Dictionary } from '../index'
 
 export const en: Dictionary = {
+  "cta.defaultTitle": "Ready to run your next tournament?",
+  "cta.defaultSubtitle": "Show us your tournament and we’ll show you how Cancha runs it from A to Z.",
+  "sports.futsal.name": "Futsal",
+  "sports.football.name": "Football",
+  "sports.padel.name": "Padel",
+  "sports.volley.name": "Volleyball",
+  "sports.basket.name": "Basketball",
+  "sports.ping-pong.name": "Table tennis",
   "announcement.close": "Close",
   "announcement.cta": "Claim it",
   "announcement.discount": "-30% for life",

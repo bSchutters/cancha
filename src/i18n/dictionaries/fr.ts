@@ -1,5 +1,13 @@
 // Generated + hand-seeded flat dictionary (source of truth). Keys are dot-paths.
 export const fr: Record<string, string> = {
+  "cta.defaultTitle": "Prêt à organiser votre prochain tournoi ?",
+  "cta.defaultSubtitle": "Montrez-nous votre tournoi, on vous montre comment Cancha le gère de A à Z.",
+  "sports.futsal.name": "Futsal",
+  "sports.football.name": "Football",
+  "sports.padel.name": "Padel",
+  "sports.volley.name": "Volley-ball",
+  "sports.basket.name": "Basket",
+  "sports.ping-pong.name": "Ping-pong",
   "announcement.close": "Fermer",
   "announcement.cta": "En profiter",
   "announcement.discount": "-30% à vie",

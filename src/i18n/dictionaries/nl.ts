@@ -1,6 +1,14 @@
 import type { Dictionary } from '../index'
 
 export const nl: Dictionary = {
+  "cta.defaultTitle": "Klaar om je volgende toernooi te organiseren?",
+  "cta.defaultSubtitle": "Toon ons je toernooi, wij tonen je hoe Cancha het van A tot Z beheert.",
+  "sports.futsal.name": "Futsal",
+  "sports.football.name": "Voetbal",
+  "sports.padel.name": "Padel",
+  "sports.volley.name": "Volleybal",
+  "sports.basket.name": "Basketbal",
+  "sports.ping-pong.name": "Tafeltennis",
   "announcement.close": "Sluiten",
   "announcement.cta": "Profiteer ervan",
   "announcement.discount": "-30% voor altijd",

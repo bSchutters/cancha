@@ -5,6 +5,8 @@ import { MiniLanding } from '@/components/marketing/mini-landing'
 import { Breadcrumbs } from '@/components/marketing/structured-data'
 import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { PROFILES } from '@/lib/marketing/content'
+import { makeT } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export function generateStaticParams() {
   return PROFILES.map((p) => ({ profil: p.slug }))
@@ -13,23 +15,36 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ profil: string }>
+  params: Promise<{ lang: string; profil: string }>
 }): Promise<Metadata> {
-  const { profil } = await params
-  const c = PROFILES.find((p) => p.slug === profil)
-  if (!c) return {}
-  return { title: c.eyebrow, description: c.intro, alternates: { canonical: `/organisateurs/${c.slug}` } }
+  const { lang, profil } = await params
+  if (!PROFILES.some((p) => p.slug === profil)) return {}
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
+  return {
+    title: t(`profiles.${profil}.eyebrow`),
+    description: t(`profiles.${profil}.intro`),
+    alternates: { canonical: `/${lang}/organisateurs/${profil}` },
+  }
 }
 
-export default async function ProfilePage({ params }: { params: Promise<{ profil: string }> }) {
-  const { profil } = await params
-  const c = PROFILES.find((p) => p.slug === profil)
-  if (!c) notFound()
+export default async function ProfilePage({ params }: { params: Promise<{ lang: string; profil: string }> }) {
+  const { lang, profil } = await params
+  if (!PROFILES.some((p) => p.slug === profil)) notFound()
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
   const base = await getRequestBaseUrl()
   return (
     <MarketingShell>
-      <Breadcrumbs baseUrl={base} items={[{ name: 'Accueil', href: '/' }, { name: c.name }]} />
-      <MiniLanding eyebrow={c.eyebrow} h1={c.h1} intro={c.intro} bullets={c.bullets} />
+      <Breadcrumbs
+        baseUrl={base}
+        items={[{ name: t('minilanding.breadcrumb.home'), href: `/${lang}` }, { name: t(`profiles.${profil}.name`) }]}
+      />
+      <MiniLanding
+        t={t}
+        eyebrow={t(`profiles.${profil}.eyebrow`)}
+        h1={t(`profiles.${profil}.h1`)}
+        intro={t(`profiles.${profil}.intro`)}
+        bullets={[0, 1, 2].map((i) => t(`profiles.${profil}.bullets.${i}`))}
+      />
     </MarketingShell>
   )
 }

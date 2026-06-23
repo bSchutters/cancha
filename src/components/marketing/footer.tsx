@@ -48,7 +48,7 @@ export function MarketingFooter() {
           <span className="text-sm font-medium text-foreground">{t('footer.sports')}</span>
           {SPORTS.slice(0, 5).map((s) => (
             <FooterLink key={s.slug} href={`/sports/${s.slug}`}>
-              {s.name}
+              {t(`sports.${s.slug}.name`)}
             </FooterLink>
           ))}
         </nav>
@@ -57,7 +57,7 @@ export function MarketingFooter() {
           <span className="text-sm font-medium text-foreground">{t('footer.organizers')}</span>
           {PROFILES.map((p) => (
             <FooterLink key={p.slug} href={`/organisateurs/${p.slug}`}>
-              {p.name}
+              {t(`profiles.${p.slug}.name`)}
             </FooterLink>
           ))}
         </nav>

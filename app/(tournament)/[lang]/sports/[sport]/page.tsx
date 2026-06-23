@@ -5,6 +5,8 @@ import { MiniLanding } from '@/components/marketing/mini-landing'
 import { Breadcrumbs } from '@/components/marketing/structured-data'
 import { getRequestBaseUrl } from '@/lib/tournament/seo'
 import { SPORTS } from '@/lib/marketing/content'
+import { makeT } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export function generateStaticParams() {
   return SPORTS.map((s) => ({ sport: s.slug }))
@@ -13,23 +15,36 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ sport: string }>
+  params: Promise<{ lang: string; sport: string }>
 }): Promise<Metadata> {
-  const { sport } = await params
-  const c = SPORTS.find((s) => s.slug === sport)
-  if (!c) return {}
-  return { title: c.eyebrow, description: c.intro, alternates: { canonical: `/sports/${c.slug}` } }
+  const { lang, sport } = await params
+  if (!SPORTS.some((s) => s.slug === sport)) return {}
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
+  return {
+    title: t(`sports.${sport}.eyebrow`),
+    description: t(`sports.${sport}.intro`),
+    alternates: { canonical: `/${lang}/sports/${sport}` },
+  }
 }
 
-export default async function SportPage({ params }: { params: Promise<{ sport: string }> }) {
-  const { sport } = await params
-  const c = SPORTS.find((s) => s.slug === sport)
-  if (!c) notFound()
+export default async function SportPage({ params }: { params: Promise<{ lang: string; sport: string }> }) {
+  const { lang, sport } = await params
+  if (!SPORTS.some((s) => s.slug === sport)) notFound()
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
   const base = await getRequestBaseUrl()
   return (
     <MarketingShell>
-      <Breadcrumbs baseUrl={base} items={[{ name: 'Accueil', href: '/' }, { name: c.name }]} />
-      <MiniLanding eyebrow={c.eyebrow} h1={c.h1} intro={c.intro} formats={c.formats} />
+      <Breadcrumbs
+        baseUrl={base}
+        items={[{ name: t('minilanding.breadcrumb.home'), href: `/${lang}` }, { name: t(`sports.${sport}.name`) }]}
+      />
+      <MiniLanding
+        t={t}
+        eyebrow={t(`sports.${sport}.eyebrow`)}
+        h1={t(`sports.${sport}.h1`)}
+        intro={t(`sports.${sport}.intro`)}
+        formats={[0, 1, 2].map((i) => t(`sports.${sport}.formats.${i}`))}
+      />
     </MarketingShell>
   )
 }
