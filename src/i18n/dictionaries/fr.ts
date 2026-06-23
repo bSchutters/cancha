@@ -783,4 +783,8 @@ export const fr: Record<string, string> = {
   "product.login.networkError": "Erreur réseau",
   "product.login.submitting": "Connexion…",
   "product.login.submit": "Se connecter",
+  "product.page.teamsCounts": "{confirmed}/{registered} confirmées · {paid} payées",
+  "product.page.scoresTitle": "Saisie des scores",
+  "product.page.resultsEmptyTitle": "Aucun résultat pour l’instant",
+  "product.page.resultsEmptyDesc": "Les classements, poules et arbre s’afficheront ici une fois le tirage et le calendrier générés.",
 }
