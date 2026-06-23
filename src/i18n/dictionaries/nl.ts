@@ -18,6 +18,20 @@ export const nl: Dictionary = {
     contact: 'Contact',
     legal: 'Wettelijke vermeldingen',
   },
+  announcement: {
+    prefix: 'Lanceeraanbieding:',
+    discount: '-30% voor altijd',
+    suffix: 'voor de eerste organisatoren.',
+    cta: 'Profiteer ervan',
+    close: 'Sluiten',
+  },
+  home: {
+    heroEyebrow: 'Voor toernooi­organisatoren, alle sporten',
+    heroTitle: 'Organiseer je toernooien',
+    heroTitleEm: 'zonder er je avonden aan te besteden.',
+    heroSubcopy:
+      'Inschrijvingen, loting, kalender over meerdere velden en live klassementen: alles wordt voor je geregeld. Geen Excel of WhatsApp-groepen meer.',
+  },
   common: {
     requestDemo: 'Demo aanvragen',
     interactivePreview: 'Bekijk een interactief voorbeeld',

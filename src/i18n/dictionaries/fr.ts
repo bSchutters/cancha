@@ -18,6 +18,20 @@ export const fr = {
     contact: 'Contact',
     legal: 'Mentions légales',
   },
+  announcement: {
+    prefix: 'Offre de lancement :',
+    discount: '-30% à vie',
+    suffix: 'pour les premiers organisateurs.',
+    cta: 'En profiter',
+    close: 'Fermer',
+  },
+  home: {
+    heroEyebrow: 'Pour les organisateurs de tournois, tous sports',
+    heroTitle: 'Organisez vos tournois',
+    heroTitleEm: 'sans y passer vos soirées.',
+    heroSubcopy:
+      'Inscriptions, tirage au sort, calendrier multi-terrains et classements en direct : tout est géré pour vous. Fini Excel et les groupes WhatsApp.',
+  },
   common: {
     requestDemo: 'Demander une démo',
     interactivePreview: 'Voir un aperçu interactif',

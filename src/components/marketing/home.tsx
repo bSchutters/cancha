@@ -1,4 +1,5 @@
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
+import type { Dictionary } from '@/i18n'
 import {
   ArrowRight,
   CalendarClock,
@@ -92,7 +93,7 @@ function LivePill() {
 }
 
 /** Apex product landing sections (rendered inside MarketingShell). */
-export function HomeSections() {
+export function HomeSections({ dict }: { dict: Dictionary }) {
   return (
     <>
       {/* Hero */}
@@ -106,37 +107,36 @@ export function HomeSections() {
         <HeroIntro className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-24 pt-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
           <div>
             <span data-hero className="inline-block text-sm font-medium text-primary">
-              Pour les organisateurs de tournois, tous sports
+              {dict.home.heroEyebrow}
             </span>
             <h1
               data-hero
               style={display}
               className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
             >
-              Organisez vos tournois{' '}
-              <span className="font-medium italic text-primary">sans y passer vos soirées.</span>
+              {dict.home.heroTitle}{' '}
+              <span className="font-medium italic text-primary">{dict.home.heroTitleEm}</span>
             </h1>
             <p data-hero className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Inscriptions, tirage au sort, calendrier multi-terrains et classements en direct : tout
-              est géré pour vous. Fini Excel et les groupes WhatsApp.
+              {dict.home.heroSubcopy}
             </p>
             <div data-hero className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Button asChild size="lg">
-                <Link href="#contact">
-                  Demander une démo
+                <LocaleLink href="#contact">
+                  {dict.common.requestDemo}
                   <ArrowRight />
-                </Link>
+                </LocaleLink>
               </Button>
-              <Link
+              <LocaleLink
                 href="/demo"
                 className={cn(
                   'inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-primary',
                   focusRing,
                 )}
               >
-                Voir un aperçu interactif
+                {dict.common.interactivePreview}
                 <ArrowRight className="size-4" />
-              </Link>
+              </LocaleLink>
             </div>
           </div>
 
@@ -339,7 +339,7 @@ export function HomeSections() {
           </Reveal>
 
           <Reveal className="mt-6 text-center">
-            <Link
+            <LocaleLink
               href="/comparatif"
               className={cn(
                 'inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-foreground',
@@ -348,7 +348,7 @@ export function HomeSections() {
             >
               Voir le comparatif complet
               <ArrowRight className="size-4" />
-            </Link>
+            </LocaleLink>
           </Reveal>
         </div>
       </section>

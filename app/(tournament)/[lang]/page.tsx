@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { MarketingShell } from '@/components/marketing/shell'
 import { HomeSections } from '@/components/marketing/home'
 import { SiteJsonLd } from '@/components/marketing/structured-data'
+import { getDictionary } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +25,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 const ACTIVE = new Set(['registration', 'registration_closed', 'draw_done', 'live'])
 
-export default async function CupHomePage() {
+export default async function CupHomePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
   const payload = await getPayloadClient()
   const org = await resolveTenant(payload)
 
@@ -31,10 +34,11 @@ export default async function CupHomePage() {
   // tournament list lives on its own subdomain / custom domain.
   if (!org) {
     const base = await getRequestBaseUrl()
+    const dict = getDictionary(isLocale(lang) ? lang : DEFAULT_LOCALE)
     return (
       <MarketingShell>
         <SiteJsonLd baseUrl={base} />
-        <HomeSections />
+        <HomeSections dict={dict} />
       </MarketingShell>
     )
   }
