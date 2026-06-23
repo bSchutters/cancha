@@ -627,4 +627,12 @@ export const fr: Record<string, string> = {
   "demo.sandbox.public.pending.calendar": "Le calendrier sera publié une fois généré.",
   "demo.sandbox.public.pending.finals": "La phase finale démarre après les poules.",
   "demo.sandbox.public.footnote": "Aperçu sur données d’exemple, avec les composants réels du produit.",
+  "demo.sandbox.replayAnimation": "Rejouer l’animation",
+  "demo.sandbox.tour.skip": "Passer le guide",
+  "home.hero.screen.live": "En direct",
+  "home.hero.screen.tabPools": "Poules",
+  "home.hero.screen.tabFinals": "Phase finale",
+  "home.hero.screen.poolsHeading": "Poule A · Terrain 1",
+  "home.hero.screen.finalsHeading": "Phase finale · arbre",
+  "home.hero.screen.points": "pts",
 }

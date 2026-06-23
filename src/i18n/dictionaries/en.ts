@@ -628,4 +628,12 @@ export const en: Dictionary = {
   "demo.sandbox.public.pending.calendar": "The schedule will be published once generated.",
   "demo.sandbox.public.pending.finals": "The knockout stage starts after the groups.",
   "demo.sandbox.public.footnote": "Preview on sample data, using the product’s real components.",
+  "demo.sandbox.replayAnimation": "Replay the animation",
+  "demo.sandbox.tour.skip": "Skip the guide",
+  "home.hero.screen.live": "Live",
+  "home.hero.screen.tabPools": "Groups",
+  "home.hero.screen.tabFinals": "Knockout stage",
+  "home.hero.screen.poolsHeading": "Group A · Court 1",
+  "home.hero.screen.finalsHeading": "Knockout stage · bracket",
+  "home.hero.screen.points": "pts",
 }

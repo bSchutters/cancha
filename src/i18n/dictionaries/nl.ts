@@ -628,4 +628,12 @@ export const nl: Dictionary = {
   "demo.sandbox.public.pending.calendar": "De kalender wordt gepubliceerd zodra die is gegenereerd.",
   "demo.sandbox.public.pending.finals": "De eindfase start na de poules.",
   "demo.sandbox.public.footnote": "Voorbeeld met voorbeeldgegevens, met de echte componenten van het product.",
+  "demo.sandbox.replayAnimation": "Animatie opnieuw afspelen",
+  "demo.sandbox.tour.skip": "Gids overslaan",
+  "home.hero.screen.live": "Live",
+  "home.hero.screen.tabPools": "Poules",
+  "home.hero.screen.tabFinals": "Eindfase",
+  "home.hero.screen.poolsHeading": "Poule A · Terrein 1",
+  "home.hero.screen.finalsHeading": "Eindfase · schema",
+  "home.hero.screen.points": "ptn",
 }

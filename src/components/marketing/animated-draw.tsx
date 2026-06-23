@@ -5,12 +5,14 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/i18n/use-t'
 import { display } from './theme'
 
 gsap.registerPlugin(useGSAP)
 
 /** Animated reveal of the drawn pools (the real draw result). */
 export function AnimatedDraw({ pools }: { pools: { label: string; teams: string[] }[] }) {
+  const t = useT()
   const root = useRef<HTMLDivElement>(null)
   const [replay, setReplay] = useState(0)
 
@@ -37,26 +39,28 @@ export function AnimatedDraw({ pools }: { pools: { label: string; teams: string[
     <div ref={root}>
       <div className="flex items-center justify-between">
         <span style={display} className="font-medium">
-          Tirage des poules
+          {t('demo.sandbox.control.draw')}
         </span>
         <Button size="sm" variant="secondary" onClick={rejouer}>
           <RotateCcw className="size-4" />
-          Rejouer l’animation
+          {t('demo.sandbox.replayAnimation')}
         </Button>
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {pools.map((pool) => (
           <div key={pool.label} className="rounded-2xl border border-border bg-card p-4">
-            <div className="mb-3 text-sm font-medium text-primary">Poule {pool.label}</div>
+            <div className="mb-3 text-sm font-medium text-primary">
+              {t('demo.sandbox.poolLabel')} {pool.label}
+            </div>
             <div className="space-y-2">
-              {pool.teams.map((t) => (
+              {pool.teams.map((team) => (
                 <div
-                  key={t}
+                  key={team}
                   className="draw-chip flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 >
                   <span className="size-1.5 rounded-full bg-primary/50" />
-                  <span className="truncate font-medium">{t}</span>
+                  <span className="truncate font-medium">{team}</span>
                 </div>
               ))}
             </div>

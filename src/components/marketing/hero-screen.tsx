@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { HeroBracket } from './hero-bracket'
 
 gsap.registerPlugin(useGSAP)
@@ -18,6 +19,7 @@ type View = 'poules' | 'finale'
  * (staggered rows / bracket reveal). Static under reduced motion.
  */
 export function HeroScreen({ standings }: { standings: Standing[] }) {
+  const t = useT()
   const [view, setView] = useState<View>('poules')
   const [auto, setAuto] = useState(true)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -60,7 +62,7 @@ export function HeroScreen({ standings }: { standings: Standing[] }) {
             <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75 motion-safe:animate-ping" />
             <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
           </span>
-          <span className="text-sm font-medium text-muted-foreground">En direct</span>
+          <span className="text-sm font-medium text-muted-foreground">{t('home.hero.screen.live')}</span>
         </span>
 
         <div className="inline-flex gap-0.5 rounded-full border border-border bg-background p-0.5 text-xs">
@@ -75,7 +77,7 @@ export function HeroScreen({ standings }: { standings: Standing[] }) {
                 view === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              {v === 'poules' ? 'Poules' : 'Phase finale'}
+              {v === 'poules' ? t('home.hero.screen.tabPools') : t('home.hero.screen.tabFinals')}
             </button>
           ))}
         </div>
@@ -84,28 +86,30 @@ export function HeroScreen({ standings }: { standings: Standing[] }) {
       <div ref={contentRef} className="mt-4 min-h-[208px]">
         {view === 'poules' ? (
           <div>
-            <div className="hs-row mb-2 text-xs text-muted-foreground">Poule A · Terrain 1</div>
+            <div className="hs-row mb-2 text-xs text-muted-foreground">{t('home.hero.screen.poolsHeading')}</div>
             <div className="space-y-1">
-              {standings.map((t) => (
+              {standings.map((team) => (
                 <div
-                  key={t.name}
+                  key={team.name}
                   className={cn(
                     'hs-row flex items-center justify-between rounded-lg px-3 py-2 text-sm',
-                    t.q && 'bg-primary/10',
+                    team.q && 'bg-primary/10',
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <span
                       className={cn(
                         'w-4 text-center font-semibold tabular-nums',
-                        t.q ? 'text-primary' : 'text-muted-foreground',
+                        team.q ? 'text-primary' : 'text-muted-foreground',
                       )}
                     >
-                      {t.rank}
+                      {team.rank}
                     </span>
-                    <span className="font-medium">{t.name}</span>
+                    <span className="font-medium">{team.name}</span>
                   </div>
-                  <span className="font-semibold tabular-nums">{t.pts} pts</span>
+                  <span className="font-semibold tabular-nums">
+                    {team.pts} {t('home.hero.screen.points')}
+                  </span>
                 </div>
               ))}
             </div>
