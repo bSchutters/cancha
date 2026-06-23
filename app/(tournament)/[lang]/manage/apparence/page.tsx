@@ -7,9 +7,10 @@ import { AppearanceForm } from '@/components/tournament/manage/AppearanceForm'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AppearancePage() {
+export default async function AppearancePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
   const user = await getSessionUser()
-  if (!isManager(user)) redirect('/login')
+  if (!isManager(user)) redirect(`/${lang}/login`)
 
   const payload = await getPayloadClient()
   const orgId = await resolveManageOrgId(payload, user)

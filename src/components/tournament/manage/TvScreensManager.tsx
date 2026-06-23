@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import { toast } from 'sonner'
 import { Plus, Trash2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -125,9 +125,9 @@ export function TvScreensManager({
                     disabled={s.views.length === 0}
                     title={s.views.length === 0 ? 'Choisis au moins une vue' : undefined}
                   >
-                    <Link href={`/${slug}/tv?vues=${s.views.join(',')}`} target="_blank">
+                    <LocaleLink href={`/${slug}/tv?vues=${s.views.join(',')}`} target="_blank">
                       <ExternalLink className="mr-1 h-4 w-4" /> Ouvrir
-                    </Link>
+                    </LocaleLink>
                   </Button>
                   <Button
                     size="icon"

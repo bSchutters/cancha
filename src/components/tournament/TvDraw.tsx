@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Dices, Trophy, RotateCcw, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PublicTournament } from '@/lib/tournament/public-view'
+import { useLocale } from '@/i18n/use-locale'
 import { useTournamentLive } from './useTournamentLive'
 
 type DrawTeam = { id: string; name: string; logoUrl: string | null }
@@ -65,6 +66,7 @@ export function TvDraw({
 }) {
   const data = useTournamentLive(slug, initial, 8000)
   const router = useRouter()
+  const locale = useLocale()
 
   // End of draw: reveal the pools publicly, then show the standings on the TV.
   const revealAndShow = useCallback(async () => {
@@ -78,8 +80,8 @@ export function TvDraw({
     } catch {
       // ignored: a public screen without a manager session just navigates
     }
-    router.push(`/${slug}/tv`)
-  }, [initial.id, router, slug])
+    router.push(`/${locale}/${slug}/tv`)
+  }, [initial.id, router, slug, locale])
 
   const pools: Pool[] = useMemo(
     () =>

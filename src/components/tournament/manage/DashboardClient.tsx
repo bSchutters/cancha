@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Dices, CalendarClock, Trophy, RotateCcw, FlaskConical, Sparkles, Loader2, Users, ListChecks, Tv, Eye, EyeOff, Flag } from 'lucide-react'
@@ -128,12 +128,12 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
           <p className="text-sm text-muted-foreground">/{t.slug}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href={`/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
+          <LocaleLink href={`/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             Vue TV ↗
-          </Link>
-          <Link href={`/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
+          </LocaleLink>
+          <LocaleLink href={`/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             Page publique ↗
-          </Link>
+          </LocaleLink>
         </div>
       </div>
 
@@ -307,9 +307,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                 ))}
               </div>
               <Button asChild size="sm" variant="secondary">
-                <Link href={`/${t.slug}/tv/draw?mode=${drawMode}`} target="_blank">
+                <LocaleLink href={`/${t.slug}/tv/draw?mode=${drawMode}`} target="_blank">
                   Ouvrir le tirage ↗
-                </Link>
+                </LocaleLink>
               </Button>
             </div>
           </div>

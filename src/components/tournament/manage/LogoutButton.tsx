@@ -2,12 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { useLocale } from '@/i18n/use-locale'
 
 export function LogoutButton() {
   const router = useRouter()
+  const locale = useLocale()
   const onLogout = async () => {
     await fetch('/api/users/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
-    router.push('/login')
+    router.push(`/${locale}/login`)
     router.refresh()
   }
   return (

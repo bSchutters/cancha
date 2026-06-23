@@ -6,11 +6,13 @@ import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLocale } from '@/i18n/use-locale'
 
 export const dynamic = 'force-dynamic'
 
 export default function ManageLoginPage() {
   const router = useRouter()
+  const locale = useLocale()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -28,7 +30,7 @@ export default function ManageLoginPage() {
         body: JSON.stringify({ email, password }),
       })
       if (res.ok) {
-        router.push('/manage')
+        router.push(`/${locale}/manage`)
         router.refresh()
       } else {
         setError('Identifiants invalides')

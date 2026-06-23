@@ -17,6 +17,7 @@ import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
 import { estimateFeasibility } from '@/lib/tournament/feasibility'
 import type { RankingDepth } from '@/lib/tournament/bracket'
 import type { ManageTournament } from '@/lib/tournament/manage-view'
+import { useLocale } from '@/i18n/use-locale'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
 function validateConfig(s: FormState): string | null {
@@ -133,6 +134,7 @@ function Num({
 
 export function TournamentConfigForm({ initial, isOwner = false }: { initial?: ManageTournament; isOwner?: boolean }) {
   const router = useRouter()
+  const locale = useLocale()
   const [s, setS] = useState<FormState>(initialState(initial))
   const [saving, setSaving] = useState(false)
   const [mapFile, setMapFile] = useState<File | null>(null)
@@ -213,7 +215,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       if (res.ok) {
         const slug = data?.doc?.slug ?? initial?.slug
         toast.success(initial ? 'Tournoi mis à jour' : 'Tournoi créé')
-        router.push(`/manage/${slug}`)
+        router.push(`/${locale}/manage/${slug}`)
         router.refresh()
       } else {
         const msg =

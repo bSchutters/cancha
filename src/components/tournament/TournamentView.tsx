@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import Image from 'next/image'
 import { Star, ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -92,9 +92,9 @@ export function TournamentView({
       {/* Sticky header (+ tabs) */}
       <div className="sticky top-0 z-30 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur">
         <div className="py-3">
-          <Link href="/" className="mb-1 inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
+          <LocaleLink href="/" className="mb-1 inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-3.5 w-3.5" /> Tous les tournois
-          </Link>
+          </LocaleLink>
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               {org?.logoUrl && (

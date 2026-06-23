@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import { cn } from '@/lib/utils'
 
 const TABS = [
@@ -15,7 +15,7 @@ export function TournamentNav({ slug, active }: { slug: string; active: string }
   return (
     <nav className="mb-8 flex flex-wrap gap-1 border-b border-border">
       {TABS.map((tab) => (
-        <Link
+        <LocaleLink
           key={tab.key}
           href={`/manage/${slug}${tab.path}`}
           className={cn(
@@ -26,7 +26,7 @@ export function TournamentNav({ slug, active }: { slug: string; active: string }
           )}
         >
           {tab.label}
-        </Link>
+        </LocaleLink>
       ))}
     </nav>
   )

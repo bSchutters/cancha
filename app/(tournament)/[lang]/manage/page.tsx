@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, getUserTenantId } from '@/lib/tournament/session'
 import { Badge } from '@/components/ui/badge'
@@ -32,11 +32,11 @@ export default async function ManageHomePage() {
     <main className="mx-auto max-w-screen-2xl px-4 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Tournois</h1>
-        <Link href="/manage/new">
+        <LocaleLink href="/manage/new">
           <Button className="bg-primary font-bold text-primary-foreground hover:bg-primary/90">
             + Nouveau tournoi
           </Button>
-        </Link>
+        </LocaleLink>
       </div>
 
       {res.docs.length === 0 ? (
@@ -46,7 +46,7 @@ export default async function ManageHomePage() {
           {res.docs.map((doc) => {
             const t = doc as { id: number | string; name: string; slug: string; status: string }
             return (
-              <Link
+              <LocaleLink
                 key={String(t.id)}
                 href={`/manage/${t.slug}`}
                 className="block rounded-xl border border-border bg-card p-5 transition-colors hover:bg-muted"
@@ -56,7 +56,7 @@ export default async function ManageHomePage() {
                   <Badge variant="secondary">{STATUS_LABEL[t.status] ?? t.status}</Badge>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">/{t.slug}</p>
-              </Link>
+              </LocaleLink>
             )
           })}
         </div>
