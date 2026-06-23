@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Translate } from '@/i18n'
 import { Button } from '@/components/ui/button'
 import { display } from './theme'
 import { Reveal } from './motion'
@@ -17,23 +18,22 @@ function initials(name: string) {
  * Testimonials when we have real ones; until then, an honest "founding
  * organizers" offer (no fabricated reviews).
  */
-export function Testimonials() {
+export function Testimonials({ t }: { t: Translate }) {
   if (TESTIMONIALS.length === 0) {
     return (
       <section className="border-y border-border bg-secondary/50">
         <div className="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
           <Reveal>
-            <span className="text-sm font-medium text-primary">Lancement</span>
+            <span className="text-sm font-medium text-primary">{t('home.testimonials.empty.eyebrow')}</span>
             <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              Soyez parmi nos premiers organisateurs
+              {t('home.testimonials.empty.title')}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Cancha se lance. Les premiers clubs et comités qui l’adoptent bénéficient d’un
-              accompagnement personnalisé pour leur premier tournoi et de conditions de lancement.
+              {t('home.testimonials.empty.subcopy')}
             </p>
             <div className="mt-8">
               <Button asChild size="lg">
-                <Link href="#contact">Demander une démo</Link>
+                <Link href="#contact">{t('home.testimonials.empty.cta')}</Link>
               </Button>
             </div>
           </Reveal>
@@ -46,9 +46,9 @@ export function Testimonials() {
     <section className="border-y border-border bg-secondary/50">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-medium text-primary">Ils organisent avec Cancha</span>
+          <span className="text-sm font-medium text-primary">{t('home.testimonials.filled.eyebrow')}</span>
           <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            Des organisateurs qui ont rangé Excel et le papier
+            {t('home.testimonials.filled.title')}
           </h2>
         </Reveal>
         <div className="mt-12 grid gap-4 md:grid-cols-3">

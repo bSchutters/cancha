@@ -332,7 +332,7 @@ export function HomeSections({ t }: { t: Translate }) {
         </div>
       </section>
 
-      <Testimonials />
+      <Testimonials t={t} />
 
       {/* Audience */}
       <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
