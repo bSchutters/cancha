@@ -7,6 +7,8 @@ import type { Metadata } from 'next'
 import { LocaleLink } from '@/components/locale-link'
 import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { makeT } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +24,7 @@ export default async function ManageLayout({
   params: Promise<{ lang: string }>
 }) {
   const { lang } = await params
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
   const user = await getSessionUser()
   if (!isManager(user)) redirect(`/${lang}/login`)
 
@@ -54,7 +57,7 @@ export default async function ManageLayout({
           </LocaleLink>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <LocaleLink href="/manage/apparence" className="hover:text-foreground">
-              Apparence
+              {t('product.manage.appearance')}
             </LocaleLink>
             <span className="hidden sm:inline">{user?.email}</span>
             <ThemeToggle />

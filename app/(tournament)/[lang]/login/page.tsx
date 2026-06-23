@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLocale } from '@/i18n/use-locale'
+import { useT } from '@/i18n/use-t'
 
 export const dynamic = 'force-dynamic'
 
 export default function ManageLoginPage() {
   const router = useRouter()
   const locale = useLocale()
+  const t = useT()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -33,10 +35,10 @@ export default function ManageLoginPage() {
         router.push(`/${locale}/manage`)
         router.refresh()
       } else {
-        setError('Identifiants invalides')
+        setError(t('product.login.invalid'))
       }
     } catch {
-      setError('Erreur réseau')
+      setError(t('product.login.networkError'))
     } finally {
       setLoading(false)
     }
@@ -51,15 +53,15 @@ export default function ManageLoginPage() {
         <h1 className="text-2xl font-bold">
           Cancha
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Connexion organisateur</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t('product.login.subtitle')}</p>
 
         <div className="mt-6 space-y-4">
           <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('product.login.email')}</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t('product.login.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -75,7 +77,7 @@ export default function ManageLoginPage() {
             className="w-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
           >
             {loading && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-            {loading ? 'Connexion…' : 'Se connecter'}
+            {loading ? t('product.login.submitting') : t('product.login.submit')}
           </Button>
         </div>
       </form>

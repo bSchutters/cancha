@@ -1,17 +1,21 @@
+'use client'
+
 import { LocaleLink } from '@/components/locale-link'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 
 const TABS = [
-  { key: 'dashboard', label: 'Dashboard', path: '' },
-  { key: 'teams', label: 'Inscriptions', path: '/teams' },
-  { key: 'scores', label: 'Saisie scores', path: '/scores' },
-  { key: 'results', label: 'Résultats', path: '/results' },
-  { key: 'referees', label: 'Arbitres', path: '/referees' },
-  { key: 'sponsors', label: 'Sponsors', path: '/sponsors' },
-  { key: 'config', label: 'Configuration', path: '/config' },
+  { key: 'dashboard', path: '' },
+  { key: 'teams', path: '/teams' },
+  { key: 'scores', path: '/scores' },
+  { key: 'results', path: '/results' },
+  { key: 'referees', path: '/referees' },
+  { key: 'sponsors', path: '/sponsors' },
+  { key: 'config', path: '/config' },
 ]
 
 export function TournamentNav({ slug, active }: { slug: string; active: string }) {
+  const t = useT()
   return (
     <nav className="mb-8 flex flex-wrap gap-1 border-b border-border">
       {TABS.map((tab) => (
@@ -25,7 +29,7 @@ export function TournamentNav({ slug, active }: { slug: string; active: string }
               : 'border-transparent text-muted-foreground hover:text-foreground',
           )}
         >
-          {tab.label}
+          {t(`product.nav.${tab.key}`)}
         </LocaleLink>
       ))}
     </nav>

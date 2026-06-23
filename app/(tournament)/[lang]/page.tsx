@@ -9,19 +9,10 @@ import { Badge } from '@/components/ui/badge'
 import { MarketingShell } from '@/components/marketing/shell'
 import { HomeSections } from '@/components/marketing/home'
 import { SiteJsonLd } from '@/components/marketing/structured-data'
-import { makeT } from '@/i18n'
+import { makeT, type Translate } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
-
-const STATUS_LABEL: Record<string, string> = {
-  registration: 'Inscriptions ouvertes',
-  registration_closed: 'Inscriptions fermées',
-  draw_done: 'Poules constituées',
-  live: 'En cours',
-  finished: 'Terminé',
-  archived: 'Archivé',
-}
 
 const ACTIVE = new Set(['registration', 'registration_closed', 'draw_done', 'live'])
 
@@ -43,9 +34,10 @@ export default async function CupHomePage({ params }: { params: Promise<{ lang: 
     )
   }
 
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
   const tournaments = await listPublicTournaments(payload, org.id)
-  const active = tournaments.filter((t) => ACTIVE.has(t.status))
-  const past = tournaments.filter((t) => !ACTIVE.has(t.status))
+  const active = tournaments.filter((x) => ACTIVE.has(x.status))
+  const past = tournaments.filter((x) => !ACTIVE.has(x.status))
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-16">
@@ -56,21 +48,19 @@ export default async function CupHomePage({ params }: { params: Promise<{ lang: 
           </span>
         )}
         <h1 className="text-5xl font-bold">{org.name}</h1>
-        <p className="mt-3 text-muted-foreground">
-          Inscriptions, classements et résultats en direct.
-        </p>
+        <p className="mt-3 text-muted-foreground">{t('product.orgHome.subtitle')}</p>
       </header>
 
       {tournaments.length === 0 && (
-        <p className="mt-16 text-center text-muted-foreground">Aucun tournoi pour le moment. Revenez bientôt !</p>
+        <p className="mt-16 text-center text-muted-foreground">{t('product.orgHome.empty')}</p>
       )}
 
       {active.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-bold">À l’affiche</h2>
+          <h2 className="mb-4 text-2xl font-bold">{t('product.orgHome.featured')}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {active.map((t) => (
-              <TournamentCard key={String(t.id)} t={t} highlighted />
+            {active.map((x) => (
+              <TournamentCard key={String(x.id)} tournament={x} t={t} highlighted />
             ))}
           </div>
         </section>
@@ -78,10 +68,10 @@ export default async function CupHomePage({ params }: { params: Promise<{ lang: 
 
       {past.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-bold">Éditions précédentes</h2>
+          <h2 className="mb-4 text-2xl font-bold">{t('product.orgHome.past')}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {past.map((t) => (
-              <TournamentCard key={String(t.id)} t={t} />
+            {past.map((x) => (
+              <TournamentCard key={String(x.id)} tournament={x} t={t} />
             ))}
           </div>
         </section>
@@ -91,15 +81,17 @@ export default async function CupHomePage({ params }: { params: Promise<{ lang: 
 }
 
 function TournamentCard({
+  tournament,
   t,
   highlighted = false,
 }: {
-  t: { id: string | number; name: string; slug: string; status: string; editionDate: string | null }
+  tournament: { id: string | number; name: string; slug: string; status: string; editionDate: string | null }
+  t: Translate
   highlighted?: boolean
 }) {
   return (
     <LocaleLink
-      href={`/${t.slug}`}
+      href={`/${tournament.slug}`}
       className={`block rounded-xl border p-6 transition-colors ${
         highlighted
           ? 'border-primary/40 bg-primary/10 hover:bg-primary/20'
@@ -107,11 +99,11 @@ function TournamentCard({
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-xl font-bold">{t.name}</h3>
-        <Badge variant="secondary">{STATUS_LABEL[t.status] ?? t.status}</Badge>
+        <h3 className="text-xl font-bold">{tournament.name}</h3>
+        <Badge variant="secondary">{t(`product.status.${tournament.status}`)}</Badge>
       </div>
-      {formatEditionDate(t.editionDate) && (
-        <p className="mt-2 text-sm text-muted-foreground">{formatEditionDate(t.editionDate)}</p>
+      {formatEditionDate(tournament.editionDate) && (
+        <p className="mt-2 text-sm text-muted-foreground">{formatEditionDate(tournament.editionDate)}</p>
       )}
     </LocaleLink>
   )
