@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
 import { ConfirmDialog } from '@/components/tournament/manage/ConfirmDialog'
+import { useT } from '@/i18n/use-t'
 import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
 
 type Fairplay = 'home' | 'away' | 'none'
@@ -49,6 +50,7 @@ function IconBtn({
 }
 
 function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: ManageReferee[] }) {
+  const t = useT()
   const router = useRouter()
   const [home, setHome] = useState<number | null>(match.scoreHome)
   const [away, setAway] = useState<number | null>(match.scoreAway)
@@ -78,18 +80,18 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ clear: true }),
-      }).catch(() => toast.error('Erreur lors de la réinitialisation'))
+      }).catch(() => toast.error(t('product.scores.resetError')))
       router.refresh()
     }
   }
 
   const save = async () => {
     if (!bothEntered) {
-      toast.error('Saisissez les deux scores')
+      toast.error(t('product.scores.enterBoth'))
       return
     }
     if (needsPenalty && (penHome == null || penAway == null || penHome === penAway)) {
-      toast.error('Tirs au but : saisissez un score décisif (pas d’égalité)')
+      toast.error(t('product.scores.penaltyDecisive'))
       return
     }
     setSaving(true)
@@ -108,11 +110,11 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       })
       const body = await res.json()
       if (res.ok) {
-        toast.success('Score enregistré')
+        toast.success(t('product.scores.saved'))
         setLocked(true)
         router.refresh()
       } else {
-        toast.error(body?.error?.message ?? 'Erreur')
+        toast.error(body?.error?.message ?? t('product.toast.error'))
       }
     } finally {
       setSaving(false)
@@ -125,7 +127,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ referee: refId ? Number(refId) : null }),
-    }).catch(() => toast.error('Erreur arbitre'))
+    }).catch(() => toast.error(t('product.scores.refereeError')))
     router.refresh()
   }
 
@@ -142,21 +144,21 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
             <span className="rounded-sm bg-muted px-1.5 py-0.5 font-bold text-foreground">{match.code}</span>
           )}
           {match.scheduledTime ?? ''}
-          {match.court != null ? ` · Terrain ${match.court}` : ''}
+          {match.court != null ? ` · ${t('product.court')} ${match.court}` : ''}
         </span>
-        <span>{match.groupLabel ? `Poule ${match.groupLabel}` : match.bracketLabel}</span>
+        <span>{match.groupLabel ? `${t('product.poolLabel')} ${match.groupLabel}` : match.bracketLabel}</span>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
-            {match.homeName ?? 'À déterminer'}
+            {match.homeName ?? t('product.match.tbd')}
           </span>
           <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-muted-foreground')}>
-            {match.awayName ?? 'À déterminer'}
+            {match.awayName ?? t('product.match.tbd')}
           </span>
           <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
         </div>
@@ -164,7 +166,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
 
       {/* Fair-play - labelled with team names */}
       <div className="mt-3">
-        <p className="mb-1 text-xs text-muted-foreground">Point fair-play</p>
+        <p className="mb-1 text-xs text-muted-foreground">{t('product.scores.fairplayPoint')}</p>
         <div className="flex gap-1">
           {(['home', 'none', 'away'] as Fairplay[]).map((v) => (
             <Button
@@ -181,7 +183,11 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
                 locked && 'opacity-60',
               )}
             >
-              {v === 'home' ? (match.homeName ?? 'Domicile') : v === 'away' ? (match.awayName ?? 'Extérieur') : 'Aucune'}
+              {v === 'home'
+                ? (match.homeName ?? t('product.scores.home'))
+                : v === 'away'
+                  ? (match.awayName ?? t('product.scores.away'))
+                  : t('product.scores.none')}
             </Button>
           ))}
         </div>
@@ -190,7 +196,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       {/* Penalty shootout score for KO draws */}
       {needsPenalty && (
         <div className="mt-3">
-          <p className="mb-1 text-xs text-muted-foreground">Tirs au but</p>
+          <p className="mb-1 text-xs text-muted-foreground">{t('product.scores.penalties')}</p>
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-sm">{match.homeName}</span>
             <NumberStepper value={penHome} onChange={setPenHome} disabled={locked} size="sm" />
@@ -210,10 +216,10 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
           disabled={locked || saving}
         >
           <SelectTrigger size="sm" className="min-w-0 flex-1 text-xs">
-            <SelectValue placeholder="- Arbitre -" />
+            <SelectValue placeholder={t('product.scores.refereePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__none__">- Aucun -</SelectItem>
+            <SelectItem value="__none__">{t('product.results.none')}</SelectItem>
             {referees.map((r) => (
               <SelectItem key={String(r.id)} value={String(r.id)}>
                 {r.name}
@@ -223,17 +229,17 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
         </Select>
         <div className="flex shrink-0 items-center gap-2">
           <IconBtn
-            title="Reset"
+            title={t('product.scores.reset')}
             tone="danger"
             disabled={saving}
             onClick={() => (match.status === 'finished' ? setConfirmReset(true) : reset())}
           >
             <RotateCcw className="h-4 w-4" />
           </IconBtn>
-          <IconBtn title="Modifier" tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
+          <IconBtn title={t('product.match.edit')} tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
             <Pencil className="h-4 w-4" />
           </IconBtn>
-          <IconBtn title="Valider" tone="save" disabled={locked || saving} onClick={save}>
+          <IconBtn title={t('product.scores.validate')} tone="save" disabled={locked || saving} onClick={save}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
           </IconBtn>
         </div>
@@ -241,9 +247,9 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
 
       <ConfirmDialog
         open={confirmReset}
-        title="Réinitialiser le score ?"
-        description="Le score enregistré sera effacé. Cette action est irréversible."
-        confirmLabel="Réinitialiser"
+        title={t('product.scores.confirmResetTitle')}
+        description={t('product.scores.confirmResetDesc')}
+        confirmLabel={t('product.scores.resetConfirm')}
         busy={saving}
         onConfirm={() => {
           setConfirmReset(false)
@@ -302,6 +308,7 @@ export function ScoresClient({
   matches: ManageMatch[]
   referees: ManageReferee[]
 }) {
+  const t = useT()
   const [filter, setFilter] = useState<'all' | 'pending'>('all')
   const visible = filter === 'pending' ? matches.filter((m) => m.status !== 'finished') : matches
 
@@ -312,14 +319,14 @@ export function ScoresClient({
 
   const groupSections: Section[] = byRound(visible.filter((m) => m.phase === 'group')).map(({ round, matches }) => ({
     key: `g${round}`,
-    title: `Round ${round}`,
+    title: `${t('product.round')} ${round}`,
     matches: matches.sort((a, b) => (a.court ?? 0) - (b.court ?? 0)),
     time: matches[0]?.scheduledTime ?? null,
   }))
   // Group knockout by bracket label so the Final and Petite finale are separate.
   const koByLabel = new Map<string, ManageMatch[]>()
   for (const m of visible.filter((mm) => mm.phase === 'knockout')) {
-    const label = m.bracketLabel ?? `Tour ${m.round}`
+    const label = m.bracketLabel ?? `${t('product.bracketRound')} ${m.round}`
     koByLabel.set(label, [...(koByLabel.get(label) ?? []), m])
   }
   const koSections: Section[] = [...koByLabel.entries()].map(([label, ms]) => ({
@@ -333,24 +340,27 @@ export function ScoresClient({
   const clRounds = byRound(visible.filter((m) => m.phase === 'classification'))
   const clSections: Section[] = clRounds.map(({ round, matches }) => ({
     key: `c${round}`,
-    title: clRounds.length > 1 ? `Placements - tour ${round}` : 'Placements',
+    title:
+      clRounds.length > 1
+        ? t('product.scores.placementsRound').replace('{round}', String(round))
+        : t('product.scores.placements'),
     matches: matches.sort((a, b) => (a.court ?? 0) - (b.court ?? 0)),
     time: matches[0]?.scheduledTime ?? null,
   }))
   const allSections = orderSections([...groupSections, ...koSections, ...clSections])
 
   if (matches.length === 0) {
-    return <p className="text-muted-foreground">Aucun match généré. Lancez le tirage puis le calendrier.</p>
+    return <p className="text-muted-foreground">{t('product.scores.noMatches')}</p>
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center gap-2">
         <Badge variant={filter === 'all' ? 'default' : 'secondary'} className="cursor-pointer" onClick={() => setFilter('all')}>
-          Tous
+          {t('product.scores.filterAll')}
         </Badge>
         <Badge variant={filter === 'pending' ? 'default' : 'secondary'} className="cursor-pointer" onClick={() => setFilter('pending')}>
-          À saisir
+          {t('product.scores.filterPending')}
         </Badge>
       </div>
 
