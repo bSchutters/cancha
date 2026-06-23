@@ -3,38 +3,40 @@ import { MarketingShell } from '@/components/marketing/shell'
 import { Reveal } from '@/components/marketing/motion'
 import { CtaSection } from '@/components/marketing/cta-section'
 import { display } from '@/components/marketing/theme'
+import { makeT } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
-export const metadata: Metadata = {
-  title: 'À propos',
-  description:
-    'Cancha est né de l’organisation de vrais tournois. Notre mission : rendre la gestion de tournois sportifs simple, fiable et professionnelle.',
-  alternates: { canonical: '/a-propos' },
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
+  return {
+    title: t('apropos.metaTitle'),
+    description: t('apropos.metaDescription'),
+    alternates: { canonical: `/${lang}/a-propos` },
+  }
 }
 
-const PARAGRAPHS = [
-  'Cancha n’est pas né dans un fichier Excel, mais sur le terrain. L’outil a d’abord servi à gérer les tournois d’un club, avec leurs vraies contraintes : des dizaines d’équipes, plusieurs terrains, un tirage à annoncer sur place et des classements à tenir à jour en direct.',
-  'À force de l’utiliser, une évidence est apparue : ce dont un club a besoin, n’importe quel organisateur en a besoin aussi. Nous avons donc détaché l’outil pour en faire une plateforme à part entière, ouverte à tous les sports et à tous les formats.',
-  'Notre conviction est simple : organiser un tournoi devrait être un plaisir, pas une corvée logistique. La technique doit s’effacer pour laisser place au sport, à l’ambiance et aux équipes.',
-]
+export default async function AProposPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
 
-export default function AProposPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-3xl px-4 pb-12 pt-20 sm:px-6 lg:pt-24">
-        <span className="text-sm font-medium text-primary">À propos</span>
+        <span className="text-sm font-medium text-primary">{t('apropos.eyebrow')}</span>
         <h1 style={display} className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-          Né sur le terrain, pas dans un fichier Excel
+          {t('apropos.heroTitle')}
         </h1>
         <div className="mt-8 space-y-6">
-          {PARAGRAPHS.map((p, i) => (
-            <Reveal key={i} delay={i * 0.06}>
-              <p className="text-lg leading-relaxed text-muted-foreground">{p}</p>
+          {[1, 2, 3].map((i) => (
+            <Reveal key={i} delay={(i - 1) * 0.06}>
+              <p className="text-lg leading-relaxed text-muted-foreground">{t(`apropos.paragraph${i}`)}</p>
             </Reveal>
           ))}
         </div>
       </section>
 
-      <CtaSection title="Envie d’en discuter ?" subtitle="Parlez-nous de votre tournoi, on vous montre comment Cancha peut aider." />
+      <CtaSection title={t('apropos.ctaTitle')} subtitle={t('apropos.ctaSubtitle')} />
     </MarketingShell>
   )
 }

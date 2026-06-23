@@ -1,53 +1,42 @@
 import type { Metadata } from 'next'
 import { MarketingShell } from '@/components/marketing/shell'
 import { display } from '@/components/marketing/theme'
+import { makeT } from '@/i18n'
+import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
-export const metadata: Metadata = {
-  title: 'Mentions légales',
-  description: 'Mentions légales et politique de confidentialité de Cancha.',
-  alternates: { canonical: '/mentions-legales' },
-  robots: { index: false, follow: true },
+// Placeholders to complete with real company details before launch (raison
+// sociale, BCE, adresse, hébergeur, contact RGPD) — translated copy lives in the
+// dictionaries under legal.*.
+const SECTION_KEYS = ['editor', 'hosting', 'gdpr', 'cookies', 'ip']
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
+  return {
+    title: t('legal.meta.title'),
+    description: t('legal.meta.description'),
+    alternates: { canonical: `/${lang}/mentions-legales` },
+    robots: { index: false, follow: true },
+  }
 }
 
-// NOTE: placeholders to complete with real company details before launch
-// (raison sociale, numéro d'entreprise/BCE, adresse, hébergeur, DPO/contact RGPD).
-const SECTIONS = [
-  {
-    title: 'Éditeur du site',
-    body: 'Cancha — [raison sociale], [forme juridique], [adresse], [numéro d’entreprise / BCE]. Contact : [email]. Responsable de la publication : [nom].',
-  },
-  {
-    title: 'Hébergement',
-    body: 'Le site est hébergé par [hébergeur], [adresse de l’hébergeur].',
-  },
-  {
-    title: 'Données personnelles (RGPD)',
-    body: 'Les informations transmises via le formulaire de demande de démo (nom, email, et données facultatives sur votre tournoi) sont utilisées uniquement pour répondre à votre demande. Elles ne sont ni revendues ni cédées à des tiers. Conformément au RGPD, vous disposez d’un droit d’accès, de rectification et de suppression de vos données : écrivez à [email].',
-  },
-  {
-    title: 'Cookies',
-    body: 'Le site marketing n’utilise pas de cookies de suivi publicitaire. Seuls des cookies strictement nécessaires au fonctionnement peuvent être déposés.',
-  },
-  {
-    title: 'Propriété intellectuelle',
-    body: 'L’ensemble des contenus (textes, visuels, marque Cancha) est protégé. Toute reproduction sans autorisation est interdite.',
-  },
-]
+export default async function MentionsLegalesPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
+  const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
 
-export default function MentionsLegalesPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:py-24">
         <h1 style={display} className="text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-          Mentions légales
+          {t('legal.hero.title')}
         </h1>
         <div className="mt-10 space-y-10">
-          {SECTIONS.map((s) => (
-            <div key={s.title}>
+          {SECTION_KEYS.map((k) => (
+            <div key={k}>
               <h2 style={display} className="text-xl font-medium">
-                {s.title}
+                {t(`legal.${k}.title`)}
               </h2>
-              <p className="mt-2 leading-relaxed text-muted-foreground">{s.body}</p>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{t(`legal.${k}.body`)}</p>
             </div>
           ))}
         </div>
