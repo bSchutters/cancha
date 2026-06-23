@@ -3,19 +3,18 @@
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { LocaleLink } from '@/components/locale-link'
-import { useLocale } from '@/i18n/use-locale'
-import { getDictionary } from '@/i18n'
+import { useT } from '@/i18n/use-t'
 import { display, focusRing } from './theme'
 import { LanguageSwitcher } from './language-switcher'
 
 export function MarketingNav() {
-  const dict = getDictionary(useLocale())
+  const t = useT()
   const links = [
-    { href: '/fonctionnalites', label: dict.nav.features },
-    { href: '/demo', label: dict.nav.demo },
-    { href: '/tarifs', label: dict.nav.pricing },
-    { href: '/comparatif', label: dict.nav.comparison },
-    { href: '/ressources', label: dict.nav.resources },
+    { href: '/fonctionnalites', label: t('nav.features') },
+    { href: '/demo', label: t('nav.demo') },
+    { href: '/tarifs', label: t('nav.pricing') },
+    { href: '/comparatif', label: t('nav.comparison') },
+    { href: '/ressources', label: t('nav.resources') },
   ]
 
   return (
@@ -41,7 +40,7 @@ export function MarketingNav() {
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
           <Button asChild size="sm">
-            <LocaleLink href="/#contact">{dict.nav.requestDemo}</LocaleLink>
+            <LocaleLink href="/#contact">{t('nav.requestDemo')}</LocaleLink>
           </Button>
         </div>
       </div>

@@ -2,8 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { LocaleLink } from '@/components/locale-link'
-import { useLocale } from '@/i18n/use-locale'
-import { getDictionary } from '@/i18n'
+import { useT } from '@/i18n/use-t'
 import { display, focusRing } from './theme'
 import { SPORTS, PROFILES, CONTACT_EMAIL } from '@/lib/marketing/content'
 
@@ -19,7 +18,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 }
 
 export function MarketingFooter() {
-  const dict = getDictionary(useLocale())
+  const t = useT()
   return (
     <footer className="border-t border-border">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
@@ -27,26 +26,26 @@ export function MarketingFooter() {
           <span style={display} className="text-lg font-medium tracking-tight text-primary">
             Cancha
           </span>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{dict.footer.tagline}</p>
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{t('footer.tagline')}</p>
         </div>
 
         <nav className="flex flex-col gap-3">
-          <span className="text-sm font-medium text-foreground">{dict.footer.product}</span>
-          <FooterLink href="/fonctionnalites">{dict.nav.features}</FooterLink>
-          <FooterLink href="/demo">{dict.nav.demo}</FooterLink>
-          <FooterLink href="/tarifs">{dict.nav.pricing}</FooterLink>
-          <FooterLink href="/comparatif">{dict.nav.comparison}</FooterLink>
+          <span className="text-sm font-medium text-foreground">{t('footer.product')}</span>
+          <FooterLink href="/fonctionnalites">{t('nav.features')}</FooterLink>
+          <FooterLink href="/demo">{t('nav.demo')}</FooterLink>
+          <FooterLink href="/tarifs">{t('nav.pricing')}</FooterLink>
+          <FooterLink href="/comparatif">{t('nav.comparison')}</FooterLink>
         </nav>
 
         <nav className="flex flex-col gap-3">
-          <span className="text-sm font-medium text-foreground">{dict.footer.resources}</span>
-          <FooterLink href="/ressources">{dict.nav.resources}</FooterLink>
+          <span className="text-sm font-medium text-foreground">{t('footer.resources')}</span>
+          <FooterLink href="/ressources">{t('nav.resources')}</FooterLink>
           <FooterLink href="/faq">FAQ</FooterLink>
           <FooterLink href="/a-propos">À propos</FooterLink>
         </nav>
 
         <nav className="flex flex-col gap-3">
-          <span className="text-sm font-medium text-foreground">{dict.footer.sports}</span>
+          <span className="text-sm font-medium text-foreground">{t('footer.sports')}</span>
           {SPORTS.slice(0, 5).map((s) => (
             <FooterLink key={s.slug} href={`/sports/${s.slug}`}>
               {s.name}
@@ -55,7 +54,7 @@ export function MarketingFooter() {
         </nav>
 
         <nav className="flex flex-col gap-3">
-          <span className="text-sm font-medium text-foreground">{dict.footer.organizers}</span>
+          <span className="text-sm font-medium text-foreground">{t('footer.organizers')}</span>
           {PROFILES.map((p) => (
             <FooterLink key={p.slug} href={`/organisateurs/${p.slug}`}>
               {p.name}
@@ -72,9 +71,9 @@ export function MarketingFooter() {
               href={`mailto:${CONTACT_EMAIL}`}
               className={cn('text-sm text-muted-foreground transition-colors hover:text-foreground', focusRing)}
             >
-              {dict.footer.contact}
+              {t('footer.contact')}
             </a>
-            <FooterLink href="/mentions-legales">{dict.footer.legal}</FooterLink>
+            <FooterLink href="/mentions-legales">{t('footer.legal')}</FooterLink>
           </div>
         </div>
       </div>

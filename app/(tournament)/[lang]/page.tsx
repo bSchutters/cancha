@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { MarketingShell } from '@/components/marketing/shell'
 import { HomeSections } from '@/components/marketing/home'
 import { SiteJsonLd } from '@/components/marketing/structured-data'
-import { getDictionary } from '@/i18n'
+import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
@@ -34,11 +34,11 @@ export default async function CupHomePage({ params }: { params: Promise<{ lang: 
   // tournament list lives on its own subdomain / custom domain.
   if (!org) {
     const base = await getRequestBaseUrl()
-    const dict = getDictionary(isLocale(lang) ? lang : DEFAULT_LOCALE)
+    const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
     return (
       <MarketingShell>
         <SiteJsonLd baseUrl={base} />
-        <HomeSections dict={dict} />
+        <HomeSections t={t} />
       </MarketingShell>
     )
   }
