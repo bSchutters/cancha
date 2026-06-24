@@ -14,8 +14,8 @@ export function getDictionary(locale: Locale): Dictionary {
   return DICTIONARIES[locale] ?? DICTIONARIES[DEFAULT_LOCALE]
 }
 
-/** Server-side translator for a locale. Falls back to the key if missing. */
+/** Server-side translator for a locale. Falls back to FR (source), then the key. */
 export function makeT(locale: Locale): Translate {
   const dict = getDictionary(locale)
-  return (key) => dict[key] ?? key
+  return (key) => dict[key] ?? fr[key] ?? key
 }
