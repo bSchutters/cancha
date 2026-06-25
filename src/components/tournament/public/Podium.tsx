@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Trophy, Medal, Award } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
+import { localizeFinalNote } from '@/lib/tournament/bracket-label'
 import type { PublicTournament } from '@/lib/tournament/public-view'
 
 function Logo({ url, size, alt = '' }: { url: string | null; size: number; alt?: string }) {
@@ -101,7 +102,7 @@ export function Podium({ data }: { data: PublicTournament }) {
                   <Logo url={e.logoUrl} size={18} />
                   <span className="truncate font-medium">{e.teamName}</span>
                 </span>
-                <span className="shrink-0 text-xs text-muted-foreground">{e.note}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{localizeFinalNote(e.note, t)}</span>
               </li>
             ))}
           </ol>

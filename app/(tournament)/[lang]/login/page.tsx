@@ -10,8 +10,6 @@ import { useLocale } from '@/i18n/use-locale'
 import { useT } from '@/i18n/use-t'
 import { manageLandingLocale } from './actions'
 
-export const dynamic = 'force-dynamic'
-
 export default function ManageLoginPage() {
   const router = useRouter()
   const locale = useLocale()

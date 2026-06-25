@@ -1123,4 +1123,12 @@ export const en: Dictionary = {
   "product.bracket.ranking": "Ranking",
   "product.bracket.placesRange": "Places {lo}-{hi}",
   "product.bracket.placeSingle": "Place {n}",
+  "product.ranking.champion": "Champion",
+  "product.ranking.finalist": "Runner-up",
+  "product.ranking.third": "3rd place",
+  "product.ranking.fourth": "4th place",
+  "product.ranking.ranking": "Ranking",
+  "product.ranking.eliminated": "Eliminated",
+  "product.feeder.winner": "Winner {code}",
+  "product.feeder.loser": "Loser {code}",
 }

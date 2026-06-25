@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
-import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
+import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { BracketView } from './BracketView'
@@ -126,7 +126,7 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
                 </p>
                 <p className="text-base text-muted-foreground">{m.scheduledTime ?? slot.time}</p>
               </div>
-              <ScoreboardTeam name={m.homeName} logo={m.homeLogoUrl} side="home" nameSize={nameSize} logoSize={logoSize} winner={homeWin} />
+              <ScoreboardTeam name={localizeFeederName(m.homeName, t)} logo={m.homeLogoUrl} side="home" nameSize={nameSize} logoSize={logoSize} winner={homeWin} />
               {/* Center: score (played) or VS */}
               {decided ? (
                 <span className={cn('flex shrink-0 items-center gap-3 font-extrabold tabular-nums', midSize)}>
@@ -139,7 +139,7 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
                   {t('product.tv.vs')}
                 </span>
               )}
-              <ScoreboardTeam name={m.awayName} logo={m.awayLogoUrl} side="away" nameSize={nameSize} logoSize={logoSize} winner={awayWin} />
+              <ScoreboardTeam name={localizeFeederName(m.awayName, t)} logo={m.awayLogoUrl} side="away" nameSize={nameSize} logoSize={logoSize} winner={awayWin} />
             </div>
           )
         })}
@@ -317,7 +317,7 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
           {matchRoundLabel(m, t)}
         </span>
       )}
-      <ScheduleTeam name={m.homeName} logo={m.homeLogoUrl} align="right" />
+      <ScheduleTeam name={localizeFeederName(m.homeName, t)} logo={m.homeLogoUrl} align="right" />
       {decided ? (
         <span className="shrink-0 rounded-sm bg-muted px-2 py-0.5 text-sm font-bold tabular-nums">
           {m.scoreHome}-{m.scoreAway}
@@ -325,7 +325,7 @@ function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }
       ) : (
         <span className="shrink-0 text-sm text-muted-foreground">{t('product.versus')}</span>
       )}
-      <ScheduleTeam name={m.awayName} logo={m.awayLogoUrl} align="left" />
+      <ScheduleTeam name={localizeFeederName(m.awayName, t)} logo={m.awayLogoUrl} align="left" />
       {m.court != null && (
         <span className="w-7 shrink-0 text-right text-xs font-semibold text-muted-foreground">T{m.court}</span>
       )}

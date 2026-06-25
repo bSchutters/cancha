@@ -5,7 +5,7 @@ import { CalendarOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useT } from '@/i18n/use-t'
-import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
+import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { GroupStandings } from '../GroupStandings'
 import { EmptyState } from '../EmptyState'
@@ -129,7 +129,7 @@ export function MyTeamTab({
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-muted-foreground">{t('product.versus')}</span>
-                  <TeamBadge logo={v.oppLogo} name={v.oppName} size={28} />
+                  <TeamBadge logo={v.oppLogo} name={localizeFeederName(v.oppName, t)} size={28} />
                 </div>
               </div>
             )

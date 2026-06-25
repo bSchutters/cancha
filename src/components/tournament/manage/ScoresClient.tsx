@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
 import { ConfirmDialog } from '@/components/tournament/manage/ConfirmDialog'
 import { useT } from '@/i18n/use-t'
-import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
+import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
 
 type Fairplay = 'home' | 'away' | 'none'
@@ -153,13 +153,13 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
-            {match.homeName ?? t('product.match.tbd')}
+            {match.homeName ? localizeFeederName(match.homeName, t) : t('product.match.tbd')}
           </span>
           <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-muted-foreground')}>
-            {match.awayName ?? t('product.match.tbd')}
+            {match.awayName ? localizeFeederName(match.awayName, t) : t('product.match.tbd')}
           </span>
           <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
         </div>

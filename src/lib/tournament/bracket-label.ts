@@ -28,3 +28,33 @@ export function localizeBracketLabel(label: string | null | undefined, t: Transl
   if (m) return t('product.bracket.placeSingle').replace('{n}', m[1])
   return label
 }
+
+// Final-ranking notes are generated in French (final-ranking.ts noteFor()).
+const NOTE: Record<string, string> = {
+  Champion: 'product.ranking.champion',
+  Finaliste: 'product.ranking.finalist',
+  '3e place': 'product.ranking.third',
+  '4e place': 'product.ranking.fourth',
+  Classement: 'product.ranking.ranking',
+  Éliminé: 'product.ranking.eliminated',
+}
+
+/** Localize a final-ranking note ("Champion", "3e place"…). Raw label if unknown. */
+export function localizeFinalNote(note: string | null | undefined, t: Translate): string {
+  if (!note) return ''
+  return NOTE[note] ? t(NOTE[note]) : note
+}
+
+/**
+ * Localize a TBD bracket-slot feeder name ("Vainqueur QF1" / "Perdant DF2",
+ * from match-code.ts). The match code (QF1…) is a compact identifier and stays;
+ * only the Vainqueur/Perdant prefix is translated. Raw name if it isn't a feeder.
+ */
+export function localizeFeederName(name: string | null | undefined, t: Translate): string | null {
+  if (!name) return name ?? null
+  let m = /^Vainqueur (.+)$/.exec(name)
+  if (m) return t('product.feeder.winner').replace('{code}', m[1])
+  m = /^Perdant (.+)$/.exec(name)
+  if (m) return t('product.feeder.loser').replace('{code}', m[1])
+  return name
+}

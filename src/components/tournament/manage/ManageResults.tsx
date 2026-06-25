@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BracketView, type BracketMatchView } from '@/components/tournament/BracketView'
 import { useT } from '@/i18n/use-t'
+import { localizeFinalNote } from '@/lib/tournament/bracket-label'
 import type { ManageMatch, ManageTournament } from '@/lib/tournament/manage-view'
 
 function toBracketView(m: ManageMatch): BracketMatchView {
@@ -188,7 +189,7 @@ function FinalRankingContent({ t }: { t: ManageTournament }) {
             <TableCell className="font-medium">
               <NameWithLogo logo={e.logoUrl} name={e.teamName} />
             </TableCell>
-            <TableCell className="text-right text-xs text-muted-foreground">{e.note}</TableCell>
+            <TableCell className="text-right text-xs text-muted-foreground">{localizeFinalNote(e.note, tr)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

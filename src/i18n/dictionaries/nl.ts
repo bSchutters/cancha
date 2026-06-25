@@ -1123,4 +1123,12 @@ export const nl: Dictionary = {
   "product.bracket.ranking": "Klassement",
   "product.bracket.placesRange": "Plaatsen {lo}-{hi}",
   "product.bracket.placeSingle": "Plaats {n}",
+  "product.ranking.champion": "Kampioen",
+  "product.ranking.finalist": "Finalist",
+  "product.ranking.third": "3e plaats",
+  "product.ranking.fourth": "4e plaats",
+  "product.ranking.ranking": "Klassement",
+  "product.ranking.eliminated": "Uitgeschakeld",
+  "product.feeder.winner": "Winnaar {code}",
+  "product.feeder.loser": "Verliezer {code}",
 }

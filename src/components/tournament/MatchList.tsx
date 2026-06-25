@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
-import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
+import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { PublicMatch } from '@/lib/tournament/public-view'
 
 function TeamLine({
@@ -28,7 +28,7 @@ function TeamLine({
             <Image src={logo} alt={name} fill sizes="20px" unoptimized className="object-contain" />
           </span>
         )}
-        <span className="truncate">{name ?? t('product.match.tbd')}</span>
+        <span className="truncate">{name ? localizeFeederName(name, t) : t('product.match.tbd')}</span>
         {penaltyWin && (
           <span className="shrink-0 rounded-sm bg-emerald-400/20 px-1 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-300">
             {t('product.match.penaltyShort')}

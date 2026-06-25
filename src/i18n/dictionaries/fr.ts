@@ -1122,4 +1122,12 @@ export const fr: Record<string, string> = {
   "product.bracket.ranking": "Classement",
   "product.bracket.placesRange": "Places {lo}-{hi}",
   "product.bracket.placeSingle": "Place {n}",
+  "product.ranking.champion": "Champion",
+  "product.ranking.finalist": "Finaliste",
+  "product.ranking.third": "3e place",
+  "product.ranking.fourth": "4e place",
+  "product.ranking.ranking": "Classement",
+  "product.ranking.eliminated": "Éliminé",
+  "product.feeder.winner": "Vainqueur {code}",
+  "product.feeder.loser": "Perdant {code}",
 }
