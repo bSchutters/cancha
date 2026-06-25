@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint src app",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "payload": "node --env-file=.env node_modules/payload/bin.js",
+    "migrate": "node --env-file=.env node_modules/payload/bin.js migrate",
+    "migrate:create": "node --env-file=.env node_modules/payload/bin.js migrate:create",
+    "migrate:status": "node --env-file=.env node_modules/payload/bin.js migrate:status"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
