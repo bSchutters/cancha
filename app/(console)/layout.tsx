@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { Newsreader, Geist } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
+import { DEFAULT_LOCALE } from '@/i18n/config'
 import { ConsoleShell } from '@/components/console/console-shell'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -32,7 +33,9 @@ export const metadata: Metadata = { title: 'Console', robots: { index: false, fo
  */
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const user = await getSessionUser()
-  if (!isSuperAdmin(user)) redirect('/login')
+  // Login lives under the localized segment ([lang]/login); the console is
+  // FR-only, so send unauthenticated staff to the French login.
+  if (!isSuperAdmin(user)) redirect(`/${DEFAULT_LOCALE}/login`)
 
   return (
     <html lang="fr-BE" suppressHydrationWarning>

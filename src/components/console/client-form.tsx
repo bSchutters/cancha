@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { LOCALES, LOCALE_LABELS } from '@/i18n/config'
 
 type CreateClientState = { error?: string }
 
@@ -97,7 +98,7 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Thème par défaut « Papier (Cancha) » — le client pourra le personnaliser dans son espace.
+            Thème par défaut « Papier (Cancha) », le client pourra le personnaliser dans son espace.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -105,9 +106,11 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
                 Langue du backoffice
               </label>
               <select id="cf-manage-locale" name="default_manage_locale" defaultValue="fr" className={fieldClass}>
-                <option value="fr">Français</option>
-                <option value="nl">Nederlands</option>
-                <option value="en">English</option>
+                {LOCALES.map((l) => (
+                  <option key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -115,9 +118,11 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
                 Langue du site public
               </label>
               <select id="cf-public-locale" name="default_public_locale" defaultValue="fr" className={fieldClass}>
-                <option value="fr">Français</option>
-                <option value="nl">Nederlands</option>
-                <option value="en">English</option>
+                {LOCALES.map((l) => (
+                  <option key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

@@ -327,7 +327,7 @@ export const fr: Record<string, string> = {
   "home.testimonials.filled.title": "Des organisateurs qui ont rangé Excel et le papier",
   "legal.cookies.body": "Le site marketing n’utilise pas de cookies de suivi publicitaire. Seuls des cookies strictement nécessaires au fonctionnement peuvent être déposés.",
   "legal.cookies.title": "Cookies",
-  "legal.editor.body": "Cancha — [raison sociale], [forme juridique], [adresse], [numéro d’entreprise / BCE]. Contact : [email]. Responsable de la publication : [nom].",
+  "legal.editor.body": "Cancha, [raison sociale], [forme juridique], [adresse], [numéro d’entreprise / BCE]. Contact : [email]. Responsable de la publication : [nom].",
   "legal.editor.title": "Éditeur du site",
   "legal.gdpr.body": "Les informations transmises via le formulaire de demande de démo (nom, email, et données facultatives sur votre tournoi) sont utilisées uniquement pour répondre à votre demande. Elles ne sont ni revendues ni cédées à des tiers. Conformément au RGPD, vous disposez d’un droit d’accès, de rectification et de suppression de vos données : écrivez à [email].",
   "legal.gdpr.title": "Données personnelles (RGPD)",

@@ -5,8 +5,11 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
+import { LOCALES } from '@/i18n/config'
 
 export type CreateClientState = { error?: string }
+
+const RESERVED_SLUGS = new Set<string>(LOCALES)
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Le nom est requis.').max(120),
@@ -16,7 +19,8 @@ const schema = z.object({
     .toLowerCase()
     .min(2, 'Le slug est trop court.')
     .max(60)
-    .regex(/^[a-z0-9-]+$/, 'Slug : uniquement a-z, 0-9 et tirets.'),
+    .regex(/^[a-z0-9-]+$/, 'Slug : uniquement a-z, 0-9 et tirets.')
+    .refine((s) => !RESERVED_SLUGS.has(s), 'Ce slug est réservé (code de langue).'),
   subdomain: z
     .string()
     .trim()

@@ -49,12 +49,18 @@ export function localizeFinalNote(note: string | null | undefined, t: Translate)
  * Localize a TBD bracket-slot feeder name ("Vainqueur QF1" / "Perdant DF2",
  * from match-code.ts). The match code (QF1…) is a compact identifier and stays;
  * only the Vainqueur/Perdant prefix is translated. Raw name if it isn't a feeder.
+ *
+ * The code is matched against its exact grammar — uppercase letters + digits, no
+ * spaces (buildMatchCodes: R1A, QF1, DF, F, P3, PL9, BR, T3…) — so a real team
+ * literally named "Vainqueur …" (with a space, lowercase, or accents) is left
+ * untouched instead of being mistaken for a feeder placeholder.
  */
+const FEEDER_CODE = '([A-Z0-9]+)'
 export function localizeFeederName(name: string | null | undefined, t: Translate): string | null {
   if (!name) return name ?? null
-  let m = /^Vainqueur (.+)$/.exec(name)
+  let m = new RegExp(`^Vainqueur ${FEEDER_CODE}$`).exec(name)
   if (m) return t('product.feeder.winner').replace('{code}', m[1])
-  m = /^Perdant (.+)$/.exec(name)
+  m = new RegExp(`^Perdant ${FEEDER_CODE}$`).exec(name)
   if (m) return t('product.feeder.loser').replace('{code}', m[1])
   return name
 }
