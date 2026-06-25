@@ -670,7 +670,7 @@ export const nl: Dictionary = {
   "product.standings.played.title": "Gespeeld",
   "product.standings.wins.short": "W",
   "product.standings.wins.title": "Winst",
-  "product.standings.draws.short": "G",
+  "product.standings.draws.short": "GL",
   "product.standings.draws.title": "Gelijk",
   "product.standings.losses.short": "V",
   "product.standings.losses.title": "Verlies",
