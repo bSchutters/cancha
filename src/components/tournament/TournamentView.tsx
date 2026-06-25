@@ -280,10 +280,10 @@ function TeamGrid({
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm">{t.name}</span>
               {t.status === 'pending' && (
-                <span className="text-[10px] font-medium text-amber-300/90">En attente de validation</span>
+                <span className="text-[10px] font-medium text-amber-700 dark:text-amber-300/90">En attente de validation</span>
               )}
               {t.status === 'waitlist' && (
-                <span className="text-[10px] font-medium text-sky-300/90">Liste d&apos;attente</span>
+                <span className="text-[10px] font-medium text-sky-700 dark:text-sky-300/90">Liste d&apos;attente</span>
               )}
             </span>
           </>

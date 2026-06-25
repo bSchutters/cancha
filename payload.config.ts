@@ -12,6 +12,7 @@ import { isSuperAdmin } from '@/payload/access'
 import { Users } from '@/payload/collections/Users'
 import { Media } from '@/payload/collections/Media'
 import { Organizations } from '@/payload/collections/Organizations'
+import { Leads } from '@/payload/collections/Leads'
 import { Tournaments } from '@/payload/collections/Tournaments'
 import { TournamentTeams } from '@/payload/collections/TournamentTeams'
 import { TournamentMatches } from '@/payload/collections/TournamentMatches'
@@ -28,7 +29,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' | Cup Generator',
+      titleSuffix: ' | Cancha',
     },
     components: {
       beforeNavLinks: ['@/payload/components/DashboardLink'],
@@ -40,6 +41,7 @@ export default buildConfig({
     Users,
     Media,
     Organizations,
+    Leads,
     Tournaments,
     TournamentTeams,
     TournamentMatches,

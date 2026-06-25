@@ -7,7 +7,7 @@ import { getSessionUser, getUserTenantId, type SessionUser } from './session'
 /**
  * Extract the tenant subdomain from a host.
  *  - `asturiana.localhost:3001` -> 'asturiana'  (browsers resolve *.localhost locally)
- *  - `asturiana.cupgenerator.app` -> 'asturiana'
+ *  - `asturiana.cancha.be` -> 'asturiana'
  *  - bare `localhost`, apex domain, or `www.` -> null (no tenant)
  */
 export function subdomainFromHost(host: string | null): string | null {

@@ -5,7 +5,7 @@ import { Reveal } from './motion'
 /** Conversion block with the demo lead form. Reused at the bottom of every page. */
 export function CtaSection({
   title = 'Prêt à organiser votre prochain tournoi ?',
-  subtitle = 'Montrez-nous votre tournoi, on vous montre comment Cup Generator le gère de A à Z.',
+  subtitle = 'Montrez-nous votre tournoi, on vous montre comment Cancha le gère de A à Z.',
 }: {
   title?: string
   subtitle?: string

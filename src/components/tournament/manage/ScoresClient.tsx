@@ -37,10 +37,10 @@ function IconBtn({
       disabled={disabled}
       className={cn(
         'rounded-md border disabled:opacity-25',
-        tone === 'danger' && 'border-red-500/40 text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300',
+        tone === 'danger' && 'border-red-500/40 text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300',
         tone === 'edit' && 'border-border bg-muted text-foreground hover:bg-accent hover:text-accent-foreground',
         tone === 'save' &&
-          'border-emerald-400/40 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-300',
+          'border-emerald-400/40 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/20 hover:text-emerald-700 dark:hover:text-emerald-300',
       )}
     >
       {children}

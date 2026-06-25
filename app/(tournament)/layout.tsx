@@ -1,5 +1,6 @@
 import '../globals.css'
 import type { Metadata, Viewport } from 'next'
+import { Newsreader, Geist } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant, resolveLayoutTenant } from '@/lib/tournament/tenant'
@@ -8,6 +9,23 @@ import { getRequestBaseUrl, socialMetadata } from '@/lib/tournament/seo'
 import { BRAND_NAME, SITE_DESCRIPTION, SITE_LOCALE } from '@/lib/site'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+
+// Default product faces (Cancha house style, matching the landing): an
+// editorial serif for headings + a clean grotesque for body. Per-org fonts, when
+// chosen, override these via --font-heading / --font-body (see globals.css).
+const productSerif = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-product-heading',
+  display: 'swap',
+})
+const productSans = Geist({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-product-body',
+  display: 'swap',
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -49,11 +67,17 @@ export default async function TournamentLayout({
       {/* Single background layer: ONLY the <body> paints var(--background) (it
           propagates to the whole viewport canvas because <html> has no background).
           Never also paint <html> - two layers of the same colour seam into a band. */}
-      <body className={cn('tournament-scope antialiased min-h-screen bg-background text-foreground font-nugros')}>
+      <body
+        className={cn(
+          productSerif.variable,
+          productSans.variable,
+          'tournament-scope antialiased min-h-screen bg-background text-foreground font-nugros',
+        )}
+      >
         {/* React 19 hoists <link>/<style> to <head>; the theme block is scoped to .tournament-scope. */}
         {fontsHref && <link rel="stylesheet" href={fontsHref} />}
         {themeCss && <style>{themeCss}</style>}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
           <Toaster />
         </ThemeProvider>

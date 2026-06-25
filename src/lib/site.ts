@@ -2,7 +2,7 @@
 // programmatic brand name in ONE place: changing BRAND_NAME here updates every
 // title, OG site name and JSON-LD usage at once. (Inline prose copy in the
 // marketing pages is intentionally not templated.)
-export const BRAND_NAME = 'Cup Generator'
+export const BRAND_NAME = 'Cancha'
 
 // Primary market: French-speaking Belgium. SITE_LOCALE is BCP-47 (html lang,
 // JSON-LD inLanguage); SITE_LOCALE_OG is the underscore form Open Graph expects.

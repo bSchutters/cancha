@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } else {
     // Apex (no tenant): the marketing site. List the static + SEO pages here,
     // where they are canonical.
-    for (const path of ['/demo', '/tarifs', '/comparatif', '/faq', '/a-propos', '/ressources']) {
+    for (const path of ['/fonctionnalites', '/demo', '/tarifs', '/comparatif', '/faq', '/a-propos', '/ressources']) {
       entries.push({ url: `${base}${path}`, changeFrequency: 'monthly', priority: 0.6 })
     }
     for (const s of SPORTS) {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { z } from 'zod'
+import { getPayloadClient } from '@/lib/payload'
 
 // Demo-request lead form (apex landing). Sends a qualified lead to OWNER_EMAIL
 // via Resend, reusing the same transactional-email env as registrations.
@@ -11,8 +12,10 @@ const schema = z.object({
   sport: z.string().trim().max(80).optional().default(''),
   teams: z.string().trim().max(40).optional().default(''),
   message: z.string().trim().max(2000).optional().default(''),
-  // Honeypot: hidden in the UI, so any value means a bot filled it.
-  website: z.string().max(0).optional().default(''),
+  // Honeypot: hidden in the UI, so any value means a bot filled it. Accept any
+  // string here (don't reject) so the handler can return a silent fake success
+  // instead of a 400 that signals the bot it was caught.
+  website: z.string().max(200).optional().default(''),
 })
 
 // Best-effort, in-memory rate limit. On serverless this is per warm instance
@@ -32,11 +35,6 @@ function rateLimited(ip: string): boolean {
 }
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  if (rateLimited(ip)) {
-    return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
-  }
-
   let data: z.infer<typeof schema>
   try {
     data = schema.parse(await req.json())
@@ -45,38 +43,78 @@ export async function POST(req: Request) {
   }
 
   // Honeypot tripped: pretend success and send nothing, so bots get no signal.
+  // Checked BEFORE the rate limit so honeypot spam doesn't burn the budget of a
+  // legitimate visitor sharing the same IP (NAT/proxy).
   if (data.website) {
     return NextResponse.json({ ok: true })
   }
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
+  }
+
+  // 1) Persist the lead first — the primary capture path. The owner email below
+  // is a best-effort notification on top, so a prospect isn't lost if it fails.
+  let saved = false
+  try {
+    const payload = await getPayloadClient()
+    await payload.create({
+      collection: 'leads',
+      data: {
+        name: data.name,
+        email: data.email,
+        organization: data.organization,
+        sport: data.sport,
+        teams: data.teams,
+        message: data.message,
+        status: 'new',
+        source: 'demo-request',
+      },
+      overrideAccess: true,
+    })
+    saved = true
+  } catch (err) {
+    // Don't fail the request yet (email may still notify), but make the outage
+    // visible and log the payload so the lead is recoverable from server logs.
+    console.error('[demo-request] lead persist failed', { email: data.email, err })
+  }
+
+  // 2) Best-effort email notification to the owner.
+  let emailed = false
   const to = process.env.OWNER_EMAIL
   const from = process.env.RESEND_FROM_EMAIL
   const key = process.env.RESEND_API_KEY
-  if (!to || !from || !key) {
-    return NextResponse.json({ error: 'email_not_configured' }, { status: 500 })
+  if (to && from && key) {
+    const lines = [
+      `Nom : ${data.name}`,
+      `Email : ${data.email}`,
+      data.organization && `Organisation : ${data.organization}`,
+      data.sport && `Sport : ${data.sport}`,
+      data.teams && `Nombre d’équipes : ${data.teams}`,
+      data.message && `\nMessage :\n${data.message}`,
+    ].filter(Boolean)
+    try {
+      const resend = new Resend(key)
+      await resend.emails.send({
+        from: `Cancha <${from}>`,
+        to,
+        replyTo: data.email,
+        subject: `Demande de démo - ${data.name}${data.organization ? ` (${data.organization})` : ''}`,
+        text: lines.join('\n'),
+      })
+      emailed = true
+    } catch (err) {
+      // The lead is already saved; the owner will see it in /console. Still log
+      // so a silently-expired Resend key is noticed.
+      console.error('[demo-request] owner email failed', err)
+    }
   }
 
-  const lines = [
-    `Nom : ${data.name}`,
-    `Email : ${data.email}`,
-    data.organization && `Organisation : ${data.organization}`,
-    data.sport && `Sport : ${data.sport}`,
-    data.teams && `Nombre d’équipes : ${data.teams}`,
-    data.message && `\nMessage :\n${data.message}`,
-  ].filter(Boolean)
-
-  try {
-    const resend = new Resend(key)
-    await resend.emails.send({
-      from: `Cup Generator <${from}>`,
-      to,
-      replyTo: data.email,
-      subject: `Demande de démo - ${data.name}${data.organization ? ` (${data.organization})` : ''}`,
-      text: lines.join('\n'),
-    })
-  } catch {
-    return NextResponse.json({ error: 'send_failed' }, { status: 502 })
+  // Only fail if the lead was neither stored nor announced — then the client
+  // shows its contact-email fallback.
+  if (!saved && !emailed) {
+    return NextResponse.json({ error: 'unavailable' }, { status: 502 })
   }
-
   return NextResponse.json({ ok: true })
 }

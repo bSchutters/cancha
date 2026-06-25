@@ -28,7 +28,7 @@ export function Testimonials() {
               Soyez parmi nos premiers organisateurs
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Cup Generator se lance. Les premiers clubs et comités qui l’adoptent bénéficient d’un
+              Cancha se lance. Les premiers clubs et comités qui l’adoptent bénéficient d’un
               accompagnement personnalisé pour leur premier tournoi et de conditions de lancement.
             </p>
             <div className="mt-8">
@@ -46,7 +46,7 @@ export function Testimonials() {
     <section className="border-y border-border bg-secondary/50">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-medium text-primary">Ils organisent avec Cup Generator</span>
+          <span className="text-sm font-medium text-primary">Ils organisent avec Cancha</span>
           <h2 style={display} className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             Des organisateurs qui ont rangé Excel et le papier
           </h2>

@@ -19,7 +19,7 @@ export const SPORTS: SportContent[] = [
     eyebrow: 'Logiciel de tournoi de futsal',
     h1: 'Gérez votre tournoi de futsal, du tirage au trophée',
     intro:
-      'Poules, calendrier multi-terrains, phase finale et classements en direct : Cup Generator gère votre tournoi de futsal de l’inscription des équipes au coup de sifflet final.',
+      'Poules, calendrier multi-terrains, phase finale et classements en direct : Cancha gère votre tournoi de futsal de l’inscription des équipes au coup de sifflet final.',
     formats: [
       'Futsal à 5 contre 5, avec ou sans gardien tournant',
       'Poules puis tableau à élimination directe',
@@ -58,7 +58,7 @@ export const SPORTS: SportContent[] = [
     eyebrow: 'Logiciel de tournoi de volley',
     h1: 'Votre tournoi de volley, géré de A à Z',
     intro:
-      'Des poules à la phase finale, Cup Generator répartit les matchs sur vos terrains, calcule les classements et affiche tout en direct sur place.',
+      'Des poules à la phase finale, Cancha répartit les matchs sur vos terrains, calcule les classements et affiche tout en direct sur place.',
     formats: [
       'Équipes en 4 contre 4 ou 6 contre 6',
       'Classement aux sets et aux points',
@@ -106,7 +106,7 @@ export const PROFILES: ProfileContent[] = [
   {
     slug: 'clubs',
     name: 'Clubs sportifs',
-    eyebrow: 'Cup Generator pour les clubs',
+    eyebrow: 'Cancha pour les clubs',
     h1: 'L’outil de tournoi pensé pour les clubs',
     intro:
       'Montez votre tournoi annuel sans y passer vos soirées. Tirage, calendrier et classements automatisés, et une page publique aux couleurs du club.',
@@ -119,7 +119,7 @@ export const PROFILES: ProfileContent[] = [
   {
     slug: 'comites',
     name: 'Comités des fêtes',
-    eyebrow: 'Cup Generator pour les comités des fêtes',
+    eyebrow: 'Cancha pour les comités des fêtes',
     h1: 'Le tournoi du village, clé en main',
     intro:
       'Pas besoin d’être informaticien : si vous savez remplir un formulaire, vous savez organiser votre tournoi. On vous accompagne pour le premier.',
@@ -132,7 +132,7 @@ export const PROFILES: ProfileContent[] = [
   {
     slug: 'ecoles',
     name: 'Écoles de jeunes',
-    eyebrow: 'Cup Generator pour les écoles de jeunes',
+    eyebrow: 'Cancha pour les écoles de jeunes',
     h1: 'Des tournois de jeunes parfaitement organisés',
     intro:
       'Gérez de nombreuses équipes sur plusieurs terrains sans erreur de planning, et tenez parents et coachs informés en temps réel.',
@@ -145,7 +145,7 @@ export const PROFILES: ProfileContent[] = [
   {
     slug: 'entreprises',
     name: 'Entreprises',
-    eyebrow: 'Cup Generator pour les entreprises',
+    eyebrow: 'Cancha pour les entreprises',
     h1: 'Votre tournoi inter-entreprises, sans logistique',
     intro:
       'Team building ou tournoi caritatif : lancez les inscriptions, laissez la plateforme gérer le déroulé et offrez une vraie expérience aux participants.',
@@ -159,7 +159,7 @@ export const PROFILES: ProfileContent[] = [
 
 export const FAQ: { q: string; a: string }[] = [
   {
-    q: 'Pour quels sports Cup Generator fonctionne-t-il ?',
+    q: 'Pour quels sports Cancha fonctionne-t-il ?',
     a: 'Tous les sports qui se jouent en poules puis en phase finale : football, futsal, padel, volley, basket, ping-pong, pétanque… Le format est entièrement configurable.',
   },
   {
@@ -184,22 +184,22 @@ export const FAQ: { q: string; a: string }[] = [
   },
 ]
 
-export type ComparisonRow = { criterion: string; excel: string; generic: string; cupgenerator: string }
+export type ComparisonRow = { criterion: string; excel: string; generic: string; cancha: string }
 
 export const COMPARISON_INTRO =
-  'Beaucoup d’organisateurs gèrent encore leur tournoi sur Excel et papier, ou avec un outil généraliste. Voici comment ces approches se comparent à Cup Generator sur les tâches qui comptent vraiment.'
+  'Beaucoup d’organisateurs gèrent encore leur tournoi sur Excel et papier, ou avec un outil généraliste. Voici comment ces approches se comparent à Cancha sur les tâches qui comptent vraiment.'
 
 export const COMPARISON: ComparisonRow[] = [
-  { criterion: 'Inscriptions en ligne', excel: 'Saisie manuelle, erreurs fréquentes', generic: 'Formulaire de base', cupgenerator: 'Formulaire dédié, liste centralisée' },
-  { criterion: 'Tirage au sort', excel: 'À faire à la main', generic: 'Rarement intégré', cupgenerator: 'Tirage animé, affiché en direct' },
-  { criterion: 'Planning multi-terrains', excel: 'Très long à construire', generic: 'Souvent limité', cupgenerator: 'Généré automatiquement' },
-  { criterion: 'Recalcul après retard', excel: 'Tout reprendre à la main', generic: 'Variable selon l’outil', cupgenerator: 'Horaires recalés en un clic' },
-  { criterion: 'Scores et classements', excel: 'Formules fragiles, erreurs de calcul', generic: 'Mise à jour manuelle', cupgenerator: 'Classements en direct, automatiques' },
-  { criterion: 'Affichage sur place', excel: 'Non prévu', generic: 'Rarement disponible', cupgenerator: 'Écran TV et tableau live' },
-  { criterion: 'Gestion des arbitres', excel: 'Sur papier', generic: 'Peu adapté', cupgenerator: 'Saisie des scores par terrain' },
-  { criterion: 'Sponsors et marque', excel: 'Aucun', generic: 'Limité', cupgenerator: 'Logos et couleurs personnalisés' },
-  { criterion: 'Prise en main', excel: 'Familier mais laborieux', generic: 'Courbe d’apprentissage variable', cupgenerator: 'Pensé pour les organisateurs' },
-  { criterion: 'Coût', excel: 'Gratuit mais chronophage', generic: 'Souvent un abonnement', cupgenerator: 'Par équipe, sans abonnement' },
+  { criterion: 'Inscriptions en ligne', excel: 'Saisie manuelle, erreurs fréquentes', generic: 'Formulaire de base', cancha: 'Formulaire dédié, liste centralisée' },
+  { criterion: 'Tirage au sort', excel: 'À faire à la main', generic: 'Rarement intégré', cancha: 'Tirage animé, affiché en direct' },
+  { criterion: 'Planning multi-terrains', excel: 'Très long à construire', generic: 'Souvent limité', cancha: 'Généré automatiquement' },
+  { criterion: 'Recalcul après retard', excel: 'Tout reprendre à la main', generic: 'Variable selon l’outil', cancha: 'Horaires recalés en un clic' },
+  { criterion: 'Scores et classements', excel: 'Formules fragiles, erreurs de calcul', generic: 'Mise à jour manuelle', cancha: 'Classements en direct, automatiques' },
+  { criterion: 'Affichage sur place', excel: 'Non prévu', generic: 'Rarement disponible', cancha: 'Écran TV et tableau live' },
+  { criterion: 'Gestion des arbitres', excel: 'Sur papier', generic: 'Peu adapté', cancha: 'Saisie des scores par terrain' },
+  { criterion: 'Sponsors et marque', excel: 'Aucun', generic: 'Limité', cancha: 'Logos et couleurs personnalisés' },
+  { criterion: 'Prise en main', excel: 'Familier mais laborieux', generic: 'Courbe d’apprentissage variable', cancha: 'Pensé pour les organisateurs' },
+  { criterion: 'Coût', excel: 'Gratuit mais chronophage', generic: 'Souvent un abonnement', cancha: 'Par équipe, sans abonnement' },
 ]
 
 export type Testimonial = { quote: string; name: string; role: string; org: string }
@@ -209,7 +209,7 @@ export type Testimonial = { quote: string; name: string; role: string; org: stri
 export const TESTIMONIALS: Testimonial[] = []
 
 // Public contact address: lead-form fallback + footer. TODO: confirm the real inbox.
-export const CONTACT_EMAIL = 'contact@cupgenerator.be'
+export const CONTACT_EMAIL = 'contact@cancha.be'
 
 // Pricing model: pay-per-team (no subscription, no upfront). No hard rate is shown
 // here yet; it is intentionally left to a quote until the exact amount is fixed.

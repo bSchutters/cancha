@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Newsreader, Geist } from 'next/font/google'
 
-// Cup Generator brand fonts: editorial serif for display + clean grotesque body
+// Cancha brand fonts: editorial serif for display + clean grotesque body
 // (a warm, literary "Claude-like" pairing). Shared across all marketing pages.
 const serif = Newsreader({
   subsets: ['latin'],

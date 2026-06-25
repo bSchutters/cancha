@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { smoothScrollTo } from './motion'
 
 /**
  * Guided-tour spotlight: dims everything except the targeted element (matched by
@@ -31,7 +32,8 @@ export function Spotlight({
     if (el) {
       const r = el.getBoundingClientRect()
       if (r.top < 96 || r.bottom > window.innerHeight - 150) {
-        el.scrollIntoView({ behavior: mq.matches ? 'auto' : 'smooth', block: 'center' })
+        // Route through Lenis (when active) so it doesn't fight native smooth scroll.
+        smoothScrollTo(el, { immediate: mq.matches })
       }
     }
     const measure = () => {

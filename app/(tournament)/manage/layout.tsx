@@ -41,16 +41,13 @@ export default async function ManageLayout({ children }: { children: React.React
               </>
             ) : (
               <span>
-                Cup <span className="text-primary">Generator</span>
+                Cancha
               </span>
             )}
           </Link>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Link href="/manage/apparence" className="hover:text-foreground">
               Apparence
-            </Link>
-            <Link href="/" className="hover:text-foreground">
-              Voir le site public
             </Link>
             <span className="hidden sm:inline">{user?.email}</span>
             <ThemeToggle />

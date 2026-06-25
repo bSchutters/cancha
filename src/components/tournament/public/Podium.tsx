@@ -93,7 +93,7 @@ export function Podium({ data }: { data: PublicTournament }) {
           </summary>
           <ol className="mt-3 space-y-1">
             {data.finalRanking.map((e) => (
-              <li key={String(e.teamId)} className="flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm odd:bg-white/[0.03]">
+              <li key={String(e.teamId)} className="flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm odd:bg-foreground/[0.03]">
                 <span className="flex min-w-0 items-center gap-2">
                   <span className="w-8 shrink-0 text-muted-foreground">{e.positionLabel}</span>
                   <Logo url={e.logoUrl} size={18} />

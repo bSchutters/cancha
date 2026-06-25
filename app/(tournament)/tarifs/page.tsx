@@ -12,7 +12,7 @@ import { PRICING_POINTS, PRICING_STEPS, PRICE_TIERS } from '@/lib/marketing/cont
 export const metadata: Metadata = {
   title: 'Tarifs',
   description:
-    'Cup Generator se paie par équipe inscrite, dégressif au volume : pas d’abonnement, pas de frais fixes, vous ne payez que si votre tournoi a lieu.',
+    'Cancha se paie par équipe inscrite, dégressif au volume : pas d’abonnement, pas de frais fixes, vous ne payez que si votre tournoi a lieu.',
   alternates: { canonical: '/tarifs' },
 }
 
@@ -45,7 +45,7 @@ export default function TarifsPage() {
             -30% à vie pour les premiers organisateurs
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-primary-foreground/85">
-            Places limitées. Les premiers clubs et comités qui adoptent Cup Generator gardent ce
+            Places limitées. Les premiers clubs et comités qui adoptent Cancha gardent ce
             tarif réduit sur tous leurs futurs tournois.
           </p>
           <div className="mt-6">

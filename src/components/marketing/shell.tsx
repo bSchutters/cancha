@@ -16,7 +16,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={BRAND}
-      className={cn(fontVars, 'min-h-screen overflow-x-hidden bg-background text-foreground antialiased')}
+      className={cn(fontVars, 'marketing-scope min-h-screen overflow-x-hidden bg-background text-foreground antialiased')}
     >
       <SmoothScroll>
         <AnnouncementBar />

@@ -7,9 +7,9 @@ import { display } from '@/components/marketing/theme'
 import { COMPARISON, COMPARISON_INTRO } from '@/lib/marketing/content'
 
 export const metadata: Metadata = {
-  title: 'Cup Generator vs Excel et outils génériques',
+  title: 'Cancha vs Excel et outils génériques',
   description:
-    'Comparatif : gérer un tournoi sur Excel et papier, avec un outil générique ou avec Cup Generator. Inscriptions, tirage, planning, scores et affichage.',
+    'Comparatif : gérer un tournoi sur Excel et papier, avec un outil générique ou avec Cancha. Inscriptions, tirage, planning, scores et affichage.',
   alternates: { canonical: '/comparatif' },
 }
 
@@ -19,7 +19,7 @@ export default function ComparatifPage() {
       <section className="mx-auto max-w-3xl px-4 pb-10 pt-20 text-center sm:px-6 lg:pt-24">
         <span className="text-sm font-medium text-primary">Comparatif</span>
         <h1 style={display} className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-          Excel, outil générique ou Cup Generator ?
+          Excel, outil générique ou Cancha ?
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{COMPARISON_INTRO}</p>
       </section>
@@ -32,7 +32,7 @@ export default function ComparatifPage() {
                 <th className="p-4 font-medium text-muted-foreground">Tâche</th>
                 <th className="p-4 font-medium text-muted-foreground">Excel / papier</th>
                 <th className="p-4 font-medium text-muted-foreground">Outil générique</th>
-                <th className="p-4 font-medium text-primary">Cup Generator</th>
+                <th className="p-4 font-medium text-primary">Cancha</th>
               </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@ export default function ComparatifPage() {
                   <td className="bg-primary/[0.04] p-4">
                     <span className="flex items-start gap-2">
                       <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                      <span className="font-medium text-foreground">{row.cupgenerator}</span>
+                      <span className="font-medium text-foreground">{row.cancha}</span>
                     </span>
                   </td>
                 </tr>

@@ -4,7 +4,7 @@ import { display } from '@/components/marketing/theme'
 
 export const metadata: Metadata = {
   title: 'Mentions légales',
-  description: 'Mentions légales et politique de confidentialité de Cup Generator.',
+  description: 'Mentions légales et politique de confidentialité de Cancha.',
   alternates: { canonical: '/mentions-legales' },
   robots: { index: false, follow: true },
 }
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const SECTIONS = [
   {
     title: 'Éditeur du site',
-    body: 'Cup Generator — [raison sociale], [forme juridique], [adresse], [numéro d’entreprise / BCE]. Contact : [email]. Responsable de la publication : [nom].',
+    body: 'Cancha — [raison sociale], [forme juridique], [adresse], [numéro d’entreprise / BCE]. Contact : [email]. Responsable de la publication : [nom].',
   },
   {
     title: 'Hébergement',
@@ -30,7 +30,7 @@ const SECTIONS = [
   },
   {
     title: 'Propriété intellectuelle',
-    body: 'L’ensemble des contenus (textes, visuels, marque Cup Generator) est protégé. Toute reproduction sans autorisation est interdite.',
+    body: 'L’ensemble des contenus (textes, visuels, marque Cancha) est protégé. Toute reproduction sans autorisation est interdite.',
   },
 ]
 

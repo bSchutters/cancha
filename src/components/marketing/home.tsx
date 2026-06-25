@@ -22,7 +22,7 @@ import { COMPARISON } from '@/lib/marketing/content'
 import { HeroScreen } from './hero-screen'
 import { HeroBracket } from './hero-bracket'
 import { display, focusRing } from './theme'
-import { Reveal } from './motion'
+import { Reveal, Parallax, HeroIntro } from './motion'
 import { CtaSection } from './cta-section'
 import { Testimonials } from './testimonials'
 
@@ -97,27 +97,30 @@ export function HomeSections() {
     <>
       {/* Hero */}
       <section className="relative">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-130 bg-[radial-gradient(55%_55%_at_50%_0%,rgba(53,82,125,0.07),transparent_70%)]"
-        />
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-24 pt-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
-          <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700">
-            <span className="text-sm font-medium text-primary">
+        <Parallax amount={40} className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-130">
+          <div
+            aria-hidden
+            className="h-full w-full bg-[radial-gradient(55%_55%_at_50%_0%,rgba(53,82,125,0.07),transparent_70%)]"
+          />
+        </Parallax>
+        <HeroIntro className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-24 pt-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
+          <div>
+            <span data-hero className="inline-block text-sm font-medium text-primary">
               Pour les organisateurs de tournois, tous sports
             </span>
             <h1
+              data-hero
               style={display}
               className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
             >
               Organisez vos tournois{' '}
               <span className="font-medium italic text-primary">sans y passer vos soirées.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+            <p data-hero className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Inscriptions, tirage au sort, calendrier multi-terrains et classements en direct : tout
               est géré pour vous. Fini Excel et les groupes WhatsApp.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div data-hero className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Button asChild size="lg">
                 <Link href="#contact">
                   Demander une démo
@@ -138,10 +141,10 @@ export function HomeSections() {
           </div>
 
           {/* Live screen: alternates between pool standings and the knockout tree */}
-          <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000">
+          <div data-hero>
             <HeroScreen standings={STANDINGS} />
           </div>
-        </div>
+        </HeroIntro>
       </section>
 
       {/* Spotlight: the in-hall show */}
@@ -315,7 +318,7 @@ export function HomeSections() {
                 <tr className="border-b border-border text-left">
                   <th className="p-4 font-medium text-muted-foreground">Tâche</th>
                   <th className="p-4 font-medium text-muted-foreground">Excel / papier</th>
-                  <th className="p-4 font-medium text-primary">Cup Generator</th>
+                  <th className="p-4 font-medium text-primary">Cancha</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,7 +329,7 @@ export function HomeSections() {
                     <td className="bg-primary/[0.04] p-4">
                       <span className="flex items-start gap-2">
                         <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                        <span className="font-medium text-foreground">{row.cupgenerator}</span>
+                        <span className="font-medium text-foreground">{row.cancha}</span>
                       </span>
                     </td>
                   </tr>

@@ -196,7 +196,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             variant="ghost"
             onClick={() => setConfirmReset(true)}
             disabled={busy !== null}
-            className="h-auto flex-col items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/5 p-4 text-left text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300"
+            className="h-auto flex-col items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/5 p-4 text-left text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
           >
             <RotateCcw className="h-5 w-5" />
             <span className="text-sm font-semibold">Réinitialiser</span>
@@ -406,7 +406,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
               Annuler
             </Button>
             <Button
-              className="bg-red-500 font-bold text-foreground hover:bg-red-600"
+              className="bg-red-500 font-bold text-white hover:bg-red-600"
               onClick={() => post('reset', 'Réinitialisation')}
               disabled={busy === 'reset'}
             >
@@ -461,7 +461,7 @@ function DevButton({
       className={cn(
         'h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border p-4 text-left',
         done
-          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-300'
+          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-700 dark:hover:text-emerald-300'
           : primary
             ? 'border-fuchsia-400/60 bg-fuchsia-500/25 text-foreground hover:bg-fuchsia-500/35 hover:text-foreground'
             : 'border-border bg-card/60 text-foreground hover:bg-muted hover:text-foreground',
@@ -501,7 +501,7 @@ function ControlButton({
       className={cn(
         'h-auto flex-col items-start gap-2 whitespace-normal rounded-lg border p-4 text-left',
         done
-          ? 'border-emerald-400/30 bg-emerald-400/5 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-300'
+          ? 'border-emerald-400/30 bg-emerald-400/5 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-700 dark:hover:text-emerald-300'
           : 'border-border bg-card hover:bg-muted hover:text-foreground',
       )}
     >

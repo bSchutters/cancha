@@ -8,6 +8,21 @@ import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
+// The active Lenis instance (null under reduced motion / before mount). Lets
+// programmatic scrolls go THROUGH Lenis instead of fighting it with native
+// smooth scroll. See smoothScrollTo / the Spotlight tour.
+let activeLenis: Lenis | null = null
+
+/** Scroll an element into view through Lenis when active; native fallback otherwise. */
+export function smoothScrollTo(el: Element, { immediate = false }: { immediate?: boolean } = {}) {
+  const target = el as HTMLElement
+  if (activeLenis && !immediate) {
+    activeLenis.scrollTo(target, { offset: -window.innerHeight / 2 + target.offsetHeight / 2 })
+  } else {
+    el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth', block: 'center' })
+  }
+}
+
 /**
  * Lenis smooth scroll, synced to GSAP's ticker + ScrollTrigger. Scoped to the
  * marketing shell only (never mounted on /manage or /admin). Native scroll under
@@ -17,15 +32,23 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true })
+    // `anchors: true` lets Lenis own in-page #hash jumps (smooth, not native).
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true, anchors: true })
+    activeLenis = lenis
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
     gsap.ticker.lagSmoothing(0)
 
+    // Recompute trigger positions once Lenis drives the scroll and again after
+    // the display font swaps in (the swap shifts layout / start-end pixels).
+    requestAnimationFrame(() => ScrollTrigger.refresh())
+    document.fonts?.ready.then(() => ScrollTrigger.refresh())
+
     return () => {
       gsap.ticker.remove(tick)
       lenis.destroy()
+      activeLenis = null
     }
   }, [])
 
@@ -57,6 +80,31 @@ export function Reveal({
           ease: 'power3.out',
           scrollTrigger: { trigger: ref.current, start: 'top 85%', once: true },
         })
+      })
+    },
+    { scope: ref },
+  )
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Staggered GSAP entrance for hero elements tagged `[data-hero]`, so the first
+ * viewport shares the same easing vocabulary (power3.out) as the scroll reveals.
+ * useGSAP runs in a layout effect (no flash); static under reduced motion.
+ */
+export function HeroIntro({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        const items = ref.current?.querySelectorAll('[data-hero]')
+        if (!items?.length) return
+        gsap.from(items, { opacity: 0, y: 20, duration: 0.8, ease: 'power3.out', stagger: 0.09 })
       })
     },
     { scope: ref },

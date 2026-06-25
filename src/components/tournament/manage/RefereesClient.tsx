@@ -147,7 +147,7 @@ export function RefereesClient({ tournamentId, referees }: { tournamentId: Id; r
                 <Button
                   variant="link"
                   onClick={() => setConfirmDelete(r)}
-                  className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-300"
+                  className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                 >
                   Suppr.
                 </Button>

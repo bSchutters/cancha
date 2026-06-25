@@ -135,7 +135,7 @@ export function TvScreensManager({
                     disabled={busy}
                     onClick={() => removeScreen(i)}
                     title="Supprimer cette TV"
-                    className="text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-300"
+                    className="text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
