@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { LOCALES, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
+import { LOCALES, DEFAULT_LOCALE, bestAcceptLocale } from '@/i18n/config'
 
 // Everything user-facing lives under a localized segment (/fr, /nl, /en). An
 // un-prefixed path — an old bookmark, a shared tournament link (…/summer-cup),
@@ -8,23 +8,17 @@ import { LOCALES, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
 // page, which does the tenant-aware (org default-public-locale) redirect.
 //
 // The matcher already excludes /api, /admin (Payload), /console (FR-only, no
-// [lang]), /_next and any file with an extension, so this only touches the
-// localized app surface.
+// [lang]), underscore-prefixed Next internals (/_next, /__nextjs…) and any file
+// with an extension, so this only touches the localized app surface.
+//
+// Trade-off: on a tenant host this picks the locale from Accept-Language, not the
+// org's defaultPublicLocale — only the root page ('/') can resolve the tenant
+// (DB access isn't available in the edge runtime). Deep links favor the visitor's
+// language; the canonical entry ('/') still honors the org default.
+//
+// Next 16 renamed the "middleware" file convention to "proxy" (same request API).
 
-function bestAcceptLocale(accept: string): Locale | undefined {
-  return accept
-    .split(',')
-    .map((part) => {
-      const [tag, ...params] = part.trim().split(';')
-      const qParam = params.find((p) => p.trim().startsWith('q='))
-      const q = qParam ? Number.parseFloat(qParam.trim().slice(2)) : 1
-      return { lang: tag?.trim().slice(0, 2).toLowerCase() ?? '', q: Number.isFinite(q) ? q : 0 }
-    })
-    .filter((e) => (LOCALES as readonly string[]).includes(e.lang))
-    .sort((a, b) => b.q - a.q)[0]?.lang as Locale | undefined
-}
-
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // Root is handled by the tenant-aware root page.
@@ -41,7 +35,9 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Exclude API, Payload admin, the FR-only console, Next internals, and any
-  // path that looks like a file (has a dot: favicon.ico, sitemap.xml, …).
-  matcher: ['/((?!api|admin|console|_next|.*\\.).*)'],
+  // Exclude — as whole first segments, not mere prefixes, so a real slug like
+  // `api-cup` or `console-final` is NOT skipped — the API, Payload admin and the
+  // FR-only console; plus underscore-prefixed Next internals (/_next, /__nextjs…)
+  // and any path that looks like a file (has a dot: favicon.ico, sitemap.xml, …).
+  matcher: ['/((?!(?:api|admin|console)(?:/|$)|_|.*\\.).*)'],
 }
