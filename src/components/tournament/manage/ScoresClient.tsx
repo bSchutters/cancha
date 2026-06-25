@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
 import { ConfirmDialog } from '@/components/tournament/manage/ConfirmDialog'
 import { useT } from '@/i18n/use-t'
+import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
 import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
 
 type Fairplay = 'home' | 'away' | 'none'
@@ -331,7 +332,7 @@ export function ScoresClient({
   }
   const koSections: Section[] = [...koByLabel.entries()].map(([label, ms]) => ({
     key: `k:${label}`,
-    title: label,
+    title: localizeBracketLabel(label, t),
     matches: ms,
     time: ms[0]?.scheduledTime ?? null,
   }))

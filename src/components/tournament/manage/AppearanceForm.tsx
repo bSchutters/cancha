@@ -19,7 +19,6 @@ import { useT } from '@/i18n/use-t'
 import {
   BASE_COLORS,
   BASE_COLOR_KEYS,
-  RADIUS_PRESETS,
   RADIUS_KEYS,
   ACCENT_PRESETS,
   FONTS,
@@ -126,7 +125,11 @@ export function AppearanceForm({
 
   // Current accent display (preset label, "Personnalisé", or "Défaut").
   const accentPreset = ACCENT_PRESETS.find((p) => p.color.toLowerCase() === accent.trim().toLowerCase())
-  const accentLabel = accent.trim() ? (accentPreset?.label ?? t('product.appearance.custom')) : t('product.appearance.default')
+  const accentLabel = accent.trim()
+    ? accentPreset
+      ? t(`product.accent.${accentPreset.key}`)
+      : t('product.appearance.custom')
+    : t('product.appearance.default')
 
   // Load the chosen Google fonts so the live preview renders with them.
   useEffect(() => {
@@ -257,7 +260,7 @@ export function AppearanceForm({
           {ACCENT_PRESETS.map((p) => (
             <DropdownMenuItem key={p.key} onClick={() => setAccent(p.color)} className="gap-2">
               <span className="size-4 rounded-full border border-border" style={{ background: p.color }} />
-              <span className="flex-1">{p.label}</span>
+              <span className="flex-1">{t(`product.accent.${p.key}`)}</span>
               {accent.trim().toLowerCase() === p.color.toLowerCase() && <Check className="size-4" />}
             </DropdownMenuItem>
           ))}
@@ -266,12 +269,12 @@ export function AppearanceForm({
         {/* Arrondi */}
         <SettingRow
           label={t('product.appearance.radius')}
-          value={RADIUS_PRESETS[radius].label}
+          value={t(`product.radius.${radius}`)}
           indicator={<ChevronDown className="size-4" />}
         >
           {RADIUS_KEYS.map((k) => (
             <DropdownMenuItem key={k} onClick={() => setRadius(k)} className="gap-2">
-              <span className="flex-1">{RADIUS_PRESETS[k].label}</span>
+              <span className="flex-1">{t(`product.radius.${k}`)}</span>
               {radius === k && <Check className="size-4" />}
             </DropdownMenuItem>
           ))}

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
+import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { BracketView } from './BracketView'
@@ -48,7 +49,9 @@ function currentSlot(
   const first = pending[0]
   const key = `${first.phase}:${first.round}`
   const matches = pending.filter((m) => `${m.phase}:${m.round}` === key)
-  const label = first.groupLabel ? `${t('product.round')} ${first.round}` : (first.bracketLabel ?? t('product.tv.upcomingMatches'))
+  const label = first.groupLabel
+    ? `${t('product.round')} ${first.round}`
+    : (localizeBracketLabel(first.bracketLabel, t) || t('product.tv.upcomingMatches'))
   return { label, time: first.scheduledTime ?? null, matches }
 }
 
@@ -298,7 +301,7 @@ function ScheduleTeam({ name, logo, align }: { name: string | null; logo: string
 /** Round/phase label of a match: "Round N" for pools, the bracket label for finals. */
 function matchRoundLabel(m: PublicMatch, t: Translate): string {
   if (m.phase === 'group') return `${t('product.round')} ${m.round}`
-  return (m.bracketLabel ?? t('product.finalsPhase')).replace(/\s*\(.*\)$/, '')
+  return (localizeBracketLabel(m.bracketLabel, t) || t('product.finalsPhase')).replace(/\s*\(.*\)$/, '')
 }
 
 function ProgrammeMatch({ m, showLabel }: { m: PublicMatch; showLabel: boolean }) {

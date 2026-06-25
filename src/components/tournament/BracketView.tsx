@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
+import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
 import type { Id } from '@/lib/tournament/types'
 
 export interface BracketMatchView {
@@ -97,7 +98,11 @@ export function BracketView({
   }
   const columns = [...rounds.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([round, list]) => ({ key: `r${round}`, label: list[0]?.bracketLabel ?? `${t('product.bracketRound')} ${round}`, matches: list }))
+    .map(([round, list]) => ({
+      key: `r${round}`,
+      label: localizeBracketLabel(list[0]?.bracketLabel, t) || `${t('product.bracketRound')} ${round}`,
+      matches: list,
+    }))
 
   const matchBox = (m: BracketMatchView) => {
     const decided = m.status === 'finished' && m.scoreHome != null && m.scoreAway != null
@@ -144,7 +149,7 @@ export function BracketView({
       {petite.length > 0 && (
         <div className="border-t border-border pt-3">
           <h4 className={cn('mb-2 font-bold uppercase tracking-wide text-orange-700 dark:text-orange-300/70', s.head)}>
-            {petite[0]?.bracketLabel ?? t('product.bracket.thirdPlace')}
+            {localizeBracketLabel(petite[0]?.bracketLabel, t) || t('product.bracket.thirdPlace')}
           </h4>
           <div className={cn('flex flex-wrap', s.gap)}>
             {petite.map((m) => (

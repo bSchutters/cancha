@@ -5,6 +5,7 @@ import { CalendarOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useT } from '@/i18n/use-t'
+import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { GroupStandings } from '../GroupStandings'
 import { EmptyState } from '../EmptyState'
@@ -124,7 +125,7 @@ export function MyTeamTab({
                     {next.scheduledTime ?? ''}
                     {next.court != null ? ` · ${t('product.court')} ${next.court}` : ''}
                   </span>
-                  <span>{next.groupLabel ? `${t('product.poolLabel')} ${next.groupLabel}` : next.bracketLabel}</span>
+                  <span>{next.groupLabel ? `${t('product.poolLabel')} ${next.groupLabel}` : localizeBracketLabel(next.bracketLabel, t)}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-muted-foreground">{t('product.versus')}</span>

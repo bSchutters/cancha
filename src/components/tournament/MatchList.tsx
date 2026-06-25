@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
+import { localizeBracketLabel } from '@/lib/tournament/bracket-label'
 import type { PublicMatch } from '@/lib/tournament/public-view'
 
 function TeamLine({
@@ -58,7 +59,7 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
             {match.court != null ? ` · ${t('product.court')} ${match.court}` : ''}
           </span>
           <span>
-            {match.groupLabel ? `${t('product.poolLabel')} ${match.groupLabel}` : match.bracketLabel ?? ''}
+            {match.groupLabel ? `${t('product.poolLabel')} ${match.groupLabel}` : localizeBracketLabel(match.bracketLabel, t)}
             {finished ? '' : ` · ${t('product.match.upcoming')}`}
           </span>
         </div>
@@ -140,7 +141,7 @@ export function MatchesByLabel({ matches }: { matches: PublicMatch[] }) {
       {groups.map(([label, list]) => (
         <div key={label}>
           <h3 className="mb-2 flex items-baseline gap-2 text-lg font-bold">
-            {label}
+            {localizeBracketLabel(label, t)}
             {list[0]?.scheduledTime && (
               <span className="text-sm font-normal text-muted-foreground">{list[0].scheduledTime}</span>
             )}
