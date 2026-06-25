@@ -1082,4 +1082,13 @@ export const en: Dictionary = {
   "product.cfg.devMode": "Developer mode",
   "product.cfg.devModeDesc": "Test control centre (seed, random scores, simulation). Owner only.",
   "product.cfg.create": "Create tournament",
+  "product.settings.title": "Settings",
+  "product.settings.langSubtitle": "Default languages for your space (backoffice and public site).",
+  "product.settings.manageLocale": "Backoffice language",
+  "product.settings.manageLocaleHint": "The language you manage your tournaments in.",
+  "product.settings.publicLocale": "Public site language",
+  "product.settings.publicLocaleHint": "The default language of your tournaments' public pages.",
+  "product.settings.saved": "Settings saved.",
+  "product.settings.ambiguousSuperAdmin": "Several organizations exist and your account isn't bound to any one in particular. Change each organization's languages from /admin.",
+  "product.settings.noOrg": "No organization is associated with your account.",
 }

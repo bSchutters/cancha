@@ -59,6 +59,9 @@ export default async function ManageLayout({
             <LocaleLink href="/manage/apparence" className="hover:text-foreground">
               {t('product.manage.appearance')}
             </LocaleLink>
+            <LocaleLink href="/manage/parametres" className="hover:text-foreground">
+              {t('product.settings.title')}
+            </LocaleLink>
             <span className="hidden sm:inline">{user?.email}</span>
             <ThemeToggle />
             <LogoutButton />

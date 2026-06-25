@@ -1082,4 +1082,13 @@ export const nl: Dictionary = {
   "product.cfg.devMode": "Ontwikkelaarsmodus",
   "product.cfg.devModeDesc": "Testbedieningspaneel (seed, willekeurige scores, simulatie). Enkel voor de eigenaar.",
   "product.cfg.create": "Toernooi aanmaken",
+  "product.settings.title": "Instellingen",
+  "product.settings.langSubtitle": "Standaardtalen van je omgeving (backoffice en publieke site).",
+  "product.settings.manageLocale": "Taal van de backoffice",
+  "product.settings.manageLocaleHint": "De taal waarin je je toernooien beheert.",
+  "product.settings.publicLocale": "Taal van de publieke site",
+  "product.settings.publicLocaleHint": "De standaardtaal van de publieke pagina's van je toernooien.",
+  "product.settings.saved": "Instellingen opgeslagen.",
+  "product.settings.ambiguousSuperAdmin": "Er bestaan meerdere organisaties en je account is aan geen enkele in het bijzonder gekoppeld. Wijzig de talen van elke organisatie via /admin.",
+  "product.settings.noOrg": "Er is geen organisatie aan je account gekoppeld.",
 }

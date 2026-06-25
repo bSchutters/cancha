@@ -99,6 +99,28 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
           <p className="text-xs text-muted-foreground">
             Thème par défaut « Papier (Cancha) » — le client pourra le personnaliser dans son espace.
           </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="cf-manage-locale" className={labelClass}>
+                Langue du backoffice
+              </label>
+              <select id="cf-manage-locale" name="default_manage_locale" defaultValue="fr" className={fieldClass}>
+                <option value="fr">Français</option>
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="cf-public-locale" className={labelClass}>
+                Langue du site public
+              </label>
+              <select id="cf-public-locale" name="default_public_locale" defaultValue="fr" className={fieldClass}>
+                <option value="fr">Français</option>
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
         </div>
       </section>
 

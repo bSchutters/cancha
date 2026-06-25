@@ -27,6 +27,8 @@ const schema = z.object({
     .default(''),
   email: z.string().trim().toLowerCase().email('Email invalide.').max(160),
   password: z.string().min(12, 'Mot de passe : 12 caractères minimum.').max(200),
+  default_manage_locale: z.enum(['fr', 'nl', 'en']).default('fr'),
+  default_public_locale: z.enum(['fr', 'nl', 'en']).default('fr'),
 })
 
 /**
@@ -49,9 +51,11 @@ export async function createClient(
     subdomain: formData.get('subdomain') ?? '',
     email: formData.get('email'),
     password: formData.get('password'),
+    default_manage_locale: formData.get('default_manage_locale') ?? 'fr',
+    default_public_locale: formData.get('default_public_locale') ?? 'fr',
   })
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Champs invalides.' }
-  const { name, slug, subdomain, email, password } = parsed.data
+  const { name, slug, subdomain, email, password, default_manage_locale, default_public_locale } = parsed.data
 
   const payload = await getPayloadClient()
 
@@ -108,7 +112,7 @@ export async function createClient(
     // index (only one row could ever be blank). Omitting stores NULL.
     const org = await payload.create({
       collection: 'organizations',
-      data: { name, slug, ...(subdomain ? { subdomain } : {}) },
+      data: { name, slug, default_manage_locale, default_public_locale, ...(subdomain ? { subdomain } : {}) },
       overrideAccess: true,
     })
     orgId = org.id

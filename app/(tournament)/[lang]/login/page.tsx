@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLocale } from '@/i18n/use-locale'
 import { useT } from '@/i18n/use-t'
+import { manageLandingLocale } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,7 +33,9 @@ export default function ManageLoginPage() {
         body: JSON.stringify({ email, password }),
       })
       if (res.ok) {
-        router.push(`/${locale}/manage`)
+        // Open the backoffice in the org's configured manage language.
+        const target = await manageLandingLocale().catch(() => locale)
+        router.push(`/${target}/manage`)
         router.refresh()
       } else {
         setError(t('product.login.invalid'))

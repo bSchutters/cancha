@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access'
 import { BASE_COLORS, BASE_COLOR_KEYS, RADIUS_PRESETS, RADIUS_KEYS, FONTS } from '@/lib/tournament/theme'
+import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE } from '@/i18n/config'
+
+const LOCALE_OPTIONS = LOCALES.map((l) => ({ label: LOCALE_LABELS[l], value: l }))
 
 /**
  * Tenant collection: one organization (TO) per row. Tournaments and their
@@ -72,6 +75,32 @@ export const Organizations: CollectionConfig = {
           type: 'upload',
           relationTo: 'media',
           label: 'Logo',
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Langues',
+      admin: {
+        initCollapsed: true,
+        description: 'Langue par défaut du backoffice (organisateur) et du site public. Modifiables aussi dans /manage/parametres.',
+      },
+      fields: [
+        {
+          name: 'default_manage_locale',
+          type: 'select',
+          label: 'Langue du backoffice',
+          defaultValue: DEFAULT_LOCALE,
+          options: LOCALE_OPTIONS,
+          admin: { description: 'Langue dans laquelle l’organisateur gère ses tournois (/manage).' },
+        },
+        {
+          name: 'default_public_locale',
+          type: 'select',
+          label: 'Langue du site public',
+          defaultValue: DEFAULT_LOCALE,
+          options: LOCALE_OPTIONS,
+          admin: { description: 'Langue par défaut des pages publiques du tournoi sur ce domaine.' },
         },
       ],
     },

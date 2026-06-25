@@ -1081,4 +1081,13 @@ export const fr: Record<string, string> = {
   "product.cfg.devMode": "Mode développeur",
   "product.cfg.devModeDesc": "Centre de contrôle de test (seed, scores aléatoires, simulation). Réservé au propriétaire.",
   "product.cfg.create": "Créer le tournoi",
+  "product.settings.title": "Paramètres",
+  "product.settings.langSubtitle": "Langues par défaut de votre espace (backoffice et site public).",
+  "product.settings.manageLocale": "Langue du backoffice",
+  "product.settings.manageLocaleHint": "La langue dans laquelle vous gérez vos tournois.",
+  "product.settings.publicLocale": "Langue du site public",
+  "product.settings.publicLocaleHint": "La langue par défaut des pages publiques de vos tournois.",
+  "product.settings.saved": "Paramètres enregistrés.",
+  "product.settings.ambiguousSuperAdmin": "Plusieurs organisations existent et votre compte n'est rattaché à aucune en particulier. Modifiez les langues de chaque organisation depuis /admin.",
+  "product.settings.noOrg": "Aucune organisation n'est associée à votre compte.",
 }
