@@ -1,7 +1,5 @@
 import type { Id, MatchResult, Standing, TeamRef } from './types'
-
-const WIN = 3
-const DRAW = 1
+import { futsal, type SportProfile } from '../sport'
 
 function blankStanding(team: TeamRef): Standing {
   return {
@@ -28,6 +26,7 @@ function isPlayed(m: MatchResult): boolean {
 function headToHead(
   tied: Standing[],
   results: readonly MatchResult[],
+  scoring: SportProfile['scoring'],
 ): Map<Id, { points: number; gd: number; gf: number }> {
   const ids = new Set(tied.map((s) => s.teamId))
   const mini = new Map<Id, { points: number; gd: number; gf: number }>()
@@ -44,11 +43,15 @@ function headToHead(
     a.gf += sa
     h.gd += sh - sa
     a.gd += sa - sh
-    if (sh > sa) h.points += WIN
-    else if (sa > sh) a.points += WIN
-    else {
-      h.points += DRAW
-      a.points += DRAW
+    if (sh > sa) {
+      h.points += scoring.win
+      a.points += scoring.loss
+    } else if (sa > sh) {
+      a.points += scoring.win
+      h.points += scoring.loss
+    } else {
+      h.points += scoring.draw
+      a.points += scoring.draw
     }
   }
   return mini
@@ -56,8 +59,9 @@ function headToHead(
 
 /**
  * Compute a group standing with the agreed cascade:
- *   points (3-1-0) → goal difference → head-to-head → fair-play points.
- * Teams still tied after fair-play are left equal (penalties resolved on site).
+ *   points → goal difference → head-to-head → fair-play points.
+ * Points come from the sport profile (futsal = 3-1-0 by default). Teams still
+ * tied after fair-play are left equal (penalties resolved on site).
  *
  * Head-to-head is a mini-table over the tied teams' common matches and handles
  * 3+ way ties correctly.
@@ -65,7 +69,9 @@ function headToHead(
 export function computeStandings(
   teams: readonly TeamRef[],
   results: readonly MatchResult[],
+  profile: SportProfile = futsal,
 ): Standing[] {
+  const { scoring } = profile
   const table = new Map<Id, Standing>()
   teams.forEach((t) => table.set(t.id, blankStanding(t)))
 
@@ -87,16 +93,18 @@ export function computeStandings(
     if (sh > sa) {
       home.wins++
       away.losses++
-      home.points += WIN
+      home.points += scoring.win
+      away.points += scoring.loss
     } else if (sa > sh) {
       away.wins++
       home.losses++
-      away.points += WIN
+      away.points += scoring.win
+      home.points += scoring.loss
     } else {
       home.draws++
       away.draws++
-      home.points += DRAW
-      away.points += DRAW
+      home.points += scoring.draw
+      away.points += scoring.draw
     }
 
     if (m.fairplayWinner === 'home') home.fairplayPoints++
@@ -126,7 +134,7 @@ export function computeStandings(
     }
     const tie = sorted.slice(i, j)
     if (tie.length > 1) {
-      const h2h = headToHead(tie, results)
+      const h2h = headToHead(tie, results, scoring)
       tie.sort((a, b) => {
         const ha = h2h.get(a.teamId)!
         const hb = h2h.get(b.teamId)!

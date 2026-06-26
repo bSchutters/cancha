@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { computeStandings } from './standings'
 import type { MatchResult, TeamRef } from './types'
+import type { SportProfile } from '../sport'
 
 const teams: TeamRef[] = [1, 2, 3, 4].map((id) => ({ id, name: `T${id}` }))
 
@@ -53,6 +54,15 @@ describe('computeStandings', () => {
     expect(table[3].teamId).toBe(4)
     // T2 has 2 fair-play points vs 1 each → ranks first among the tied trio.
     expect(table[0].teamId).toBe(2)
+  })
+
+  it('uses the sport profile points scheme (not hardcoded 3-1-0)', () => {
+    // Same fixtures as the first test, but a profile where a win is worth 2.
+    const custom: SportProfile = { id: 'futsal', label: 'test', scoring: { win: 2, draw: 1, loss: 0 } }
+    const results = [m(1, 2, 3, 0), m(1, 3, 1, 0), m(2, 3, 1, 0), m(1, 4, 2, 0), m(2, 4, 1, 0), m(3, 4, 1, 0)]
+    const table = computeStandings(teams, results, custom)
+    expect(table[0].teamId).toBe(1)
+    expect(table[0].points).toBe(6) // 3 wins × 2 (would be 9 under the default profile)
   })
 
   it('ignores unplayed matches', () => {
