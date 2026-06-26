@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import { computeStandings } from './standings'
+import { getSportProfile } from '../sport'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { computeFinalRanking } from './final-ranking'
@@ -315,7 +316,7 @@ export async function buildPublicTournament(
           scoreAway: typeof m.score_away === 'number' ? m.score_away : null,
           fairplayWinner: m.fairplay_winner ?? 'none',
         }))
-      const standings = computeStandings(groupTeams, results).map((s) => ({
+      const standings = computeStandings(groupTeams, results, getSportProfile(t.sport)).map((s) => ({
         rank: s.rank,
         teamId: s.teamId,
         teamName: s.teamName,

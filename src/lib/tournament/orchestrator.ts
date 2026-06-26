@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { drawGroups } from './draw'
 import { buildSchedule, buildScheduleMaps } from './schedule'
 import { computeStandings } from './standings'
+import { getSportProfile } from '../sport'
 import { rankAll, type RankingDepth } from './bracket'
 import type {
   CourtConfig,
@@ -265,7 +266,7 @@ export async function generateKnockoutPhase(payload: Payload, tournamentId: Id) 
         scoreAway: m.score_away ?? null,
         fairplayWinner: m.fairplay_winner ?? 'none',
       }))
-    const standing = computeStandings(groupTeams, results)
+    const standing = computeStandings(groupTeams, results, getSportProfile(tournament.sport))
     standing.forEach((s) => {
       const entry: QualifiedTeam = {
         teamId: s.teamId,

@@ -20,6 +20,7 @@ import type { ManageTournament } from '@/lib/tournament/manage-view'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
+import { ALL_SPORTS, DEFAULT_SPORT, type SportId } from '@/lib/sport'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
 function validateConfig(s: FormState, t: Translate): string | null {
@@ -53,6 +54,7 @@ type FormState = {
   description: string
   manage_locale: Locale
   public_locale: Locale
+  sport: SportId
   num_groups: number
   group_size: number
   qualifiers_per_group: number
@@ -88,6 +90,7 @@ function initialState(t?: ManageTournament): FormState {
     description: t?.description ?? '',
     manage_locale: t?.manageLocale ?? DEFAULT_LOCALE,
     public_locale: t?.publicLocale ?? DEFAULT_LOCALE,
+    sport: t?.sport ?? DEFAULT_SPORT,
     num_groups: t?.format.numGroups ?? 4,
     group_size: t?.format.groupSize ?? 4,
     qualifiers_per_group: t?.format.qualifiersPerGroup ?? 2,
@@ -269,6 +272,34 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">{t('product.cfg.format')}</h2>
+        <div className="space-y-1 sm:max-w-xs">
+          <Label>{t('product.cfg.sport')}</Label>
+          {initial ? (
+            // The sport drives the scoring rules, so it is chosen at creation and
+            // locked afterwards — changing it on a running tournament would
+            // silently rewrite its standings. Shown read-only here.
+            <>
+              <Input value={ALL_SPORTS.find((sp) => sp.id === s.sport)?.label ?? s.sport} disabled readOnly />
+              <p className="text-xs text-muted-foreground">{t('product.cfg.sportLocked')}</p>
+            </>
+          ) : (
+            <>
+              <Select value={s.sport} onValueChange={(v) => set('sport', v as SportId)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALL_SPORTS.map((sp) => (
+                    <SelectItem key={sp.id} value={sp.id}>
+                      {sp.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">{t('product.cfg.sportHint')}</p>
+            </>
+          )}
+        </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <Num label={t('product.cfg.numGroups')} value={s.num_groups} onChange={(n) => set('num_groups', n)} max={16} />
           <Num label={t('product.cfg.groupSize')} value={s.group_size} onChange={(n) => set('group_size', n)} max={12} />

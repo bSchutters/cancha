@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import { computeStandings } from './standings'
+import { getSportProfile, type SportId } from '../sport'
 import { fairplayRanking } from './fairplay'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
@@ -91,6 +92,7 @@ export interface ManageTournament {
   description: string | null
   manageLocale: Locale
   publicLocale: Locale
+  sport: SportId
   format: {
     numGroups: number
     groupSize: number
@@ -300,7 +302,7 @@ export async function buildManageTournament(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([label, groupTeams]) => ({
       label,
-      standings: computeStandings(groupTeams, groupMatchResults(label)).map((s) => ({
+      standings: computeStandings(groupTeams, groupMatchResults(label), getSportProfile(t.sport)).map((s) => ({
         rank: s.rank,
         teamId: s.teamId,
         teamName: s.teamName,
@@ -360,6 +362,7 @@ export async function buildManageTournament(
     description: t.description ?? null,
     manageLocale: isLocale(t.manage_locale) ? t.manage_locale : DEFAULT_LOCALE,
     publicLocale: isLocale(t.public_locale) ? t.public_locale : DEFAULT_LOCALE,
+    sport: getSportProfile(t.sport).id,
     format: {
       numGroups: t.num_groups ?? 0,
       groupSize: t.group_size ?? 0,

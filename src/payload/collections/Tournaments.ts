@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrManager } from '../access'
+import { isAdmin, isAdminOrManager, isAdminField } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE } from '@/i18n/config'
+import { ALL_SPORTS, DEFAULT_SPORT } from '@/lib/sport'
 
 const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tournament-${doc.slug}`]
 
@@ -11,6 +12,7 @@ const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tourna
 const RESERVED_SLUGS = new Set<string>(LOCALES)
 
 const LOCALE_OPTIONS = LOCALES.map((l) => ({ label: LOCALE_LABELS[l], value: l }))
+const SPORT_OPTIONS = ALL_SPORTS.map((s) => ({ label: s.label, value: s.id }))
 
 export const TOURNAMENT_STATUSES = [
   { label: 'Brouillon', value: 'draft' },
@@ -139,6 +141,18 @@ export const Tournaments: CollectionConfig = {
       label: 'Format',
       admin: { initCollapsed: true },
       fields: [
+        {
+          name: 'sport',
+          type: 'select',
+          defaultValue: DEFAULT_SPORT,
+          options: SPORT_OPTIONS,
+          label: 'Sport',
+          // Chosen at creation, then locked: changing the sport on an existing
+          // tournament would rewrite its scoring rules. Managers can set it on
+          // create but not update it; only a super-admin can fix it afterwards.
+          access: { update: isAdminField },
+          admin: { description: 'Détermine les règles de score et de classement. Défini à la création.' },
+        },
         {
           name: 'num_groups',
           type: 'number',
