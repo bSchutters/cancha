@@ -7,6 +7,7 @@ import { getSessionUser, getUserTenantId } from './session'
 import { computeFinalRanking as computeFinalRankingRaw, type FinalMatchInput } from './final-ranking'
 import type { Id, MatchResult, TeamRef } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
+import { isLocale, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
 
 // ---- Admin DTOs (authenticated console only: includes contacts + fair-play) ----
 
@@ -88,6 +89,8 @@ export interface ManageTournament {
   drawRevealed: boolean
   editionDate: string | null
   description: string | null
+  manageLocale: Locale
+  publicLocale: Locale
   format: {
     numGroups: number
     groupSize: number
@@ -355,6 +358,8 @@ export async function buildManageTournament(
     drawRevealed: t.draw_revealed === true,
     editionDate: t.edition_date ?? null,
     description: t.description ?? null,
+    manageLocale: isLocale(t.manage_locale) ? t.manage_locale : DEFAULT_LOCALE,
+    publicLocale: isLocale(t.public_locale) ? t.public_locale : DEFAULT_LOCALE,
     format: {
       numGroups: t.num_groups ?? 0,
       groupSize: t.group_size ?? 0,

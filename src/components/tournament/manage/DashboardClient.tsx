@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LocaleLink } from '@/components/locale-link'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Dices, CalendarClock, Trophy, RotateCcw, FlaskConical, Sparkles, Loader2, Users, ListChecks, Tv, Eye, EyeOff, Flag } from 'lucide-react'
@@ -131,12 +131,12 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
           <p className="text-sm text-muted-foreground">/{t.slug}</p>
         </div>
         <div className="flex items-center gap-3">
-          <LocaleLink href={`/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
+          <Link href={`/${t.publicLocale}/${t.slug}/tv`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             {tr('product.dash.tvView')} ↗
-          </LocaleLink>
-          <LocaleLink href={`/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
+          </Link>
+          <Link href={`/${t.publicLocale}/${t.slug}`} target="_blank" className="text-sm text-muted-foreground underline hover:text-foreground">
             {tr('product.dash.publicPage')} ↗
-          </LocaleLink>
+          </Link>
         </div>
       </div>
 
@@ -311,9 +311,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
                 ))}
               </div>
               <Button asChild size="sm" variant="secondary">
-                <LocaleLink href={`/${t.slug}/tv/draw?mode=${drawMode}`} target="_blank">
+                <Link href={`/${t.publicLocale}/${t.slug}/tv/draw?mode=${drawMode}`} target="_blank">
                   {tr('product.dash.openDraw')} ↗
-                </LocaleLink>
+                </Link>
               </Button>
             </div>
           </div>

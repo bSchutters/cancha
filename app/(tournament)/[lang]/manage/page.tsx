@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LocaleLink } from '@/components/locale-link'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, getUserTenantId } from '@/lib/tournament/session'
@@ -38,11 +39,19 @@ export default async function ManageHomePage({ params }: { params: Promise<{ lan
       ) : (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {res.docs.map((doc) => {
-            const tour = doc as { id: number | string; name: string; slug: string; status: string }
+            const tour = doc as {
+              id: number | string
+              name: string
+              slug: string
+              status: string
+              manage_locale?: string
+            }
+            // Open each tournament's backoffice in its own configured manage language.
+            const manageLocale = isLocale(tour.manage_locale) ? tour.manage_locale : DEFAULT_LOCALE
             return (
-              <LocaleLink
+              <Link
                 key={String(tour.id)}
-                href={`/manage/${tour.slug}`}
+                href={`/${manageLocale}/manage/${tour.slug}`}
                 className="block rounded-xl border border-border bg-card p-5 transition-colors hover:bg-muted"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -50,7 +59,7 @@ export default async function ManageHomePage({ params }: { params: Promise<{ lan
                   <Badge variant="secondary">{t(`product.manageStatus.${tour.status}`)}</Badge>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">/{tour.slug}</p>
-              </LocaleLink>
+              </Link>
             )
           })}
         </div>

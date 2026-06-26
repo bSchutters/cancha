@@ -83,7 +83,7 @@ export const Organizations: CollectionConfig = {
       label: 'Langues',
       admin: {
         initCollapsed: true,
-        description: 'Langue par défaut du backoffice (organisateur) et du site public. Modifiables aussi dans /manage/parametres.',
+        description: 'Défaut de compte : langue au login (avant de choisir un tournoi) et sur la racine du domaine. La langue de chaque tournoi se règle dans l’onglet Configuration du tournoi.',
       },
       fields: [
         {

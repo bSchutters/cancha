@@ -20,6 +20,7 @@ import type { ManageTournament } from '@/lib/tournament/manage-view'
 import { useLocale } from '@/i18n/use-locale'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
+import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
 function validateConfig(s: FormState, t: Translate): string | null {
@@ -51,6 +52,8 @@ type FormState = {
   name: string
   edition_date: string
   description: string
+  manage_locale: Locale
+  public_locale: Locale
   num_groups: number
   group_size: number
   qualifiers_per_group: number
@@ -84,6 +87,8 @@ function initialState(t?: ManageTournament): FormState {
     name: t?.name ?? '',
     edition_date: t?.editionDate ? t.editionDate.slice(0, 10) : '',
     description: t?.description ?? '',
+    manage_locale: t?.manageLocale ?? DEFAULT_LOCALE,
+    public_locale: t?.publicLocale ?? DEFAULT_LOCALE,
     num_groups: t?.format.numGroups ?? 4,
     group_size: t?.format.groupSize ?? 4,
     qualifiers_per_group: t?.format.qualifiersPerGroup ?? 2,
@@ -311,6 +316,44 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
             {tooLate && <p className="mt-1 text-xs">{t('product.cfg.estTooLate')}</p>}
           </div>
         )}
+      </section>
+
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-xl font-bold">{t('product.cfg.languages')}</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label>{t('product.settings.manageLocale')}</Label>
+            <Select value={s.manage_locale} onValueChange={(v) => set('manage_locale', v as Locale)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LOCALES.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">{t('product.settings.manageLocaleHint')}</p>
+          </div>
+          <div className="space-y-1">
+            <Label>{t('product.settings.publicLocale')}</Label>
+            <Select value={s.public_locale} onValueChange={(v) => set('public_locale', v as Locale)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LOCALES.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">{t('product.settings.publicLocaleHint')}</p>
+          </div>
+        </div>
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">

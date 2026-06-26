@@ -1047,6 +1047,7 @@ export const nl: Dictionary = {
   "product.cfg.estMatches": "{total} matchen ({group} poules + {finals} finales)",
   "product.cfg.estEnd": "geschat einde ~{time}",
   "product.cfg.estTooLate": "Erg lange dag: voeg terreinen toe, verlaag de klasseringsdiepte, of vervroeg de starttijd.",
+  "product.cfg.languages": "Talen",
   "product.cfg.courts": "Terreinen",
   "product.cfg.multiCourt": "Meerdere terreinen",
   "product.cfg.numCourts": "Aantal terreinen",

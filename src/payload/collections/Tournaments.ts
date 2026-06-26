@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
-import { LOCALES } from '@/i18n/config'
+import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE } from '@/i18n/config'
 
 const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tournament-${doc.slug}`]
 
@@ -9,6 +9,8 @@ const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tourna
 // A slug equal to a locale code (fr/nl/en) would collide with the localized routes,
 // so those values are reserved.
 const RESERVED_SLUGS = new Set<string>(LOCALES)
+
+const LOCALE_OPTIONS = LOCALES.map((l) => ({ label: LOCALE_LABELS[l], value: l }))
 
 export const TOURNAMENT_STATUSES = [
   { label: 'Brouillon', value: 'draft' },
@@ -180,6 +182,32 @@ export const Tournaments: CollectionConfig = {
           min: 1,
           label: 'Top N à classer exactement',
           admin: { condition: (data) => data?.ranking_depth === 'top_k' },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Langues',
+      admin: {
+        initCollapsed: true,
+        description: 'Langue par défaut du backoffice et du site public POUR CE TOURNOI (réglable aussi dans l’onglet Configuration).',
+      },
+      fields: [
+        {
+          name: 'manage_locale',
+          type: 'select',
+          label: 'Langue du backoffice',
+          defaultValue: DEFAULT_LOCALE,
+          options: LOCALE_OPTIONS,
+          admin: { description: 'Langue dans laquelle ce tournoi s’ouvre en gestion (/manage).' },
+        },
+        {
+          name: 'public_locale',
+          type: 'select',
+          label: 'Langue du site public',
+          defaultValue: DEFAULT_LOCALE,
+          options: LOCALE_OPTIONS,
+          admin: { description: 'Langue par défaut des pages publiques de ce tournoi.' },
         },
       ],
     },

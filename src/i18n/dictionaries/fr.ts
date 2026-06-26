@@ -1046,6 +1046,7 @@ export const fr: Record<string, string> = {
   "product.cfg.estMatches": "{total} matchs ({group} poules + {finals} finales)",
   "product.cfg.estEnd": "fin estimée ~{time}",
   "product.cfg.estTooLate": "Journée très longue : ajoutez des terrains, réduisez la profondeur de classement, ou avancez l’heure de début.",
+  "product.cfg.languages": "Langues",
   "product.cfg.courts": "Terrains",
   "product.cfg.multiCourt": "Plusieurs terrains",
   "product.cfg.numCourts": "Nombre de terrains",
