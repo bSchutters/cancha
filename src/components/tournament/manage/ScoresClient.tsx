@@ -237,7 +237,7 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
           >
             <RotateCcw className="h-4 w-4" />
           </IconBtn>
-          <IconBtn title={t('product.match.edit')} tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
+          <IconBtn title={t('product.action.edit')} tone="edit" disabled={!locked} onClick={() => setLocked(false)}>
             <Pencil className="h-4 w-4" />
           </IconBtn>
           <IconBtn title={t('product.scores.validate')} tone="save" disabled={locked || saving} onClick={save}>
