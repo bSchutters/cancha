@@ -1,17 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
+import { LocaleLink } from '@/components/locale-link'
 import { Button } from '@/components/ui/button'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 /** Mobile-only sticky demo CTA that appears after the user scrolls past the hero. */
 export function StickyCta() {
+  const t = useT()
   const [show, setShow] = useState(false)
 
   useGSAP(() => {
@@ -31,7 +33,7 @@ export function StickyCta() {
       )}
     >
       <Button asChild size="lg" className="w-full shadow-lg">
-        <Link href="/#contact">Demander une démo</Link>
+        <LocaleLink href="/#contact">{t('common.requestDemo')}</LocaleLink>
       </Button>
     </div>
   )

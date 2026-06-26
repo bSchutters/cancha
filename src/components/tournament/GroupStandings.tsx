@@ -1,6 +1,9 @@
+'use client'
+
 import Image from 'next/image'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { PublicGroup } from '@/lib/tournament/public-view'
 
 export function GroupStandings({
@@ -14,26 +17,45 @@ export function GroupStandings({
   compact?: boolean
   highlightTeamId?: string
 }) {
+  const t = useT()
   if (groups.length === 0) return null
   return (
     <div className={cn('grid gap-6', compact ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2')}>
       {groups.map((group) => (
         <div key={group.label} className="rounded-xl border border-border bg-card p-3 sm:p-4">
-          <h3 className={cn('mb-3 font-bold', compact ? 'text-lg' : 'text-xl')}>Poule {group.label}</h3>
+          <h3 className={cn('mb-3 font-bold', compact ? 'text-lg' : 'text-xl')}>
+            {t('product.poolLabel')} {group.label}
+          </h3>
           <div className="-mx-1 overflow-x-auto">
             <Table className="min-w-[20rem]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-6 px-1">#</TableHead>
-                  <TableHead className="px-1">Équipe</TableHead>
-                  <TableHead className="px-1 text-center" title="Joués">J</TableHead>
-                  <TableHead className="px-1 text-center" title="Victoires">V</TableHead>
-                  <TableHead className="px-1 text-center" title="Nuls">N</TableHead>
-                  <TableHead className="px-1 text-center" title="Défaites">D</TableHead>
-                  <TableHead className="px-1 text-center" title="Buts pour">BP</TableHead>
-                  <TableHead className="px-1 text-center" title="Buts contre">BC</TableHead>
-                  <TableHead className="px-1 text-center" title="Différence">Diff</TableHead>
-                  <TableHead className="px-1 text-center font-bold text-foreground">Pts</TableHead>
+                  <TableHead className="px-1">{t('product.standings.team')}</TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.played.title')}>
+                    {t('product.standings.played.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.wins.title')}>
+                    {t('product.standings.wins.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.draws.title')}>
+                    {t('product.standings.draws.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.losses.title')}>
+                    {t('product.standings.losses.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.goalsFor.title')}>
+                    {t('product.standings.goalsFor.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.goalsAgainst.title')}>
+                    {t('product.standings.goalsAgainst.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center" title={t('product.standings.goalDiff.title')}>
+                    {t('product.standings.goalDiff.short')}
+                  </TableHead>
+                  <TableHead className="px-1 text-center font-bold text-foreground">
+                    {t('product.standings.points.short')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

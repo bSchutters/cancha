@@ -1,19 +1,22 @@
-import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { LocaleLink } from '@/components/locale-link'
+import type { Translate } from '@/i18n'
 import { display, focusRing } from './theme'
 import { Reveal } from './motion'
 import { CtaSection } from './cta-section'
 
 /** Shared template for data-driven SEO pages (per sport, per organizer profile). */
 export function MiniLanding({
+  t,
   eyebrow,
   h1,
   intro,
   bullets,
   formats,
 }: {
+  t: Translate
   eyebrow: string
   h1: string
   intro: string
@@ -38,21 +41,21 @@ export function MiniLanding({
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{intro}</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
             <Button asChild size="lg">
-              <Link href="#contact">
-                Demander une démo
+              <LocaleLink href="#contact">
+                {t('minilanding.cta.requestDemo')}
                 <ArrowRight />
-              </Link>
+              </LocaleLink>
             </Button>
-            <Link
+            <LocaleLink
               href="/fonctionnalites"
               className={cn(
                 'inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-primary',
                 focusRing,
               )}
             >
-              Voir les fonctionnalités
+              {t('minilanding.cta.viewFeatures')}
               <ArrowRight className="size-4" />
-            </Link>
+            </LocaleLink>
           </div>
         </div>
       </section>
@@ -61,7 +64,7 @@ export function MiniLanding({
         <section className="mx-auto max-w-3xl px-4 pb-4 sm:px-6">
           <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
             <h2 style={display} className="text-xl font-semibold tracking-tight">
-              Formats pris en charge
+              {t('minilanding.formats.heading')}
             </h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-3">
               {formats.map((f) => (

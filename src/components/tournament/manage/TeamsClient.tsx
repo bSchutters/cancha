@@ -16,17 +16,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDialog } from './ConfirmDialog'
 import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
+import { useT } from '@/i18n/use-t'
+import type { Translate } from '@/i18n'
 import type { Id } from '@/lib/tournament/types'
 import type { ManageTeam } from '@/lib/tournament/manage-view'
 
 type SortKey = 'name' | 'payment' | 'status'
 const STATUS_RANK: Record<string, number> = { pending: 0, confirmed: 1, waitlist: 2, rejected: 3 }
-const STATUS_LABEL: Record<string, string> = {
-  confirmed: 'Confirmée',
-  pending: 'En attente',
-  waitlist: 'Liste d’attente',
-  rejected: 'Refusée',
-}
+const regStatusLabel = (status: string, t: Translate) => t(`product.teams.status.${status}`)
 
 /** Escapes a CSV cell (wraps in quotes, doubles inner quotes). */
 function csvCell(v: string): string {
@@ -45,13 +42,14 @@ function pickImage(file: File | null | undefined, onValid: (f: File | null) => v
 }
 
 function TeamLogo({ team, onUpload }: { team: ManageTeam; onUpload: (file: File) => void }) {
+  const t = useT()
   const ref = useRef<HTMLInputElement>(null)
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
-      title="Changer le logo"
+      title={t('product.teams.changeLogo')}
       onClick={() => ref.current?.click()}
       className="relative shrink-0 overflow-hidden rounded-md border border-border bg-card text-muted-foreground hover:border-border hover:bg-muted/50"
     >
@@ -96,6 +94,7 @@ type Draft = { name: string; email: string; phone: string }
 const emptyDraft: Draft = { name: '', email: '', phone: '' }
 
 export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: ManageTeam[] }) {
+  const t = useT()
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
@@ -184,7 +183,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       for (const id of selectedIds) {
         await fetch(`/api/tournament-teams/${id}`, { method: 'DELETE', credentials: 'include' })
       }
-      toast.success(`${selectedIds.length} équipe(s) supprimée(s)`)
+      toast.success(t('product.teams.bulkDeleted').replace('{count}', String(selectedIds.length)))
       setSelected(new Set())
       setConfirmBulkDelete(false)
       router.refresh()
@@ -194,15 +193,22 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
   }
 
   const exportCsv = () => {
-    const header = ['Équipe', 'Poule', 'Email', 'Téléphone', 'Inscription', 'Paiement']
-    const rows = view.map((t) =>
+    const header = [
+      t('product.teams.col.team'),
+      t('product.poolLabel'),
+      t('product.field.email'),
+      t('product.field.phone'),
+      t('product.teams.col.registration'),
+      t('product.teams.col.payment'),
+    ]
+    const rows = view.map((team) =>
       [
-        t.name,
-        t.groupLabel ?? '',
-        t.email,
-        t.phone,
-        STATUS_LABEL[t.registrationStatus] ?? t.registrationStatus,
-        t.paymentStatus === 'paid' ? 'Payé' : 'Non payé',
+        team.name,
+        team.groupLabel ?? '',
+        team.email,
+        team.phone,
+        regStatusLabel(team.registrationStatus, t),
+        team.paymentStatus === 'paid' ? t('product.teams.paid') : t('product.teams.unpaid'),
       ]
         .map((c) => csvCell(String(c)))
         .join(','),
@@ -226,7 +232,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       if (addFile) {
         logoId = await uploadMedia(addFile)
         if (logoId == null) {
-          toast.error('Échec de l’upload du logo')
+          toast.error(t('product.sponsors.uploadFailed'))
           return
         }
       }
@@ -245,13 +251,13 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
         }),
       })
       if (res.ok) {
-        toast.success('Équipe ajoutée')
+        toast.success(t('product.teams.added'))
         setDraft(emptyDraft)
         setAddFile(null)
         setAdding(false)
         router.refresh()
       } else {
-        toast.error('Erreur lors de l’ajout')
+        toast.error(t('product.toast.addError'))
       }
     } finally {
       setBusy(null)
@@ -271,7 +277,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       if (editFile) {
         const logoId = await uploadMedia(editFile)
         if (logoId == null) {
-          toast.error('Échec de l’upload du logo')
+          toast.error(t('product.sponsors.uploadFailed'))
           return
         }
         data.logo = logoId
@@ -283,12 +289,12 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
         body: JSON.stringify(data),
       })
       if (res.ok) {
-        toast.success('Équipe modifiée')
+        toast.success(t('product.teams.updated'))
         setEditing(null)
         setEditFile(null)
         router.refresh()
       } else {
-        toast.error('Erreur')
+        toast.error(t('product.toast.error'))
       }
     } finally {
       setBusy(null)
@@ -300,10 +306,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
     try {
       const res = await fetch(`/api/tournament-teams/${id}`, { method: 'DELETE', credentials: 'include' })
       if (res.ok) {
-        toast.success('Équipe supprimée')
+        toast.success(t('product.teams.deleted'))
         router.refresh()
       } else {
-        toast.error('Suppression impossible')
+        toast.error(t('product.toast.deleteFailed'))
       }
     } finally {
       setBusy(null)
@@ -327,10 +333,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       if (res.ok) {
         router.refresh()
       } else {
-        toast.error('Erreur lors de la mise à jour')
+        toast.error(t('product.teams.updateError'))
       }
     } catch {
-      toast.error('Erreur réseau')
+      toast.error(t('product.toast.network'))
     } finally {
       setBusy(null)
     }
@@ -356,10 +362,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
         body: JSON.stringify({ logo: logoId }),
       })
       if (res.ok) {
-        toast.success('Logo mis à jour')
+        toast.success(t('product.teams.logoUpdated'))
         router.refresh()
       } else {
-        toast.error('Erreur')
+        toast.error(t('product.toast.error'))
       }
     } finally {
       setBusy(null)
@@ -377,26 +383,26 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
             setDraft(emptyDraft)
           }}
         >
-          {adding ? 'Annuler' : '+ Ajouter une équipe'}
+          {adding ? t('product.action.cancel') : t('product.teams.add')}
         </Button>
       </div>
 
       {adding && (
         <form onSubmit={createTeam} className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1">
-            <Label>Nom</Label>
+            <Label>{t('product.field.name')}</Label>
             <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
           </div>
           <div className="space-y-1">
-            <Label>Email</Label>
+            <Label>{t('product.field.email')}</Label>
             <Input value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
           </div>
           <div className="space-y-1">
-            <Label>Téléphone</Label>
+            <Label>{t('product.field.phone')}</Label>
             <Input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
           </div>
           <div className="space-y-1">
-            <Label>Logo (optionnel)</Label>
+            <Label>{t('product.teams.logoOptional')}</Label>
             <Input type="file" accept="image/*" onChange={(e) => pickImage(e.target.files?.[0], setAddFile)} />
           </div>
           <div className="lg:col-span-4">
@@ -406,14 +412,14 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
               className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
             >
               {busy === 'add' && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-              Ajouter l’équipe
+              {t('product.teams.addSubmit')}
             </Button>
           </div>
         </form>
       )}
 
       {teams.length === 0 ? (
-        <p className="text-muted-foreground">Aucune inscription pour le moment.</p>
+        <p className="text-muted-foreground">{t('product.teams.emptyAll')}</p>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-3">
@@ -422,7 +428,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rechercher (nom, email, téléphone)…"
+                placeholder={t('product.teams.searchPlaceholder')}
                 className="pl-9"
               />
             </div>
@@ -431,11 +437,11 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
-                <SelectItem value="confirmed">Confirmées</SelectItem>
-                <SelectItem value="waitlist">Liste d’attente</SelectItem>
-                <SelectItem value="rejected">Refusées</SelectItem>
+                <SelectItem value="all">{t('product.teams.filter.all')}</SelectItem>
+                <SelectItem value="pending">{t('product.teams.status.pending')}</SelectItem>
+                <SelectItem value="confirmed">{t('product.teams.status.confirmed')}</SelectItem>
+                <SelectItem value="waitlist">{t('product.teams.status.waitlist')}</SelectItem>
+                <SelectItem value="rejected">{t('product.teams.filter.rejected')}</SelectItem>
               </SelectContent>
             </Select>
             <Button size="sm" variant="ghost" onClick={exportCsv} className="gap-1 text-muted-foreground hover:text-foreground">
@@ -446,39 +452,39 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
           {selected.size > 0 && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-2">
               <span className="px-1 text-sm font-semibold text-primary">
-                {selected.size} sélectionnée(s)
+                {t('product.teams.selectedCount').replace('{count}', String(selected.size))}
               </span>
               <Button size="sm" variant="secondary" disabled={busy !== null}
-                onClick={() => bulkPatch({ registration_status: 'confirmed' }, 'Équipes confirmées')}>
-                Confirmer
+                onClick={() => bulkPatch({ registration_status: 'confirmed' }, t('product.teams.bulk.confirmed'))}>
+                {t('product.teams.confirm')}
               </Button>
               <Button size="sm" variant="secondary" disabled={busy !== null}
-                onClick={() => bulkPatch({ registration_status: 'rejected' }, 'Équipes refusées')}>
-                Refuser
+                onClick={() => bulkPatch({ registration_status: 'rejected' }, t('product.teams.bulk.rejected'))}>
+                {t('product.teams.reject')}
               </Button>
               <Button size="sm" variant="secondary" disabled={busy !== null}
-                onClick={() => bulkPatch({ payment_status: 'paid' }, 'Marquées payées')}>
-                Marquer payé
+                onClick={() => bulkPatch({ payment_status: 'paid' }, t('product.teams.bulk.paid'))}>
+                {t('product.teams.markPaid')}
               </Button>
               <Button size="sm" variant="secondary" disabled={busy !== null}
-                onClick={() => bulkPatch({ payment_status: 'unpaid' }, 'Marquées non payées')}>
-                Non payé
+                onClick={() => bulkPatch({ payment_status: 'unpaid' }, t('product.teams.bulk.unpaid'))}>
+                {t('product.teams.unpaid')}
               </Button>
               <Button size="sm" variant="ghost" disabled={busy !== null}
                 onClick={() => setConfirmBulkDelete(true)}
                 className="text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300">
-                Supprimer
+                {t('product.action.delete')}
               </Button>
               {busy === 'bulk' && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
               <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}
                 className="ml-auto text-muted-foreground hover:text-foreground">
-                Annuler
+                {t('product.action.cancel')}
               </Button>
             </div>
           )}
 
           {view.length === 0 ? (
-            <p className="text-muted-foreground">Aucune équipe ne correspond à la recherche.</p>
+            <p className="text-muted-foreground">{t('product.teams.noMatch')}</p>
           ) : (
             <Table>
               <TableHeader>
@@ -487,20 +493,20 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     <Checkbox
                       checked={allVisibleSelected}
                       onChange={toggleAllVisible}
-                      aria-label="Tout sélectionner"
+                      aria-label={t('product.teams.selectAll')}
                     />
                   </TableHead>
                   <TableHead>
-                    <SortHead label="Équipe" active={sortKey === 'name'} asc={sortAsc} onClick={() => toggleSort('name')} />
+                    <SortHead label={t('product.teams.col.team')} active={sortKey === 'name'} asc={sortAsc} onClick={() => toggleSort('name')} />
                   </TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead>{t('product.teams.col.contact')}</TableHead>
                   <TableHead>
-                    <SortHead label="Paiement" active={sortKey === 'payment'} asc={sortAsc} onClick={() => toggleSort('payment')} />
+                    <SortHead label={t('product.teams.col.payment')} active={sortKey === 'payment'} asc={sortAsc} onClick={() => toggleSort('payment')} />
                   </TableHead>
                   <TableHead>
-                    <SortHead label="Inscription" active={sortKey === 'status'} asc={sortAsc} onClick={() => toggleSort('status')} />
+                    <SortHead label={t('product.teams.col.registration')} active={sortKey === 'status'} asc={sortAsc} onClick={() => toggleSort('status')} />
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">{t('product.teams.col.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -512,7 +518,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <Checkbox
                   checked={selected.has(String(team.id))}
                   onChange={() => toggleOne(String(team.id))}
-                  aria-label={`Sélectionner ${team.name}`}
+                  aria-label={t('product.teams.selectOne').replace('{name}', team.name)}
                 />
               </TableCell>
               <TableCell className="font-medium">
@@ -520,7 +526,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                   <TeamLogo team={team} onUpload={(f) => uploadLogo(team.id, f)} />
                   <span>
                     {team.name}
-                    {team.groupLabel && <span className="ml-2 text-xs text-muted-foreground">Poule {team.groupLabel}</span>}
+                    {team.groupLabel && <span className="ml-2 text-xs text-muted-foreground">{t('product.poolLabel')} {team.groupLabel}</span>}
                   </span>
                 </div>
               </TableCell>
@@ -532,7 +538,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                 <Button
                   variant="ghost"
                   disabled={isBusy}
-                  title="Basculer le statut de paiement"
+                  title={t('product.teams.togglePayment')}
                   onClick={() =>
                     patchTeam(team.id, { payment_status: team.paymentStatus === 'paid' ? 'unpaid' : 'paid' })
                   }
@@ -548,7 +554,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                   ) : (
                     <CircleDashed className="h-3.5 w-3.5" />
                   )}
-                  {team.paymentStatus === 'paid' ? 'Payé' : 'Non payé'}
+                  {team.paymentStatus === 'paid' ? t('product.teams.paid') : t('product.teams.unpaid')}
                 </Button>
               </TableCell>
               <TableCell>
@@ -563,13 +569,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                           : 'border-transparent bg-amber-500/20 text-amber-700 dark:text-amber-300'
                   }
                 >
-                  {team.registrationStatus === 'confirmed'
-                    ? 'Confirmée'
-                    : team.registrationStatus === 'rejected'
-                      ? 'Refusée'
-                      : team.registrationStatus === 'waitlist'
-                        ? 'Liste d’attente'
-                        : 'En attente'}
+                  {regStatusLabel(team.registrationStatus, t)}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
@@ -581,7 +581,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       onClick={() => patchTeam(team.id, { registration_status: 'pending' })}
                       className="h-auto p-0 text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300"
                     >
-                      En attente
+                      {t('product.teams.toPending')}
                     </Button>
                   ) : (
                     <Button
@@ -590,7 +590,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       onClick={() => patchTeam(team.id, { registration_status: 'confirmed' })}
                       className="h-auto p-0 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
                     >
-                      Confirmer
+                      {t('product.teams.confirm')}
                     </Button>
                   )}
                   {team.registrationStatus !== 'rejected' && (
@@ -600,7 +600,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                       onClick={() => patchTeam(team.id, { registration_status: 'rejected' })}
                       className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                     >
-                      Refuser
+                      {t('product.teams.reject')}
                     </Button>
                   )}
                   <Button
@@ -609,7 +609,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     onClick={() => openEdit(team)}
                     className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
                   >
-                    Éditer
+                    {t('product.action.edit')}
                   </Button>
                   <Button
                     variant="link"
@@ -617,7 +617,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                     onClick={() => setConfirmDelete(team)}
                     className="h-auto p-0 text-sm font-normal text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                   >
-                    Suppr.
+                    {t('product.action.deleteShort')}
                   </Button>
                 </div>
               </TableCell>
@@ -635,29 +635,29 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
           {editing && (
             <form onSubmit={saveEdit}>
               <DialogHeader>
-                <DialogTitle>Modifier « {editing.name} »</DialogTitle>
+                <DialogTitle>{t('product.editTitle').replace('{name}', editing.name)}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-3">
                 <div className="space-y-1">
-                  <Label>Nom</Label>
+                  <Label>{t('product.field.name')}</Label>
                   <Input value={editDraft.name} onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })} required />
                 </div>
                 <div className="space-y-1">
-                  <Label>Email</Label>
+                  <Label>{t('product.field.email')}</Label>
                   <Input value={editDraft.email} onChange={(e) => setEditDraft({ ...editDraft, email: e.target.value })} />
                 </div>
                 <div className="space-y-1">
-                  <Label>Téléphone</Label>
+                  <Label>{t('product.field.phone')}</Label>
                   <Input value={editDraft.phone} onChange={(e) => setEditDraft({ ...editDraft, phone: e.target.value })} />
                 </div>
                 <div className="space-y-1">
-                  <Label>Remplacer le logo (optionnel)</Label>
+                  <Label>{t('product.sponsors.replaceLogo')}</Label>
                   <Input type="file" accept="image/*" onChange={(e) => pickImage(e.target.files?.[0], setEditFile)} />
                 </div>
               </div>
               <DialogFooter className="mt-5">
                 <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
-                  Annuler
+                  {t('product.action.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -665,7 +665,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
                   className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   {busy === String(editing.id) && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-                  Enregistrer
+                  {t('product.action.save')}
                 </Button>
               </DialogFooter>
             </form>
@@ -675,9 +675,9 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
 
       <ConfirmDialog
         open={!!confirmDelete}
-        title={confirmDelete ? `Supprimer « ${confirmDelete.name} » ?` : ''}
-        description="Cette action est irréversible. L’équipe et ses données seront définitivement supprimées."
-        confirmLabel="Supprimer"
+        title={confirmDelete ? t('product.confirmDeleteTitle').replace('{name}', confirmDelete.name) : ''}
+        description={t('product.teams.confirmDeleteDesc')}
+        confirmLabel={t('product.action.delete')}
         busy={!!confirmDelete && busy === String(confirmDelete.id)}
         onConfirm={async () => {
           if (!confirmDelete) return
@@ -689,9 +689,9 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
 
       <ConfirmDialog
         open={confirmBulkDelete}
-        title={`Supprimer ${selected.size} équipe(s) ?`}
-        description="Cette action est irréversible. Les équipes sélectionnées et leurs données seront définitivement supprimées."
-        confirmLabel="Supprimer"
+        title={t('product.teams.bulkDeleteTitle').replace('{count}', String(selected.size))}
+        description={t('product.teams.bulkDeleteDesc')}
+        confirmLabel={t('product.action.delete')}
         busy={busy === 'bulk'}
         onConfirm={bulkDelete}
         onCancel={() => setConfirmBulkDelete(false)}

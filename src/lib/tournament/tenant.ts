@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import type { Payload } from 'payload'
 import { normalizeTheme, type OrgTheme } from './theme'
 import { getSessionUser, getUserTenantId, type SessionUser } from './session'
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/i18n/config'
 
 /**
  * Extract the tenant subdomain from a host.
@@ -29,6 +30,10 @@ export interface ResolvedTenant {
   accentColor: string | null
   logoUrl: string | null
   theme: OrgTheme
+  /** Default language of the organizer backoffice (/manage) for this org. */
+  defaultManageLocale: Locale
+  /** Default language of this org's public tournament pages. */
+  defaultPublicLocale: Locale
 }
 
 /** Only allow a valid hex colour to be injected into a <style> tag (no CSS injection). */
@@ -48,6 +53,8 @@ type OrgDoc = {
   heading_font?: string
   body_font?: string
   logo?: { url?: string } | string | null
+  default_manage_locale?: string
+  default_public_locale?: string
 }
 
 function toResolvedTenant(doc: OrgDoc): ResolvedTenant {
@@ -60,6 +67,8 @@ function toResolvedTenant(doc: OrgDoc): ResolvedTenant {
     accentColor: safeHexColor(doc.accent_color),
     logoUrl: doc.logo && typeof doc.logo === 'object' ? (doc.logo.url ?? null) : null,
     theme: normalizeTheme(doc),
+    defaultManageLocale: isLocale(doc.default_manage_locale) ? doc.default_manage_locale : DEFAULT_LOCALE,
+    defaultPublicLocale: isLocale(doc.default_public_locale) ? doc.default_public_locale : DEFAULT_LOCALE,
   }
 }
 

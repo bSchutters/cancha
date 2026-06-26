@@ -1,10 +1,11 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import Link from 'next/link'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { priceForTeams, FOUNDER_DISCOUNT } from '@/lib/marketing/content'
+import { LocaleLink } from '@/components/locale-link'
+import { useT } from '@/i18n/use-t'
 import { display, focusRing } from './theme'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +15,7 @@ const MAX = 48
 
 /** Interactive price estimator with an animated count-up total. */
 export function PriceEstimator() {
+  const t = useT()
   const [teams, setTeams] = useState(16)
   const total = priceForTeams(teams)
   const founder = Math.round(total * (1 - FOUNDER_DISCOUNT))
@@ -46,7 +48,7 @@ export function PriceEstimator() {
     <div className="rounded-3xl border border-border bg-card p-8 shadow-[0_24px_60px_-32px_rgba(26,26,24,0.18)] sm:p-10">
       <div className="flex items-baseline justify-between">
         <label htmlFor="estimator" className="text-sm font-medium text-foreground">
-          Nombre d’équipes
+          {t('tarifs.estimator.teamsLabel')}
         </label>
         <span style={display} className="text-2xl font-semibold tabular-nums">
           {teams}
@@ -61,7 +63,7 @@ export function PriceEstimator() {
         step={1}
         value={teams}
         onChange={(e) => setTeams(Number(e.target.value))}
-        aria-label="Nombre d’équipes"
+        aria-label={t('tarifs.estimator.teamsLabel')}
         className="mt-3 w-full cursor-pointer accent-primary"
       />
       <div className="mt-2 flex justify-between text-xs text-muted-foreground">
@@ -70,27 +72,28 @@ export function PriceEstimator() {
       </div>
 
       <div className="mt-8 flex flex-col items-center gap-1 text-center">
-        <span className="text-sm text-muted-foreground">Prix pour votre tournoi</span>
+        <span className="text-sm text-muted-foreground">{t('tarifs.estimator.priceLabel')}</span>
         <span style={display} className="text-5xl font-semibold tabular-nums">
           <span ref={totalRef}>{total}</span> €
         </span>
-        <span className="text-sm text-primary">≈ {founder} € au tarif Organisateur fondateur</span>
+        <span className="text-sm text-primary">
+          {t('tarifs.estimator.founderPrice').replace('{founder}', String(founder))}
+        </span>
       </div>
 
       {atMax ? (
         <div className="mt-6 rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-4 text-center text-sm">
-          <p className="text-muted-foreground">Plus de 48 équipes ou un besoin particulier ?</p>
-          <Link
+          <p className="text-muted-foreground">{t('tarifs.estimator.maxPrompt')}</p>
+          <LocaleLink
             href="#contact"
             className={cn('mt-1 inline-block font-medium text-primary hover:underline', focusRing)}
           >
-            Parlons-en, on s’adapte
-          </Link>
+            {t('tarifs.estimator.maxCta')}
+          </LocaleLink>
         </div>
       ) : (
         <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
-          Paiement unique, par équipe, dégressif au volume. Pas d’abonnement, et vous ne payez que si
-          votre tournoi a lieu.
+          {t('tarifs.estimator.footnote')}
         </p>
       )}
     </div>

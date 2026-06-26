@@ -2,6 +2,7 @@
 
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/i18n/use-t'
 import {
   Dialog,
   DialogContent,
@@ -19,8 +20,8 @@ export function ConfirmDialog({
   open,
   title,
   description,
-  confirmLabel = 'Confirmer',
-  cancelLabel = 'Annuler',
+  confirmLabel,
+  cancelLabel,
   destructive = true,
   busy = false,
   onConfirm,
@@ -36,6 +37,9 @@ export function ConfirmDialog({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const t = useT()
+  const confirm = confirmLabel ?? t('product.confirm.confirm')
+  const cancel = cancelLabel ?? t('product.confirm.cancel')
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <DialogContent className="max-w-sm">
@@ -45,7 +49,7 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter className="mt-4">
           <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>
-            {cancelLabel}
+            {cancel}
           </Button>
           <Button
             type="button"
@@ -54,7 +58,7 @@ export function ConfirmDialog({
             disabled={busy}
           >
             {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-            {confirmLabel}
+            {confirm}
           </Button>
         </DialogFooter>
       </DialogContent>

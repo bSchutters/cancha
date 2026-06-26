@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { Dices, Trophy, RotateCcw, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PublicTournament } from '@/lib/tournament/public-view'
+import { useLocale } from '@/i18n/use-locale'
+import { useT } from '@/i18n/use-t'
 import { useTournamentLive } from './useTournamentLive'
 
 type DrawTeam = { id: string; name: string; logoUrl: string | null }
@@ -65,6 +67,8 @@ export function TvDraw({
 }) {
   const data = useTournamentLive(slug, initial, 8000)
   const router = useRouter()
+  const locale = useLocale()
+  const t = useT()
 
   // End of draw: reveal the pools publicly, then show the standings on the TV.
   const revealAndShow = useCallback(async () => {
@@ -78,8 +82,8 @@ export function TvDraw({
     } catch {
       // ignored: a public screen without a manager session just navigates
     }
-    router.push(`/${slug}/tv`)
-  }, [initial.id, router, slug])
+    router.push(`/${locale}/${slug}/tv`)
+  }, [initial.id, router, slug, locale])
 
   const pools: Pool[] = useMemo(
     () =>
@@ -230,7 +234,7 @@ export function TvDraw({
     <main className="relative flex h-screen flex-col overflow-hidden bg-background p-10 text-foreground">
       <header className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-lg font-semibold uppercase tracking-widest text-primary">Tirage au sort</p>
+          <p className="text-lg font-semibold uppercase tracking-widest text-primary">{t('product.draw.eyebrow')}</p>
           <h1 className="text-4xl font-bold">{data.name}</h1>
         </div>
         {phase === 'running' && (
@@ -242,14 +246,14 @@ export function TvDraw({
 
       {/* Center stage */}
       <div className="relative mb-8 flex h-44 items-center justify-center">
-        {!drawn && <p className="text-3xl text-muted-foreground">En attente du tirage des poules…</p>}
+        {!drawn && <p className="text-3xl text-muted-foreground">{t('product.draw.waiting')}</p>}
 
         {drawn && phase === 'idle' && (
           <Button
             onClick={start}
             className="h-auto gap-3 rounded-lg bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg transition-transform hover:scale-105 hover:bg-primary/90"
           >
-            <Dices className="size-7" /> Lancer le tirage
+            <Dices className="size-7" /> {t('product.draw.start')}
           </Button>
         )}
 
@@ -258,7 +262,7 @@ export function TvDraw({
             onClick={advance}
             className="h-auto animate-pulse gap-3 rounded-lg bg-primary px-8 py-4 text-2xl font-bold text-primary-foreground shadow-lg hover:scale-105 hover:bg-primary/90"
           >
-            <ChevronRight className="size-7" /> {landed === 0 ? 'Premier tirage' : 'Équipe suivante'}
+            <ChevronRight className="size-7" /> {landed === 0 ? t('product.draw.firstDraw') : t('product.draw.nextTeam')}
           </Button>
         )}
 
@@ -276,7 +280,7 @@ export function TvDraw({
                 {displayTeam.name}
               </p>
               <p className="mt-1 text-2xl font-semibold text-primary">
-                {settled && activeEntry ? `Poule ${pools[activeEntry.poolIndex].label}` : '…'}
+                {settled && activeEntry ? `${t('product.poolLabel')} ${pools[activeEntry.poolIndex].label}` : '…'}
               </p>
             </div>
           </div>
@@ -285,21 +289,21 @@ export function TvDraw({
         {phase === 'done' && (
           <div className="flex animate-in flex-col items-center gap-4 fade-in zoom-in-95 duration-700">
             <p className="flex items-center gap-3 text-5xl font-bold text-primary">
-              <Trophy className="h-12 w-12" /> Tirage terminé !
+              <Trophy className="h-12 w-12" /> {t('product.draw.done')}
             </p>
             <div className="flex gap-3">
               <Button
                 onClick={revealAndShow}
                 className="h-auto rounded-full bg-primary px-6 py-3 text-lg font-bold text-primary-foreground hover:bg-primary/90"
               >
-                Dévoiler les poules &amp; afficher
+                {t('product.draw.revealShow')}
               </Button>
               <Button
                 variant="outline"
                 onClick={start}
                 className="h-auto gap-2 rounded-full border-border bg-transparent px-6 py-3 text-lg font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
               >
-                <RotateCcw className="size-5" /> Rejouer
+                <RotateCcw className="size-5" /> {t('product.draw.replay')}
               </Button>
             </div>
           </div>
@@ -319,7 +323,7 @@ export function TvDraw({
                   incoming ? 'border-primary ring-2 ring-ring/50' : 'border-border'
                 }`}
               >
-                <h3 className="mb-3 text-2xl font-bold">Poule {pool.label}</h3>
+                <h3 className="mb-3 text-2xl font-bold">{t('product.poolLabel')} {pool.label}</h3>
                 <ul className="space-y-2">
                   {pool.teams.map((team, slot) => {
                     const isPlaced = slot < placed.length

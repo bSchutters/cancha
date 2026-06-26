@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { LIVE_STANDINGS, Screen } from './feature-demos'
 
 // Rotating in-hall TV mockup: full-width panels that cycle, so nothing is
@@ -19,15 +20,14 @@ const RESULTS = [
   { home: 'Olympic 7', away: 'Dynamo Nord', sh: 3, sa: 0 },
 ]
 
-const PANELS = ['Prochains matchs', 'Classement · Poule A', 'Derniers résultats'] as const
-
 function NextPanel() {
+  const t = useT()
   return (
     <div className="space-y-3.5">
       {NEXT.map((m, i) => (
         <div key={i} className="flex items-center justify-between gap-4 text-base">
           <span className="font-medium">
-            {m.home} <span className="text-muted-foreground">vs</span> {m.away}
+            {m.home} <span className="text-muted-foreground">{t('fonctionnalites.demos.versus')}</span> {m.away}
           </span>
           <span className="shrink-0 tabular-nums text-muted-foreground">
             {m.time} · {m.court}
@@ -39,6 +39,7 @@ function NextPanel() {
 }
 
 function StandingsPanel() {
+  const t = useT()
   return (
     <div className="space-y-2.5">
       {LIVE_STANDINGS.map((s) => (
@@ -54,7 +55,9 @@ function StandingsPanel() {
             </span>
             <span className="font-medium">{s.name}</span>
           </span>
-          <span className="font-semibold tabular-nums">{s.pts} pts</span>
+          <span className="font-semibold tabular-nums">
+            {s.pts} {t('fonctionnalites.demos.points')}
+          </span>
         </div>
       ))}
     </div>
@@ -62,12 +65,13 @@ function StandingsPanel() {
 }
 
 function ResultsPanel() {
+  const t = useT()
   return (
     <div className="space-y-3.5">
       {RESULTS.map((m, i) => (
         <div key={i} className="flex items-center justify-between gap-4 text-base">
           <span className="font-medium">
-            {m.home} <span className="text-muted-foreground">vs</span> {m.away}
+            {m.home} <span className="text-muted-foreground">{t('fonctionnalites.demos.versus')}</span> {m.away}
           </span>
           <span className="shrink-0 rounded-md bg-secondary px-2.5 py-0.5 font-semibold tabular-nums">
             {m.sh} – {m.sa}
@@ -79,19 +83,25 @@ function ResultsPanel() {
 }
 
 export function TvDisplayDemo() {
+  const t = useT()
+  const panels = [
+    t('fonctionnalites.tv.panel.next'),
+    t('fonctionnalites.tv.panel.standings'),
+    t('fonctionnalites.tv.panel.results'),
+  ]
   const [i, setI] = useState(0)
 
   useEffect(() => {
     // Don't auto-advance content for visitors who asked for reduced motion.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const id = setInterval(() => setI((v) => (v + 1) % PANELS.length), 3800)
+    const id = setInterval(() => setI((v) => (v + 1) % 3), 3800)
     return () => clearInterval(id)
   }, [])
 
   return (
-    <Screen title="Affichage sur écran" live>
+    <Screen title={t('fonctionnalites.tv.screenTitle')} live>
       <div className="px-6 pb-5 pt-5">
-        <h3 className="text-sm font-medium text-muted-foreground">{PANELS[i]}</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">{panels[i]}</h3>
         <div
           key={i}
           className="mt-4 flex min-h-[168px] flex-col justify-center motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500"
@@ -101,7 +111,7 @@ export function TvDisplayDemo() {
 
         {/* progress dots */}
         <div className="mt-5 flex items-center justify-center gap-1.5">
-          {PANELS.map((p, idx) => (
+          {panels.map((p, idx) => (
             <span
               key={p}
               className={cn(

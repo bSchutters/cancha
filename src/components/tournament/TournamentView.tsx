@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { LocaleLink } from '@/components/locale-link'
 import Image from 'next/image'
 import { Star, ChevronLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import type { PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { GroupStandings } from './GroupStandings'
@@ -20,15 +21,6 @@ import { MyTeamTab } from './public/MyTeamTab'
 import { Podium } from './public/Podium'
 import { InfoTab } from './public/InfoTab'
 
-const STATUS_LABEL: Record<string, string> = {
-  registration: 'Inscriptions ouvertes',
-  registration_closed: 'Inscriptions fermées',
-  draw_done: 'Poules constituées',
-  live: 'En cours',
-  finished: 'Terminé',
-  archived: 'Archivé',
-}
-
 export function TournamentView({
   slug,
   initial,
@@ -38,6 +30,7 @@ export function TournamentView({
   initial: PublicTournament
   org?: { name: string; logoUrl: string | null }
 }) {
+  const t = useT()
   const data = useTournamentLive(slug, initial)
   const searchParams = useSearchParams()
   const [followed, setFollowed] = useFollowedTeam(slug)
@@ -60,13 +53,13 @@ export function TournamentView({
   )
 
   const tabs = [
-    ...(finished ? [{ key: 'results', label: 'Résultats' }] : []),
-    ...(hasGroups ? [{ key: 'pools', label: 'Poules' }] : []),
-    ...(hasKnockout ? [{ key: 'bracket', label: 'Arbre' }] : []),
-    ...(hasAnyCalendar ? [{ key: 'calendar', label: 'Calendrier' }] : []),
-    { key: 'teams', label: 'Équipes' },
-    ...(hasInfo ? [{ key: 'info', label: 'Infos' }] : []),
-    { key: 'mine', label: 'Mon équipe' },
+    ...(finished ? [{ key: 'results', label: t('product.tab.results') }] : []),
+    ...(hasGroups ? [{ key: 'pools', label: t('product.tab.pools') }] : []),
+    ...(hasKnockout ? [{ key: 'bracket', label: t('product.tab.bracket') }] : []),
+    ...(hasAnyCalendar ? [{ key: 'calendar', label: t('product.tab.calendar') }] : []),
+    { key: 'teams', label: t('product.tab.teams') },
+    ...(hasInfo ? [{ key: 'info', label: t('product.tab.info') }] : []),
+    { key: 'mine', label: t('product.tab.mine') },
   ]
   const [tab, setTab] = useState(() => searchParams.get('tab') ?? (finished ? 'results' : 'pools'))
   const activeTab = tabs.find((t) => t.key === tab) ? tab : tabs[0]?.key
@@ -92,9 +85,9 @@ export function TournamentView({
       {/* Sticky header (+ tabs) */}
       <div className="sticky top-0 z-30 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur">
         <div className="py-3">
-          <Link href="/" className="mb-1 inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-3.5 w-3.5" /> Tous les tournois
-          </Link>
+          <LocaleLink href="/" className="mb-1 inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="h-3.5 w-3.5" /> {t('product.backToAll')}
+          </LocaleLink>
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               {org?.logoUrl && (
@@ -118,10 +111,10 @@ export function TournamentView({
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                     </span>
-                    Direct
+                    {t('product.liveNow')}
                   </span>
                 )}
-                <Badge variant="secondary">{STATUS_LABEL[data.status] ?? data.status}</Badge>
+                <Badge variant="secondary">{t(`product.status.${data.status}`)}</Badge>
               </div>
               </div>
             </div>
@@ -144,7 +137,7 @@ export function TournamentView({
                   </>
                 ) : (
                   <>
-                    <Star className="h-4 w-4" /> <span className="hidden sm:inline">Suivre mon équipe</span>
+                    <Star className="h-4 w-4" /> <span className="hidden sm:inline">{t('product.followMyTeam')}</span>
                   </>
                 )}
               </Button>
@@ -184,7 +177,9 @@ export function TournamentView({
           />
           {data.teams.length > 0 && (
             <section>
-              <h2 className="mb-3 text-lg font-bold">Équipes inscrites ({data.teams.length})</h2>
+              <h2 className="mb-3 text-lg font-bold">
+                {t('product.registeredTeams')} ({data.teams.length})
+              </h2>
               <TeamGrid teams={data.teams} />
             </section>
           )}
@@ -199,15 +194,13 @@ export function TournamentView({
             ) : (
               <div className="rounded-xl border border-border bg-card p-8 text-center">
                 <Star className="mx-auto mb-3 h-8 w-8 text-primary" />
-                <p className="font-semibold">Suivez votre équipe</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Choisissez une équipe pour voir son prochain match, son classement et ses résultats en un coup d&apos;œil.
-                </p>
+                <p className="font-semibold">{t('product.follow.title')}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t('product.follow.subtitle')}</p>
                 <Button
                   onClick={() => setPickerOpen(true)}
                   className="mt-4 rounded-md bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
                 >
-                  Choisir mon équipe
+                  {t('product.follow.cta')}
                 </Button>
               </div>
             ))}
@@ -221,7 +214,7 @@ export function TournamentView({
               <Bracket matches={data.knockoutMatches} />
               {data.classificationMatches.length > 0 && (
                 <section>
-                  <h3 className="mb-3 text-lg font-bold">Matchs de classement</h3>
+                  <h3 className="mb-3 text-lg font-bold">{t('product.classificationMatches')}</h3>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {data.classificationMatches.map((m) => (
                       <MatchCard key={String(m.id)} match={m} />
@@ -239,12 +232,14 @@ export function TournamentView({
                 {finalsCalendar.length > 0 && <MatchesByLabel matches={finalsCalendar} />}
               </div>
             ) : (
-              <p className="text-muted-foreground">Le calendrier sera publié prochainement.</p>
+              <p className="text-muted-foreground">{t('product.calendarSoon')}</p>
             ))}
 
           {activeTab === 'teams' && (
             <div>
-              <p className="mb-3 text-sm text-muted-foreground">{data.teams.length} équipe(s) inscrite(s)</p>
+              <p className="mb-3 text-sm text-muted-foreground">
+                {t('product.teamsRegisteredCount').replace('{count}', String(data.teams.length))}
+              </p>
               <TeamGrid teams={data.teams} />
             </div>
           )}
@@ -267,38 +262,43 @@ function TeamGrid({
   teams: PublicTournament['teams']
   onPick?: (id: string) => void
 }) {
+  const t = useT()
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {teams.map((t) => {
+      {teams.map((team) => {
         const inner = (
           <>
-            {t.logoUrl && (
+            {team.logoUrl && (
               <span className="relative h-6 w-6 shrink-0">
-                <Image src={t.logoUrl} alt={t.name} fill sizes="24px" unoptimized className="object-contain" />
+                <Image src={team.logoUrl} alt={team.name} fill sizes="24px" unoptimized className="object-contain" />
               </span>
             )}
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm">{t.name}</span>
-              {t.status === 'pending' && (
-                <span className="text-[10px] font-medium text-amber-700 dark:text-amber-300/90">En attente de validation</span>
+              <span className="block truncate text-sm">{team.name}</span>
+              {team.status === 'pending' && (
+                <span className="text-[10px] font-medium text-amber-700 dark:text-amber-300/90">
+                  {t('product.team.pendingValidation')}
+                </span>
               )}
-              {t.status === 'waitlist' && (
-                <span className="text-[10px] font-medium text-sky-700 dark:text-sky-300/90">Liste d&apos;attente</span>
+              {team.status === 'waitlist' && (
+                <span className="text-[10px] font-medium text-sky-700 dark:text-sky-300/90">
+                  {t('product.team.waitlist')}
+                </span>
               )}
             </span>
           </>
         )
         return onPick ? (
           <Button
-            key={String(t.id)}
+            key={String(team.id)}
             variant="ghost"
-            onClick={() => onPick(String(t.id))}
+            onClick={() => onPick(String(team.id))}
             className="h-auto justify-start gap-2 rounded-lg border border-border bg-card p-2 text-left font-normal hover:bg-muted hover:text-foreground"
           >
             {inner}
           </Button>
         ) : (
-          <div key={String(t.id)} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2">
+          <div key={String(team.id)} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2">
             {inner}
           </div>
         )

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { Button } from '@/components/ui/button'
 import { smoothScrollTo } from './motion'
 
@@ -24,6 +25,7 @@ export function Spotlight({
   dim?: boolean
   onSkip: () => void
 }) {
+  const t = useT()
   const [rect, setRect] = useState<DOMRect | null>(null)
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export function Spotlight({
             onClick={onSkip}
             className="mt-2 cursor-pointer text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
           >
-            Passer le guide
+            {t('demo.sandbox.tour.skip')}
           </button>
         </div>
       </div>

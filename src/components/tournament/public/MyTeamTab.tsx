@@ -4,9 +4,14 @@ import Image from 'next/image'
 import { CalendarOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/i18n/use-t'
+import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { GroupStandings } from '../GroupStandings'
 import { EmptyState } from '../EmptyState'
+
+// 'V'/'N'/'D' result codes map to the standings short labels (localized).
+const RESULT_KEY: Record<'V' | 'N' | 'D', string> = { V: 'wins', N: 'draws', D: 'losses' }
 
 function TeamBadge({ logo, name, size = 24 }: { logo: string | null; name: string | null; size?: number }) {
   return (
@@ -56,7 +61,8 @@ export function MyTeamTab({
   poolsRevealed?: boolean
   onChange: () => void
 }) {
-  const team = data.teams.find((t) => String(t.id) === teamId)
+  const t = useT()
+  const team = data.teams.find((tm) => String(tm.id) === teamId)
   const allMatches = [...data.groupMatches, ...data.knockoutMatches, ...data.classificationMatches].filter(
     (m) => String(m.homeTeamId) === teamId || String(m.awayTeamId) === teamId,
   )
@@ -74,11 +80,11 @@ export function MyTeamTab({
   if (!team) {
     return (
       <EmptyState
-        title="Équipe introuvable"
-        description="Cette équipe n’existe plus. Choisissez-en une autre."
+        title={t('product.myteam.notFoundTitle')}
+        description={t('product.myteam.notFoundDesc')}
         action={
           <Button variant="secondary" size="sm" onClick={onChange}>
-            Choisir une équipe
+            {t('product.myteam.chooseTeam')}
           </Button>
         }
       />
@@ -102,13 +108,13 @@ export function MyTeamTab({
           onClick={onChange}
           className="h-auto shrink-0 p-0 text-sm font-normal text-muted-foreground hover:text-foreground"
         >
-          Changer
+          {t('product.myteam.change')}
         </Button>
       </div>
 
       {/* Next match */}
       <section>
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Prochain match</h3>
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('product.myteam.nextMatch')}</h3>
         {next ? (
           (() => {
             const v = myView(next, teamId)
@@ -117,13 +123,13 @@ export function MyTeamTab({
                 <div className="mb-3 flex items-center justify-between text-sm text-muted-foreground">
                   <span className="font-semibold text-primary">
                     {next.scheduledTime ?? ''}
-                    {next.court != null ? ` · Terrain ${next.court}` : ''}
+                    {next.court != null ? ` · ${t('product.court')} ${next.court}` : ''}
                   </span>
-                  <span>{next.groupLabel ? `Poule ${next.groupLabel}` : next.bracketLabel}</span>
+                  <span>{next.groupLabel ? `${t('product.poolLabel')} ${next.groupLabel}` : localizeBracketLabel(next.bracketLabel, t)}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-muted-foreground">vs</span>
-                  <TeamBadge logo={v.oppLogo} name={v.oppName} size={28} />
+                  <span className="text-muted-foreground">{t('product.versus')}</span>
+                  <TeamBadge logo={v.oppLogo} name={localizeFeederName(v.oppName, t)} size={28} />
                 </div>
               </div>
             )
@@ -131,8 +137,8 @@ export function MyTeamTab({
         ) : (
           <EmptyState
             icon={<CalendarOff className="h-6 w-6" />}
-            title="Aucun match à venir"
-            description="Le prochain match de votre équipe s’affichera ici dès qu’il sera programmé."
+            title={t('product.myteam.noUpcomingTitle')}
+            description={t('product.myteam.noUpcomingDesc')}
             className="py-6"
           />
         )}
@@ -141,7 +147,7 @@ export function MyTeamTab({
       {/* Standing */}
       {poolsRevealed && group && myStanding && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Classement</h3>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('product.myteam.standing')}</h3>
           <GroupStandings
             groups={[group]}
             qualifiersPerGroup={data.format.qualifiersPerGroup}
@@ -153,7 +159,7 @@ export function MyTeamTab({
       {/* Results */}
       {results.length > 0 && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Résultats</h3>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('product.tab.results')}</h3>
           <div className="space-y-2">
             {results.map((m) => {
               const v = myView(m, teamId)
@@ -167,7 +173,7 @@ export function MyTeamTab({
                       v.result === 'N' && 'bg-muted text-muted-foreground',
                     )}
                   >
-                    {v.result}
+                    {v.result && t(`product.standings.${RESULT_KEY[v.result]}.short`)}
                   </span>
                   <span className="min-w-0 flex-1">
                     <TeamBadge logo={v.oppLogo} name={v.oppName} size={20} />

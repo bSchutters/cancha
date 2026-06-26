@@ -2,9 +2,11 @@
 
 import Image from 'next/image'
 import { MapPin, Navigation, Info } from 'lucide-react'
+import { useT } from '@/i18n/use-t'
 import type { PublicTournament } from '@/lib/tournament/public-view'
 
 export function InfoTab({ data }: { data: PublicTournament }) {
+  const t = useT()
   const venue = data.venue
   const sponsors = data.sponsors
 
@@ -27,14 +29,14 @@ export function InfoTab({ data }: { data: PublicTournament }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
             >
-              <Navigation className="h-4 w-4" /> Itinéraire
+              <Navigation className="h-4 w-4" /> {t('product.info.directions')}
             </a>
           )}
 
           {venue.mapUrl && (
             <a href={venue.mapUrl} target="_blank" rel="noopener noreferrer" className="block">
               <span className="relative block h-56 w-full overflow-hidden rounded-lg border border-border bg-card sm:h-80">
-                <Image src={venue.mapUrl} alt="Plan du complexe" fill sizes="100vw" unoptimized className="object-contain" />
+                <Image src={venue.mapUrl} alt={t('product.info.mapAlt')} fill sizes="100vw" unoptimized className="object-contain" />
               </span>
             </a>
           )}
@@ -44,7 +46,7 @@ export function InfoTab({ data }: { data: PublicTournament }) {
       {venue?.info && (
         <section className="rounded-xl border border-border bg-card p-4">
           <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            <Info className="h-4 w-4" /> Infos pratiques
+            <Info className="h-4 w-4" /> {t('product.info.practical')}
           </h3>
           <p className="whitespace-pre-line text-sm text-foreground">{venue.info}</p>
         </section>
@@ -52,7 +54,7 @@ export function InfoTab({ data }: { data: PublicTournament }) {
 
       {sponsors.length > 0 && (
         <section>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Partenaires</h3>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('product.info.partners')}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {sponsors.map((sp) => {
               const inner = (

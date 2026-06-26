@@ -61,6 +61,11 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // Versioned migrations instead of auto-push. `push` is auto-disabled in
+    // production anyway; turning it off in dev too means every schema change
+    // goes through a reviewed migration file (run `pnpm migrate`).
+    push: false,
+    migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   sharp,
   plugins: [

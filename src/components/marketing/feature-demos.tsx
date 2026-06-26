@@ -1,20 +1,24 @@
+'use client'
+
 // Reconstructed, on-brand mockups that illustrate each feature on the
 // /fonctionnalites page. These are static "example" visuals (not the live
 // product), themed via CSS vars, intentionally compact. The rotating TV
 // display lives in its own client file (tv-display.tsx).
 import { ArrowRight, Check, Clock, Flag, Medal, Minus, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
 import { display } from './theme'
 
 /** Reusable "En direct" pill with a pulsing dot. */
 export function LivePill() {
+  const t = useT()
   return (
     <span className="inline-flex items-center gap-2">
       <span className="relative flex size-2.5">
         <span className="absolute inline-flex size-full rounded-full bg-primary opacity-75 motion-safe:animate-ping" />
         <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
       </span>
-      <span className="text-sm font-medium text-muted-foreground">En direct</span>
+      <span className="text-sm font-medium text-muted-foreground">{t('fonctionnalites.demos.livePill')}</span>
     </span>
   )
 }
@@ -88,39 +92,42 @@ const REGISTRATIONS = [
 ]
 
 export function RegistrationDemo() {
+  const t = useT()
   return (
-    <Screen title="Équipes inscrites">
+    <Screen title={t('fonctionnalites.demos.registration.screenTitle')}>
       <div className="px-5 py-5">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Capacité</span>
-          <span className="font-medium tabular-nums">14 / 16 équipes</span>
+          <span className="text-muted-foreground">{t('fonctionnalites.demos.registration.capacity')}</span>
+          <span className="font-medium tabular-nums">{t('fonctionnalites.demos.registration.capacityValue')}</span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
           <div className="h-full rounded-full bg-primary" style={{ width: '87.5%' }} />
         </div>
 
         <div className="mt-5 space-y-2.5">
-          {REGISTRATIONS.map((t) => (
+          {REGISTRATIONS.map((team) => (
             <div
-              key={t.name}
+              key={team.name}
               className="flex items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5"
             >
-              <Initials name={t.name} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">{t.name}</span>
-              {t.paid && (
+              <Initials name={team.name} />
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">{team.name}</span>
+              {team.paid && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  Payé
+                  {t('fonctionnalites.demos.registration.paid')}
                 </span>
               )}
               <span
                 className={cn(
                   'rounded-full px-2 py-0.5 text-xs font-medium',
-                  t.confirmed
+                  team.confirmed
                     ? 'border border-primary/20 bg-primary/[0.06] text-primary'
                     : 'border border-border bg-secondary text-muted-foreground',
                 )}
               >
-                {t.confirmed ? 'Confirmée' : 'En attente'}
+                {team.confirmed
+                  ? t('fonctionnalites.demos.registration.confirmed')
+                  : t('fonctionnalites.demos.registration.pending')}
               </span>
             </div>
           ))}
@@ -140,12 +147,15 @@ const DRAW_POOLS = [
 ]
 
 export function DrawDemo() {
+  const t = useT()
   return (
-    <Screen title="Tirage des poules">
+    <Screen title={t('fonctionnalites.demos.draw.screenTitle')}>
       <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2">
         {DRAW_POOLS.map((pool) => (
           <div key={pool.label} className="bg-card p-5">
-            <div className="mb-3 text-sm font-medium text-primary">Poule {pool.label}</div>
+            <div className="mb-3 text-sm font-medium text-primary">
+              {t('fonctionnalites.demos.draw.poolLabel')} {pool.label}
+            </div>
             <div className="space-y-2">
               {pool.teams.map((t, i) => (
                 <div
@@ -170,7 +180,7 @@ export function DrawDemo() {
 /* Calendrier multi-terrains                                           */
 /* ------------------------------------------------------------------ */
 
-const COURTS = ['Terrain 1', 'Terrain 2', 'Terrain 3']
+const COURT_NUMBERS = [1, 2, 3]
 const SCHEDULE: { time: string; matches: (readonly [string, string] | null)[] }[] = [
   { time: '14:00', matches: [['Real Sporting', 'Les Lynx'], ['AS Tonnerre', 'FC Comète'], ['Olympic 7', 'Dynamo Nord']] },
   { time: '14:30', matches: [['Real Sporting', 'FC Comète'], ['Les Lynx', 'AS Tonnerre'], null] },
@@ -178,15 +188,18 @@ const SCHEDULE: { time: string; matches: (readonly [string, string] | null)[] }[
 ]
 
 export function ScheduleDemo() {
+  const t = useT()
   return (
-    <Screen title="Calendrier">
+    <Screen title={t('fonctionnalites.demos.schedule.screenTitle')}>
       <div className="overflow-x-auto">
         <div className="min-w-[420px]">
           <div className="grid grid-cols-[64px_repeat(3,1fr)] border-b border-border bg-secondary/40">
-            <span className="px-3 py-2.5 text-xs font-medium text-muted-foreground">Heure</span>
-            {COURTS.map((c) => (
-              <span key={c} className="px-3 py-2.5 text-xs font-medium text-primary">
-                {c}
+            <span className="px-3 py-2.5 text-xs font-medium text-muted-foreground">
+              {t('fonctionnalites.demos.schedule.hour')}
+            </span>
+            {COURT_NUMBERS.map((n) => (
+              <span key={n} className="px-3 py-2.5 text-xs font-medium text-primary">
+                {t('fonctionnalites.demos.schedule.court')} {n}
               </span>
             ))}
           </div>
@@ -200,12 +213,12 @@ export function ScheduleDemo() {
                   {m ? (
                     <div className="rounded-lg border border-border bg-card px-2.5 py-2 text-xs font-medium leading-tight">
                       {shortName(m[0])}
-                      <span className="text-muted-foreground"> vs </span>
+                      <span className="text-muted-foreground"> {t('fonctionnalites.demos.versus')} </span>
                       {shortName(m[1])}
                     </div>
                   ) : (
                     <div className="rounded-lg border border-dashed border-border/70 px-2.5 py-2 text-xs text-muted-foreground/60">
-                      Libre
+                      {t('fonctionnalites.demos.schedule.free')}
                     </div>
                   )}
                 </div>
@@ -229,16 +242,17 @@ const REFEREES = [
 ]
 
 export function RefereeDemo() {
+  const t = useT()
   return (
-    <Screen title="Affectation des arbitres">
+    <Screen title={t('fonctionnalites.demos.referee.screenTitle')}>
       <div className="px-5 py-5">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
             <Flag className="size-3.5" />
-            Aléatoire
+            {t('fonctionnalites.demos.referee.random')}
           </span>
           <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            Manuel
+            {t('fonctionnalites.demos.referee.manual')}
           </span>
         </div>
         <div className="mt-4 space-y-2.5">
@@ -252,7 +266,7 @@ export function RefereeDemo() {
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-medium">
                 {shortName(r.match[0])}
-                <span className="text-muted-foreground"> vs </span>
+                <span className="text-muted-foreground"> {t('fonctionnalites.demos.versus')} </span>
                 {shortName(r.match[1])}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/[0.06] py-0.5 pl-0.5 pr-2.5 text-xs font-medium text-primary">
@@ -286,11 +300,14 @@ function Stepper({ value }: { value: number }) {
 }
 
 export function LiveScoresDemo() {
+  const t = useT()
   return (
-    <Screen title="Scores & classement" live>
+    <Screen title={t('fonctionnalites.demos.liveScores.screenTitle')} live>
       <div className="grid gap-px bg-border sm:grid-cols-2">
         <div className="bg-card p-5">
-          <h3 className="text-sm font-medium text-muted-foreground">Saisie du score · Terrain 1</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">
+            {t('fonctionnalites.demos.liveScores.scoreEntry')}
+          </h3>
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <span className="truncate text-sm font-medium">Real Sporting</span>
@@ -303,11 +320,13 @@ export function LiveScoresDemo() {
           </div>
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-primary/[0.06] px-3 py-2 text-xs font-medium text-primary">
             <Check className="size-4" />
-            Classement mis à jour automatiquement
+            {t('fonctionnalites.demos.liveScores.autoUpdated')}
           </div>
         </div>
         <div className="bg-card p-5">
-          <h3 className="text-sm font-medium text-muted-foreground">Classement · Poule A</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">
+            {t('fonctionnalites.demos.liveScores.standingsHeading')}
+          </h3>
           <div className="mt-4 space-y-1">
             {LIVE_STANDINGS.map((s) => (
               <div
@@ -328,11 +347,13 @@ export function LiveScoresDemo() {
                   </span>
                   <span className="font-medium">{s.name}</span>
                 </span>
-                <span className="font-semibold tabular-nums">{s.pts} pts</span>
+                <span className="font-semibold tabular-nums">
+                  {s.pts} {t('fonctionnalites.demos.points')}
+                </span>
               </div>
             ))}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">Les 2 premiers sont qualifiés.</p>
+          <p className="mt-3 text-xs text-muted-foreground">{t('fonctionnalites.demos.liveScores.topTwoQualify')}</p>
         </div>
       </div>
     </Screen>
@@ -350,16 +371,17 @@ const DELAY_SHIFTS = [
 ]
 
 export function DelayDemo() {
+  const t = useT()
   return (
-    <Screen title="Gestion des horaires">
+    <Screen title={t('fonctionnalites.demos.delay.screenTitle')}>
       <div className="px-5 py-5">
         <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-3">
           <span className="flex items-center gap-2.5 text-sm">
             <Clock className="size-4 text-primary" />
-            <span className="font-medium">Terrain 2 a pris du retard</span>
+            <span className="font-medium">{t('fonctionnalites.demos.delay.courtDelayed')}</span>
           </span>
           <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground tabular-nums">
-            +15 min
+            {t('fonctionnalites.demos.delay.minutes')}
           </span>
         </div>
 
@@ -371,7 +393,7 @@ export function DelayDemo() {
             >
               <span className="min-w-0 flex-1 truncate font-medium">
                 {shortName(s.match[0])}
-                <span className="text-muted-foreground"> vs </span>
+                <span className="text-muted-foreground"> {t('fonctionnalites.demos.versus')} </span>
                 {shortName(s.match[1])}
               </span>
               <span className="text-muted-foreground line-through tabular-nums">{s.from}</span>
@@ -382,7 +404,7 @@ export function DelayDemo() {
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-muted-foreground">
           <Check className="size-4 text-primary" />
-          Horaires recalés sur tous les terrains
+          {t('fonctionnalites.demos.delay.recalibrated')}
         </div>
       </div>
     </Screen>
@@ -401,51 +423,66 @@ const FAIRPLAY = [
 ]
 
 function Cards({ yellow, red }: { yellow: number; red: number }) {
+  const t = useT()
   if (yellow === 0 && red === 0) {
-    return <span className="text-xs text-muted-foreground">Aucun carton</span>
+    return <span className="text-xs text-muted-foreground">{t('fonctionnalites.demos.fairplay.noCards')}</span>
   }
-  const label = [yellow && `${yellow} carton${yellow > 1 ? 's' : ''} jaune${yellow > 1 ? 's' : ''}`, red && `${red} carton${red > 1 ? 's' : ''} rouge${red > 1 ? 's' : ''}`]
+  const label = [
+    yellow &&
+      `${yellow} ${yellow > 1 ? t('fonctionnalites.demos.fairplay.yellowCardPlural') : t('fonctionnalites.demos.fairplay.yellowCardSingular')}`,
+    red &&
+      `${red} ${red > 1 ? t('fonctionnalites.demos.fairplay.redCardPlural') : t('fonctionnalites.demos.fairplay.redCardSingular')}`,
+  ]
     .filter(Boolean)
     .join(', ')
   return (
     <span className="flex items-center gap-1" role="img" aria-label={label}>
       {Array.from({ length: yellow }).map((_, i) => (
-        <span key={`y${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-amber-400" title="Carton jaune" />
+        <span
+          key={`y${i}`}
+          className="h-3.5 w-2.5 rounded-[2px] bg-amber-400"
+          title={t('fonctionnalites.demos.fairplay.yellowCardTitle')}
+        />
       ))}
       {Array.from({ length: red }).map((_, i) => (
-        <span key={`r${i}`} className="h-3.5 w-2.5 rounded-[2px] bg-red-500" title="Carton rouge" />
+        <span
+          key={`r${i}`}
+          className="h-3.5 w-2.5 rounded-[2px] bg-red-500"
+          title={t('fonctionnalites.demos.fairplay.redCardTitle')}
+        />
       ))}
     </span>
   )
 }
 
 export function FairplayDemo() {
+  const t = useT()
   return (
-    <Screen title="Classement fair-play">
+    <Screen title={t('fonctionnalites.demos.fairplay.screenTitle')}>
       <div className="px-5 py-5">
         <div className="space-y-2">
-          {FAIRPLAY.map((t) => (
+          {FAIRPLAY.map((team) => (
             <div
-              key={t.rank}
+              key={team.rank}
               className={cn(
                 'flex items-center gap-3 rounded-xl border px-3 py-2.5',
-                t.rank === 1 ? 'border-primary/20 bg-primary/[0.06]' : 'border-border bg-background',
+                team.rank === 1 ? 'border-primary/20 bg-primary/[0.06]' : 'border-border bg-background',
               )}
             >
               <span className="flex w-5 justify-center">
-                {t.rank === 1 ? (
+                {team.rank === 1 ? (
                   <Medal className="size-4 text-primary" />
                 ) : (
-                  <span className="text-sm font-semibold tabular-nums text-muted-foreground">{t.rank}</span>
+                  <span className="text-sm font-semibold tabular-nums text-muted-foreground">{team.rank}</span>
                 )}
               </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">{t.name}</span>
-              <Cards yellow={t.yellow} red={t.red} />
-              <span className="w-14 text-right text-sm font-semibold tabular-nums">{t.score}/100</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">{team.name}</span>
+              <Cards yellow={team.yellow} red={team.red} />
+              <span className="w-14 text-right text-sm font-semibold tabular-nums">{team.score}/100</span>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">Un classement parallèle aux résultats sportifs.</p>
+        <p className="mt-3 text-xs text-muted-foreground">{t('fonctionnalites.demos.fairplay.footnote')}</p>
       </div>
     </Screen>
   )
@@ -455,9 +492,14 @@ export function FairplayDemo() {
 /* Page publique                                                        */
 /* ------------------------------------------------------------------ */
 
-const PUBLIC_TABS = ['Équipes', 'Calendrier', 'Classement', 'Live']
-
 export function PublicPageDemo() {
+  const t = useT()
+  const publicTabs = [
+    t('fonctionnalites.demos.publicPage.tab.teams'),
+    t('fonctionnalites.demos.publicPage.tab.schedule'),
+    t('fonctionnalites.demos.publicPage.tab.standings'),
+    t('fonctionnalites.demos.publicPage.tab.live'),
+  ]
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-32px_rgba(26,26,24,0.22)]">
       <div className="flex items-center gap-2 border-b border-border bg-secondary/40 px-4 py-3">
@@ -467,20 +509,20 @@ export function PublicPageDemo() {
         </span>
       </div>
       <div className="p-6">
-        <span className="text-xs font-medium text-primary">Tournoi de Noël · Real Sporting</span>
+        <span className="text-xs font-medium text-primary">{t('fonctionnalites.demos.publicPage.eyebrow')}</span>
         <h3 style={display} className="mt-1 text-xl font-semibold tracking-tight">
-          16 équipes · Futsal · 21 décembre
+          {t('fonctionnalites.demos.publicPage.heading')}
         </h3>
         <div className="mt-4 flex flex-wrap gap-2">
-          {PUBLIC_TABS.map((t, i) => (
+          {publicTabs.map((tab, i) => (
             <span
-              key={t}
+              key={tab}
               className={cn(
                 'rounded-full px-3 py-1 text-xs font-medium',
                 i === 2 ? 'bg-primary text-primary-foreground' : 'border border-border bg-background text-muted-foreground',
               )}
             >
-              {t}
+              {tab}
             </span>
           ))}
         </div>
@@ -491,7 +533,9 @@ export function PublicPageDemo() {
                 <span className="w-4 text-center font-semibold tabular-nums text-muted-foreground">{s.rank}</span>
                 <span className="font-medium">{s.name}</span>
               </span>
-              <span className="font-semibold tabular-nums">{s.pts} pts</span>
+              <span className="font-semibold tabular-nums">
+                {s.pts} {t('fonctionnalites.demos.points')}
+              </span>
             </div>
           ))}
         </div>
@@ -549,8 +593,9 @@ function SponsorLogo({ index, name }: { index: number; name: string }) {
 const SPONSORS = ['Brasserie du Coin', 'Garage Martin', 'Boulangerie Léa', 'Sport 2000']
 
 export function SponsorsDemo() {
+  const t = useT()
   return (
-    <Screen title="Identité du tournoi">
+    <Screen title={t('fonctionnalites.demos.sponsors.screenTitle')}>
       <div className="p-5">
         {/* Branded banner using the tournament's own color */}
         <div className="overflow-hidden rounded-2xl border border-border">
@@ -562,14 +607,16 @@ export function SponsorsDemo() {
               RS
             </span>
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-white">Tournoi de Noël</div>
+              <div className="truncate text-sm font-semibold text-white">
+                {t('fonctionnalites.demos.sponsors.bannerTitle')}
+              </div>
               <div className="truncate text-xs text-white/70">Real Sporting Club</div>
             </div>
           </div>
         </div>
 
         <div className="mt-5">
-          <div className="text-xs font-medium text-muted-foreground">Couleur du club</div>
+          <div className="text-xs font-medium text-muted-foreground">{t('fonctionnalites.demos.sponsors.clubColor')}</div>
           <div className="mt-2 flex gap-2">
             {SWATCHES.map((c, i) => (
               <span
@@ -585,7 +632,7 @@ export function SponsorsDemo() {
         </div>
 
         <div className="mt-5">
-          <div className="text-xs font-medium text-muted-foreground">Sponsors</div>
+          <div className="text-xs font-medium text-muted-foreground">{t('fonctionnalites.demos.sponsors.sponsorsLabel')}</div>
           <div className="mt-2 grid grid-cols-2 gap-2">
             {SPONSORS.map((s, i) => (
               <div

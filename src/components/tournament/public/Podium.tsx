@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import { Trophy, Medal, Award } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useT } from '@/i18n/use-t'
+import { localizeFinalNote } from '@/lib/tournament/bracket-label'
 import type { PublicTournament } from '@/lib/tournament/public-view'
 
 function Logo({ url, size, alt = '' }: { url: string | null; size: number; alt?: string }) {
@@ -43,6 +45,7 @@ function Step({
 }
 
 export function Podium({ data }: { data: PublicTournament }) {
+  const t = useT()
   const top3 = data.finalRanking.slice(0, 3)
   const rest = data.finalRanking.slice(3)
   if (top3.length === 0) return null
@@ -54,7 +57,7 @@ export function Podium({ data }: { data: PublicTournament }) {
   return (
     <section className="rounded-lg border border-border bg-gradient-to-b from-foreground/[0.06] to-transparent p-5">
       <h2 className="mb-5 flex items-center justify-center gap-2 text-xl font-bold">
-        <Trophy className="h-5 w-5 text-amber-700 dark:text-amber-300" /> Podium
+        <Trophy className="h-5 w-5 text-amber-700 dark:text-amber-300" /> {t('product.podium.title')}
       </h2>
       <div className="mx-auto flex max-w-md items-end gap-2">
         <Step
@@ -80,7 +83,7 @@ export function Podium({ data }: { data: PublicTournament }) {
       {data.fairplayWinnerName && (
         <div className="mt-5 rounded-xl border border-primary/30 bg-primary/10 p-4 text-center">
           <p className="flex items-center justify-center gap-1 text-xs uppercase tracking-wide text-muted-foreground">
-            <Award className="h-3.5 w-3.5 text-primary" /> Trophée Fair-Play
+            <Award className="h-3.5 w-3.5 text-primary" /> {t('product.podium.fairplayTrophy')}
           </p>
           <p className="mt-1 text-lg font-bold text-primary">{data.fairplayWinnerName}</p>
         </div>
@@ -89,7 +92,7 @@ export function Podium({ data }: { data: PublicTournament }) {
       {rest.length > 0 && (
         <details className="mt-5">
           <summary className="cursor-pointer text-center text-sm text-muted-foreground hover:text-foreground">
-            Voir le classement complet
+            {t('product.podium.fullRanking')}
           </summary>
           <ol className="mt-3 space-y-1">
             {data.finalRanking.map((e) => (
@@ -99,7 +102,7 @@ export function Podium({ data }: { data: PublicTournament }) {
                   <Logo url={e.logoUrl} size={18} />
                   <span className="truncate font-medium">{e.teamName}</span>
                 </span>
-                <span className="shrink-0 text-xs text-muted-foreground">{e.note}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{localizeFinalNote(e.note, t)}</span>
               </li>
             ))}
           </ol>

@@ -15,10 +15,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
+import { useT } from '@/i18n/use-t'
 import {
   BASE_COLORS,
   BASE_COLOR_KEYS,
-  RADIUS_PRESETS,
   RADIUS_KEYS,
   ACCENT_PRESETS,
   FONTS,
@@ -76,6 +76,7 @@ export function AppearanceForm({
   orgId: string | number
   initialLogoUrl: string | null
 }) {
+  const t = useT()
   const router = useRouter()
   const [baseColor, setBaseColor] = useState<BaseColorKey>(initial.baseColor)
   const [accent, setAccent] = useState(initial.accentColor ?? '')
@@ -124,7 +125,11 @@ export function AppearanceForm({
 
   // Current accent display (preset label, "Personnalisé", or "Défaut").
   const accentPreset = ACCENT_PRESETS.find((p) => p.color.toLowerCase() === accent.trim().toLowerCase())
-  const accentLabel = accent.trim() ? (accentPreset?.label ?? 'Personnalisé') : 'Défaut'
+  const accentLabel = accent.trim()
+    ? accentPreset
+      ? t(`product.accent.${accentPreset.key}`)
+      : t('product.appearance.custom')
+    : t('product.appearance.default')
 
   // Load the chosen Google fonts so the live preview renders with them.
   useEffect(() => {
@@ -147,7 +152,7 @@ export function AppearanceForm({
       if (logoFile) {
         logoId = await uploadMedia(logoFile, 'logo')
         if (logoId == null) {
-          toast.error('Échec de l’upload du logo')
+          toast.error(t('product.sponsors.uploadFailed'))
           return
         }
       }
@@ -168,16 +173,16 @@ export function AppearanceForm({
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        toast.error(data?.error?.message ?? "Erreur lors de l'enregistrement")
+        toast.error(data?.error?.message ?? t('product.toast.saveError'))
         return
       }
       setLogoFile(null)
       setRemoveLogo(false)
-      toast.success('Apparence enregistrée. Les pages publiques utilisent ce thème.')
+      toast.success(t('product.appearance.saved'))
       // Refresh so the themed header/logo updates immediately.
       router.refresh()
     } catch {
-      toast.error('Erreur réseau')
+      toast.error(t('product.toast.network'))
     } finally {
       setSaving(false)
     }
@@ -188,13 +193,13 @@ export function AppearanceForm({
       {/* Controls - shadcn-create style rows */}
       <div className="space-y-3">
         <div className="space-y-1.5">
-          <Label>Logo</Label>
+          <Label>{t('product.field.logo')}</Label>
           <div className="flex items-center gap-3">
             <span className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-muted">
               {logoPreview ? (
-                <Image src={logoPreview} alt="Logo" fill sizes="56px" unoptimized className="object-contain p-1" />
+                <Image src={logoPreview} alt={t('product.field.logo')} fill sizes="56px" unoptimized className="object-contain p-1" />
               ) : (
-                <span className="text-[10px] text-muted-foreground">Aucun</span>
+                <span className="text-[10px] text-muted-foreground">{t('product.appearance.none')}</span>
               )}
             </span>
             <div className="flex flex-col gap-2">
@@ -211,7 +216,7 @@ export function AppearanceForm({
                   onClick={clearLogo}
                   className="self-start text-xs text-muted-foreground underline-offset-2 hover:text-destructive hover:underline"
                 >
-                  Retirer le logo
+                  {t('product.appearance.removeLogo')}
                 </button>
               )}
             </div>
@@ -220,7 +225,7 @@ export function AppearanceForm({
 
         {/* Couleur de base */}
         <SettingRow
-          label="Couleur de base"
+          label={t('product.appearance.baseColor')}
           value={BASE_COLORS[baseColor].label}
           indicator={
             <span className="size-4 rounded-full" style={{ background: BASE_COLORS[baseColor].swatch }} />
@@ -237,7 +242,7 @@ export function AppearanceForm({
 
         {/* Couleur d'accent */}
         <SettingRow
-          label="Couleur d'accent"
+          label={t('product.appearance.accentColor')}
           value={accentLabel}
           indicator={
             accent.trim() ? (
@@ -249,13 +254,13 @@ export function AppearanceForm({
         >
           <DropdownMenuItem onClick={() => setAccent('')} className="gap-2">
             <span className="size-4 rounded-full border border-dashed border-muted-foreground" />
-            <span className="flex-1">Défaut</span>
+            <span className="flex-1">{t('product.appearance.default')}</span>
             {!accent.trim() && <Check className="size-4" />}
           </DropdownMenuItem>
           {ACCENT_PRESETS.map((p) => (
             <DropdownMenuItem key={p.key} onClick={() => setAccent(p.color)} className="gap-2">
               <span className="size-4 rounded-full border border-border" style={{ background: p.color }} />
-              <span className="flex-1">{p.label}</span>
+              <span className="flex-1">{t(`product.accent.${p.key}`)}</span>
               {accent.trim().toLowerCase() === p.color.toLowerCase() && <Check className="size-4" />}
             </DropdownMenuItem>
           ))}
@@ -263,13 +268,13 @@ export function AppearanceForm({
 
         {/* Arrondi */}
         <SettingRow
-          label="Arrondi"
-          value={RADIUS_PRESETS[radius].label}
+          label={t('product.appearance.radius')}
+          value={t(`product.radius.${radius}`)}
           indicator={<ChevronDown className="size-4" />}
         >
           {RADIUS_KEYS.map((k) => (
             <DropdownMenuItem key={k} onClick={() => setRadius(k)} className="gap-2">
-              <span className="flex-1">{RADIUS_PRESETS[k].label}</span>
+              <span className="flex-1">{t(`product.radius.${k}`)}</span>
               {radius === k && <Check className="size-4" />}
             </DropdownMenuItem>
           ))}
@@ -277,8 +282,8 @@ export function AppearanceForm({
 
         {/* Police des titres */}
         <SettingRow
-          label="Police des titres"
-          value={headingFont || 'Par défaut'}
+          label={t('product.appearance.headingFont')}
+          value={headingFont || t('product.appearance.fontDefault')}
           indicator={
             <span className="text-base leading-none" style={{ fontFamily: headingFont ? `'${headingFont}'` : undefined }}>
               Aa
@@ -286,7 +291,7 @@ export function AppearanceForm({
           }
         >
           <DropdownMenuItem onClick={() => setHeadingFont('')} className="gap-2">
-            <span className="flex-1">Par défaut</span>
+            <span className="flex-1">{t('product.appearance.fontDefault')}</span>
             {!headingFont && <Check className="size-4" />}
           </DropdownMenuItem>
           {FONTS.map((f) => (
@@ -301,8 +306,8 @@ export function AppearanceForm({
 
         {/* Police du texte */}
         <SettingRow
-          label="Police du texte"
-          value={bodyFont || 'Par défaut'}
+          label={t('product.appearance.bodyFont')}
+          value={bodyFont || t('product.appearance.fontDefault')}
           indicator={
             <span className="text-base leading-none" style={{ fontFamily: bodyFont ? `'${bodyFont}'` : undefined }}>
               Aa
@@ -310,7 +315,7 @@ export function AppearanceForm({
           }
         >
           <DropdownMenuItem onClick={() => setBodyFont('')} className="gap-2">
-            <span className="flex-1">Par défaut</span>
+            <span className="flex-1">{t('product.appearance.fontDefault')}</span>
             {!bodyFont && <Check className="size-4" />}
           </DropdownMenuItem>
           {FONTS.map((f) => (
@@ -324,50 +329,48 @@ export function AppearanceForm({
         </SettingRow>
 
         <Button onClick={save} disabled={saving} className="mt-2 w-full">
-          {saving ? 'Enregistrement…' : 'Enregistrer'}
+          {saving ? t('product.appearance.saving') : t('product.action.save')}
         </Button>
       </div>
 
       {/* Live preview */}
       <div>
         <style>{previewCss}</style>
-        <p className="mb-2 text-xs text-muted-foreground">Aperçu (suit le mode clair/sombre actuel)</p>
+        <p className="mb-2 text-xs text-muted-foreground">{t('product.appearance.previewNote')}</p>
         <div
           className="appearance-preview rounded-xl border border-border bg-background p-6 text-foreground"
           style={{ fontFamily: 'var(--font-body)' }}
         >
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-            Tournoi de printemps
+            {t('product.appearance.previewTitle')}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Aperçu des couleurs, de l&apos;arrondi et des polices de votre organisation.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('product.appearance.previewDesc')}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button>Bouton principal</Button>
-            <Button variant="secondary">Secondaire</Button>
-            <Button variant="outline">Contour</Button>
+            <Button>{t('product.appearance.btnPrimary')}</Button>
+            <Button variant="secondary">{t('product.appearance.btnSecondary')}</Button>
+            <Button variant="outline">{t('product.appearance.btnOutline')}</Button>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-border bg-card p-4 text-card-foreground">
               <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
-                Carte
+                {t('product.appearance.card')}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">Contenu d&apos;une carte avec fond.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('product.appearance.cardContent')}</p>
             </div>
             <div className="space-y-2 rounded-lg border border-border bg-card p-4">
-              <Label className="text-xs">Champ</Label>
-              <Input placeholder="Saisie…" />
+              <Label className="text-xs">{t('product.appearance.field')}</Label>
+              <Input placeholder={t('product.appearance.fieldPlaceholder')} />
             </div>
           </div>
 
           <div className="mt-4 flex items-center gap-2">
             <span className="inline-flex items-center rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
-              Accent
+              {t('product.appearance.accent')}
             </span>
             <a href="#" className="text-sm text-primary underline-offset-4 hover:underline">
-              Lien d&apos;exemple
+              {t('product.appearance.sampleLink')}
             </a>
           </div>
         </div>

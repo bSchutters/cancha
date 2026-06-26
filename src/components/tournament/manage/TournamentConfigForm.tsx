@@ -17,30 +17,33 @@ import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
 import { estimateFeasibility } from '@/lib/tournament/feasibility'
 import type { RankingDepth } from '@/lib/tournament/bracket'
 import type { ManageTournament } from '@/lib/tournament/manage-view'
+import { useLocale } from '@/i18n/use-locale'
+import { useT } from '@/i18n/use-t'
+import type { Translate } from '@/i18n'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
-function validateConfig(s: FormState): string | null {
-  if (!s.name.trim()) return 'Le nom du tournoi est obligatoire.'
+function validateConfig(s: FormState, t: Translate): string | null {
+  if (!s.name.trim()) return t('product.cfg.err.nameRequired')
   // A cleared number input becomes NaN; catch it here with a clear message
   // instead of letting the server reject it generically.
   const numbers: Array<[number, string]> = [
-    [s.num_groups, 'Nombre de poules'],
-    [s.group_size, 'Équipes par poule'],
-    [s.qualifiers_per_group, 'Qualifiés par poule'],
-    [s.num_courts, 'Nombre de terrains'],
-    [s.match_duration_min, 'Durée d’un match'],
-    [s.gap_between_matches_min, 'Pause entre matchs'],
+    [s.num_groups, t('product.cfg.vlabel.numGroups')],
+    [s.group_size, t('product.cfg.vlabel.groupSize')],
+    [s.qualifiers_per_group, t('product.cfg.vlabel.qualifiers')],
+    [s.num_courts, t('product.cfg.vlabel.numCourts')],
+    [s.match_duration_min, t('product.cfg.vlabel.matchDuration')],
+    [s.gap_between_matches_min, t('product.cfg.vlabel.gap')],
   ]
   for (const [value, label] of numbers) {
-    if (!Number.isFinite(value)) return `Le champ « ${label} » doit être un nombre.`
+    if (!Number.isFinite(value)) return t('product.cfg.err.mustBeNumber').replace('{label}', label)
   }
-  if (s.num_groups < 1) return 'Il faut au moins 1 poule.'
-  if (s.group_size < 2) return 'Une poule doit compter au moins 2 équipes.'
-  if (s.qualifiers_per_group < 1) return 'Il faut au moins 1 qualifié par poule.'
-  if (s.qualifiers_per_group > s.group_size) return 'Le nombre de qualifiés ne peut pas dépasser la taille de la poule.'
-  if (s.num_groups % 2 !== 0) return 'Le nombre de poules doit être pair (croisement entre poules).'
-  if (s.match_duration_min < 1) return 'La durée d’un match doit être supérieure à 0.'
-  if (s.multi_court && s.num_courts < 1) return 'Avec plusieurs terrains, indiquez au moins 1 terrain.'
+  if (s.num_groups < 1) return t('product.cfg.err.minGroups')
+  if (s.group_size < 2) return t('product.cfg.err.minGroupSize')
+  if (s.qualifiers_per_group < 1) return t('product.cfg.err.minQualifiers')
+  if (s.qualifiers_per_group > s.group_size) return t('product.cfg.err.qualifiersExceed')
+  if (s.num_groups % 2 !== 0) return t('product.cfg.err.groupsEven')
+  if (s.match_duration_min < 1) return t('product.cfg.err.matchDuration')
+  if (s.multi_court && s.num_courts < 1) return t('product.cfg.err.minCourts')
   return null
 }
 
@@ -133,6 +136,8 @@ function Num({
 
 export function TournamentConfigForm({ initial, isOwner = false }: { initial?: ManageTournament; isOwner?: boolean }) {
   const router = useRouter()
+  const locale = useLocale()
+  const t = useT()
   const [s, setS] = useState<FormState>(initialState(initial))
   const [saving, setSaving] = useState(false)
   const [mapFile, setMapFile] = useState<File | null>(null)
@@ -176,7 +181,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const configError = validateConfig(s)
+    const configError = validateConfig(s, t)
     if (configError) {
       toast.error(configError)
       return
@@ -186,7 +191,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
     if (mapFile) {
       venueMapId = await uploadMedia(mapFile, 'plan du complexe')
       if (venueMapId == null) {
-        toast.error('Échec de l’upload du plan')
+        toast.error(t('product.cfg.uploadMapFailed'))
         setSaving(false)
         return
       }
@@ -212,19 +217,19 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       const data = await res.json()
       if (res.ok) {
         const slug = data?.doc?.slug ?? initial?.slug
-        toast.success(initial ? 'Tournoi mis à jour' : 'Tournoi créé')
-        router.push(`/manage/${slug}`)
+        toast.success(initial ? t('product.cfg.updated') : t('product.cfg.created'))
+        router.push(`/${locale}/manage/${slug}`)
         router.refresh()
       } else {
         const msg =
           data?.errors?.[0]?.data?.errors?.[0]?.message ??
           data?.errors?.[0]?.message ??
           data?.message ??
-          'Erreur lors de l’enregistrement'
+          t('product.toast.saveError')
         toast.error(msg)
       }
     } catch {
-      toast.error('Erreur réseau')
+      toast.error(t('product.toast.network'))
     } finally {
       setSaving(false)
     }
@@ -233,49 +238,47 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
   return (
     <form onSubmit={onSubmit} className="space-y-8">
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Général</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.general')}</h2>
         <div className="space-y-1">
-          <Label>Nom du tournoi</Label>
+          <Label>{t('product.cfg.name')}</Label>
           <Input value={s.name} onChange={(e) => set('name', e.target.value)} required />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label>Date</Label>
+            <Label>{t('product.cfg.date')}</Label>
             <Input type="date" value={s.edition_date} onChange={(e) => set('edition_date', e.target.value)} />
           </div>
         </div>
         <div className="space-y-1">
-          <Label>Description</Label>
+          <Label>{t('product.cfg.description')}</Label>
           <Textarea value={s.description} onChange={(e) => set('description', e.target.value)} />
         </div>
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Format</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.format')}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Num label="Nombre de poules (pair)" value={s.num_groups} onChange={(n) => set('num_groups', n)} max={16} />
-          <Num label="Équipes par poule" value={s.group_size} onChange={(n) => set('group_size', n)} max={12} />
-          <Num label="Qualifiés / poule" value={s.qualifiers_per_group} onChange={(n) => set('qualifiers_per_group', n)} max={4} />
+          <Num label={t('product.cfg.numGroups')} value={s.num_groups} onChange={(n) => set('num_groups', n)} max={16} />
+          <Num label={t('product.cfg.groupSize')} value={s.group_size} onChange={(n) => set('group_size', n)} max={12} />
+          <Num label={t('product.cfg.qualifiers')} value={s.qualifiers_per_group} onChange={(n) => set('qualifiers_per_group', n)} max={4} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label>Classement final</Label>
+            <Label>{t('product.cfg.rankingDepth')}</Label>
             <Select value={s.ranking_depth} onValueChange={(v) => set('ranking_depth', v as FormState['ranking_depth'])}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="full">Classer toutes les équipes</SelectItem>
-                <SelectItem value="top_k">Classer seulement le top N</SelectItem>
-                <SelectItem value="qualifiers_only">Seulement les qualifiés</SelectItem>
+                <SelectItem value="full">{t('product.cfg.rankFull')}</SelectItem>
+                <SelectItem value="top_k">{t('product.cfg.rankTopK')}</SelectItem>
+                <SelectItem value="qualifiers_only">{t('product.cfg.rankQualifiers')}</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
-              « Tout classer » donne une place exacte à chaque équipe (plus de matchs de placement).
-            </p>
+            <p className="text-xs text-muted-foreground">{t('product.cfg.rankingHint')}</p>
           </div>
           {s.ranking_depth === 'top_k' && (
-            <Num label="Top N à classer" value={s.ranking_top_k} onChange={(n) => set('ranking_top_k', n)} max={64} />
+            <Num label={t('product.cfg.rankTopKLabel')} value={s.ranking_top_k} onChange={(n) => set('ranking_top_k', n)} max={64} />
           )}
         </div>
 
@@ -288,35 +291,38 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           >
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
               {tooLate && <AlertTriangle className="h-4 w-4 shrink-0 text-red-700 dark:text-red-300" />}
-              <span>{est.teams} équipes</span>
+              <span>{t('product.cfg.estTeams').replace('{count}', String(est.teams))}</span>
               <span>·</span>
-              <span>{est.totalMatches} matchs ({est.groupMatches} poules + {est.finalsMatches} finales)</span>
+              <span>
+                {t('product.cfg.estMatches')
+                  .replace('{total}', String(est.totalMatches))
+                  .replace('{group}', String(est.groupMatches))
+                  .replace('{finals}', String(est.finalsMatches))}
+              </span>
               {est.endTime && (
                 <>
                   <span>·</span>
-                  <span className={tooLate ? 'font-bold' : ''}>fin estimée ~{est.endTime}</span>
+                  <span className={tooLate ? 'font-bold' : ''}>
+                    {t('product.cfg.estEnd').replace('{time}', est.endTime)}
+                  </span>
                 </>
               )}
             </p>
-            {tooLate && (
-              <p className="mt-1 text-xs">
-                Journée très longue : ajoutez des terrains, réduisez la profondeur de classement, ou avancez l’heure de début.
-              </p>
-            )}
+            {tooLate && <p className="mt-1 text-xs">{t('product.cfg.estTooLate')}</p>}
           </div>
         )}
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Terrains</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.courts')}</h2>
         <div className="max-w-sm">
-          <Switch label="Plusieurs terrains" checked={s.multi_court} onChange={(v) => set('multi_court', v)} />
+          <Switch label={t('product.cfg.multiCourt')} checked={s.multi_court} onChange={(v) => set('multi_court', v)} />
         </div>
         {s.multi_court && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Num label="Nombre de terrains" value={s.num_courts} onChange={(n) => set('num_courts', n)} />
+            <Num label={t('product.cfg.numCourts')} value={s.num_courts} onChange={(n) => set('num_courts', n)} />
             <div className="space-y-1">
-              <Label>Affectation poule ↔ terrain</Label>
+              <Label>{t('product.cfg.courtAssignment')}</Label>
               <Select
                 value={s.court_assignment}
                 onValueChange={(v) => set('court_assignment', v as 'fixed' | 'random')}
@@ -325,8 +331,8 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fixed">Poule fixée sur un terrain</SelectItem>
-                  <SelectItem value="random">Aléatoire</SelectItem>
+                  <SelectItem value="fixed">{t('product.cfg.courtFixed')}</SelectItem>
+                  <SelectItem value="random">{t('product.cfg.random')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -335,45 +341,43 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       </section>
 
       <section className="space-y-5 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Calendrier</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.schedule')}</h2>
 
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-muted-foreground">Durées des matchs</p>
+          <p className="text-sm font-semibold text-muted-foreground">{t('product.cfg.matchDurations')}</p>
           <div className="grid items-end gap-x-4 gap-y-5 sm:grid-cols-3">
-            <Num label="Durée match (min)" value={s.match_duration_min} onChange={(n) => set('match_duration_min', n)} max={120} />
-            <Num label="Durée match - phase finale (min)" value={s.finals_match_duration_min} onChange={(n) => set('finals_match_duration_min', n)} max={120} />
-            <Num label="Inter-match (min)" value={s.gap_between_matches_min} onChange={(n) => set('gap_between_matches_min', n)} max={60} />
+            <Num label={t('product.cfg.matchDuration')} value={s.match_duration_min} onChange={(n) => set('match_duration_min', n)} max={120} />
+            <Num label={t('product.cfg.finalsMatchDuration')} value={s.finals_match_duration_min} onChange={(n) => set('finals_match_duration_min', n)} max={120} />
+            <Num label={t('product.cfg.gap')} value={s.gap_between_matches_min} onChange={(n) => set('gap_between_matches_min', n)} max={60} />
           </div>
         </div>
 
         <div className="space-y-3 border-t border-border pt-4">
-          <p className="text-sm font-semibold text-muted-foreground">Horaires</p>
+          <p className="text-sm font-semibold text-muted-foreground">{t('product.cfg.times')}</p>
           <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label>Heure de début</Label>
+              <Label>{t('product.cfg.startTime')}</Label>
               <Input type="time" value={s.start_time} onChange={(e) => set('start_time', e.target.value)} />
-              <p className="text-xs text-muted-foreground">Coup d’envoi du 1er match de poule.</p>
+              <p className="text-xs text-muted-foreground">{t('product.cfg.startHint')}</p>
             </div>
             <div className="space-y-1">
-              <Label>Reprise phase finale (déjeuner)</Label>
+              <Label>{t('product.cfg.finalsStart')}</Label>
               <Input type="time" value={s.finals_start_time} onChange={(e) => set('finals_start_time', e.target.value)} />
-              <p className="text-xs text-muted-foreground">
-                Heure des quarts après la pause déjeuner (ex. 13:30). Vide = enchaîne directement après les poules.
-              </p>
+              <p className="text-xs text-muted-foreground">{t('product.cfg.finalsStartHint')}</p>
             </div>
           </div>
         </div>
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Paiement</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.payment')}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
             <Label>IBAN</Label>
             <Input value={s.payment_iban} onChange={(e) => set('payment_iban', e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>Montant (€)</Label>
+            <Label>{t('product.cfg.amount')}</Label>
             <Input
               type="number"
               min={0}
@@ -384,7 +388,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
             />
           </div>
           <div className="space-y-1">
-            <Label>Communication</Label>
+            <Label>{t('product.cfg.communication')}</Label>
             <Input
               value={s.payment_communication}
               onChange={(e) => set('payment_communication', e.target.value)}
@@ -394,14 +398,14 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Lieu & infos pratiques</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.venue')}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label>Nom du complexe</Label>
+            <Label>{t('product.cfg.venueName')}</Label>
             <Input value={s.venue_name} onChange={(e) => set('venue_name', e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>Lien itinéraire (Google Maps)</Label>
+            <Label>{t('product.cfg.mapsUrl')}</Label>
             <Input
               type="url"
               placeholder="https://maps.google.com/..."
@@ -411,17 +415,17 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           </div>
         </div>
         <div className="space-y-1">
-          <Label>Adresse</Label>
+          <Label>{t('product.cfg.address')}</Label>
           <Textarea value={s.venue_address} onChange={(e) => set('venue_address', e.target.value)} />
         </div>
         <div className="space-y-1">
-          <Label>Plan du complexe</Label>
+          <Label>{t('product.cfg.venueMap')}</Label>
           <div className="flex items-center gap-4">
             {(mapFile || initial?.venue.mapUrl) && (
               <span className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md border border-border bg-card">
                 <Image
                   src={mapFile ? URL.createObjectURL(mapFile) : (initial?.venue.mapUrl as string)}
-                  alt="Plan"
+                  alt={t('product.cfg.mapAlt')}
                   fill
                   sizes="112px"
                   unoptimized
@@ -438,9 +442,9 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
           </div>
         </div>
         <div className="space-y-1">
-          <Label>Infos pratiques</Label>
+          <Label>{t('product.cfg.practicalInfo')}</Label>
           <Textarea
-            placeholder="Parking, buvette, vestiaires…"
+            placeholder={t('product.cfg.practicalPlaceholder')}
             value={s.practical_info}
             onChange={(e) => set('practical_info', e.target.value)}
           />
@@ -448,9 +452,9 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       </section>
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-xl font-bold">Arbitres & options</h2>
+        <h2 className="text-xl font-bold">{t('product.cfg.refereesOptions')}</h2>
         <div className="space-y-1">
-          <Label>Affectation des arbitres</Label>
+          <Label>{t('product.cfg.refereeAssignment')}</Label>
           <Select
             value={s.referee_assignment}
             onValueChange={(v) => set('referee_assignment', v as 'manual' | 'random')}
@@ -459,17 +463,17 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="manual">Manuelle</SelectItem>
-              <SelectItem value="random">Aléatoire (auto à la génération)</SelectItem>
+              <SelectItem value="manual">{t('product.cfg.refereeManual')}</SelectItem>
+              <SelectItem value="random">{t('product.cfg.refereeRandom')}</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">Reste modifiable par match dans la saisie des scores.</p>
+          <p className="text-xs text-muted-foreground">{t('product.cfg.refereeHint')}</p>
         </div>
         {isOwner && (
           <div className="max-w-md">
             <Switch
-              label="Mode développeur"
-              description="Centre de contrôle de test (seed, scores aléatoires, simulation). Réservé au propriétaire."
+              label={t('product.cfg.devMode')}
+              description={t('product.cfg.devModeDesc')}
               checked={s.dev_mode}
               onChange={(v) => set('dev_mode', v)}
             />
@@ -483,7 +487,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         className="bg-primary font-bold text-primary-foreground hover:bg-primary/90"
       >
         {saving && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-        {initial ? 'Enregistrer' : 'Créer le tournoi'}
+        {initial ? t('product.action.save') : t('product.cfg.create')}
       </Button>
     </form>
   )

@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { LOCALES, LOCALE_LABELS } from '@/i18n/config'
 
 type CreateClientState = { error?: string }
 
@@ -97,8 +98,34 @@ export function ClientForm({ action, initial }: { action: Action; initial?: Init
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Thème par défaut « Papier (Cancha) » — le client pourra le personnaliser dans son espace.
+            Thème par défaut « Papier (Cancha) », le client pourra le personnaliser dans son espace.
           </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="cf-manage-locale" className={labelClass}>
+                Langue du backoffice
+              </label>
+              <select id="cf-manage-locale" name="default_manage_locale" defaultValue="fr" className={fieldClass}>
+                {LOCALES.map((l) => (
+                  <option key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="cf-public-locale" className={labelClass}>
+                Langue du site public
+              </label>
+              <select id="cf-public-locale" name="default_public_locale" defaultValue="fr" className={fieldClass}>
+                {LOCALES.map((l) => (
+                  <option key={l} value={l}>
+                    {LOCALE_LABELS[l]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       </section>
 

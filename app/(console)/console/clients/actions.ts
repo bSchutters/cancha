@@ -5,8 +5,11 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
+import { LOCALES } from '@/i18n/config'
 
 export type CreateClientState = { error?: string }
+
+const RESERVED_SLUGS = new Set<string>(LOCALES)
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Le nom est requis.').max(120),
@@ -16,7 +19,8 @@ const schema = z.object({
     .toLowerCase()
     .min(2, 'Le slug est trop court.')
     .max(60)
-    .regex(/^[a-z0-9-]+$/, 'Slug : uniquement a-z, 0-9 et tirets.'),
+    .regex(/^[a-z0-9-]+$/, 'Slug : uniquement a-z, 0-9 et tirets.')
+    .refine((s) => !RESERVED_SLUGS.has(s), 'Ce slug est réservé (code de langue).'),
   subdomain: z
     .string()
     .trim()
@@ -27,6 +31,8 @@ const schema = z.object({
     .default(''),
   email: z.string().trim().toLowerCase().email('Email invalide.').max(160),
   password: z.string().min(12, 'Mot de passe : 12 caractères minimum.').max(200),
+  default_manage_locale: z.enum(['fr', 'nl', 'en']).default('fr'),
+  default_public_locale: z.enum(['fr', 'nl', 'en']).default('fr'),
 })
 
 /**
@@ -49,9 +55,11 @@ export async function createClient(
     subdomain: formData.get('subdomain') ?? '',
     email: formData.get('email'),
     password: formData.get('password'),
+    default_manage_locale: formData.get('default_manage_locale') ?? 'fr',
+    default_public_locale: formData.get('default_public_locale') ?? 'fr',
   })
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Champs invalides.' }
-  const { name, slug, subdomain, email, password } = parsed.data
+  const { name, slug, subdomain, email, password, default_manage_locale, default_public_locale } = parsed.data
 
   const payload = await getPayloadClient()
 
@@ -108,7 +116,7 @@ export async function createClient(
     // index (only one row could ever be blank). Omitting stores NULL.
     const org = await payload.create({
       collection: 'organizations',
-      data: { name, slug, ...(subdomain ? { subdomain } : {}) },
+      data: { name, slug, default_manage_locale, default_public_locale, ...(subdomain ? { subdomain } : {}) },
       overrideAccess: true,
     })
     orgId = org.id

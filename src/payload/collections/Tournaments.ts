@@ -1,8 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrManager } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
+import { LOCALES } from '@/i18n/config'
 
 const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tournament-${doc.slug}`]
+
+// Slugs become the first path segment under a tenant host (asturiana.cancha.be/{slug}).
+// A slug equal to a locale code (fr/nl/en) would collide with the localized routes,
+// so those values are reserved.
+const RESERVED_SLUGS = new Set<string>(LOCALES)
 
 export const TOURNAMENT_STATUSES = [
   { label: 'Brouillon', value: 'draft' },
@@ -73,6 +79,10 @@ export const Tournaments: CollectionConfig = {
       unique: true,
       label: 'Slug (URL)',
       admin: { description: 'Identifiant d’URL : cup.udasturiana.be/{slug}' },
+      validate: (value: unknown) =>
+        typeof value === 'string' && RESERVED_SLUGS.has(value)
+          ? `« ${value} » est réservé (code de langue). Choisissez un autre slug.`
+          : true,
       hooks: {
         beforeValidate: [
           ({ value, data }) => {
