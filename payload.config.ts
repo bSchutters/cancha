@@ -61,10 +61,12 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
-    // Versioned migrations instead of auto-push. `push` is auto-disabled in
-    // production anyway; turning it off in dev too means every schema change
-    // goes through a reviewed migration file (run `pnpm migrate`).
-    push: false,
+    // Dev: auto-push keeps the DB schema in sync with the collections on boot,
+    // so schema changes need no manual step. `push` is automatically disabled
+    // when NODE_ENV=production, so production never auto-pushes — there, schema
+    // changes ship as versioned migrations generated in CI (the local migrate
+    // CLI can't run, see src/migrations/README.md).
+    push: true,
     migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   sharp,
