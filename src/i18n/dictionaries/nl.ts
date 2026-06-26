@@ -1034,6 +1034,8 @@ export const nl: Dictionary = {
   "product.cfg.date": "Datum",
   "product.cfg.description": "Beschrijving",
   "product.cfg.format": "Formaat",
+  "product.cfg.sport": "Sport",
+  "product.cfg.sportHint": "Bepaalt de score- en klassementsregels.",
   "product.cfg.numGroups": "Aantal poules (even)",
   "product.cfg.groupSize": "Teams per poule",
   "product.cfg.qualifiers": "Gekwalificeerden / poule",

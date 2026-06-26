@@ -1033,6 +1033,8 @@ export const fr: Record<string, string> = {
   "product.cfg.date": "Date",
   "product.cfg.description": "Description",
   "product.cfg.format": "Format",
+  "product.cfg.sport": "Sport",
+  "product.cfg.sportHint": "Détermine les règles de score et de classement.",
   "product.cfg.numGroups": "Nombre de poules (pair)",
   "product.cfg.groupSize": "Équipes par poule",
   "product.cfg.qualifiers": "Qualifiés / poule",
