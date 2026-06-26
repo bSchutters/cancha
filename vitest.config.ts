@@ -11,8 +11,8 @@ export default defineConfig({
     },
   },
   test: {
-    // Scope: the pure tournament engines only.
-    include: ['src/lib/tournament/**/*.test.ts'],
+    // Scope: the pure engines under src/lib (tournament structure + sport rules).
+    include: ['src/lib/**/*.test.ts'],
     environment: 'node',
   },
 })
