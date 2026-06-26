@@ -17,7 +17,6 @@ import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
 import { estimateFeasibility } from '@/lib/tournament/feasibility'
 import type { RankingDepth } from '@/lib/tournament/bracket'
 import type { ManageTournament } from '@/lib/tournament/manage-view'
-import { useLocale } from '@/i18n/use-locale'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
@@ -141,7 +140,6 @@ function Num({
 
 export function TournamentConfigForm({ initial, isOwner = false }: { initial?: ManageTournament; isOwner?: boolean }) {
   const router = useRouter()
-  const locale = useLocale()
   const t = useT()
   const [s, setS] = useState<FormState>(initialState(initial))
   const [saving, setSaving] = useState(false)
@@ -223,7 +221,9 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       if (res.ok) {
         const slug = data?.doc?.slug ?? initial?.slug
         toast.success(initial ? t('product.cfg.updated') : t('product.cfg.created'))
-        router.push(`/${locale}/manage/${slug}`)
+        // Land in the tournament's chosen backoffice language, so changing it
+        // here takes effect immediately instead of keeping the current locale.
+        router.push(`/${s.manage_locale}/manage/${slug}`)
         router.refresh()
       } else {
         const msg =
