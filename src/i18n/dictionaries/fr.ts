@@ -1035,6 +1035,7 @@ export const fr: Record<string, string> = {
   "product.cfg.format": "Format",
   "product.cfg.sport": "Sport",
   "product.cfg.sportHint": "Détermine les règles de score et de classement.",
+  "product.cfg.sportLocked": "Le sport est défini à la création et ne peut plus être changé.",
   "product.cfg.numGroups": "Nombre de poules (pair)",
   "product.cfg.groupSize": "Équipes par poule",
   "product.cfg.qualifiers": "Qualifiés / poule",

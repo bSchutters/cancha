@@ -274,19 +274,31 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
         <h2 className="text-xl font-bold">{t('product.cfg.format')}</h2>
         <div className="space-y-1 sm:max-w-xs">
           <Label>{t('product.cfg.sport')}</Label>
-          <Select value={s.sport} onValueChange={(v) => set('sport', v as SportId)}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ALL_SPORTS.map((sp) => (
-                <SelectItem key={sp.id} value={sp.id}>
-                  {sp.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground">{t('product.cfg.sportHint')}</p>
+          {initial ? (
+            // The sport drives the scoring rules, so it is chosen at creation and
+            // locked afterwards — changing it on a running tournament would
+            // silently rewrite its standings. Shown read-only here.
+            <>
+              <Input value={ALL_SPORTS.find((sp) => sp.id === s.sport)?.label ?? s.sport} disabled readOnly />
+              <p className="text-xs text-muted-foreground">{t('product.cfg.sportLocked')}</p>
+            </>
+          ) : (
+            <>
+              <Select value={s.sport} onValueChange={(v) => set('sport', v as SportId)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALL_SPORTS.map((sp) => (
+                    <SelectItem key={sp.id} value={sp.id}>
+                      {sp.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">{t('product.cfg.sportHint')}</p>
+            </>
+          )}
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <Num label={t('product.cfg.numGroups')} value={s.num_groups} onChange={(n) => set('num_groups', n)} max={16} />

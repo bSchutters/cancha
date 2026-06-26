@@ -1036,6 +1036,7 @@ export const en: Dictionary = {
   "product.cfg.format": "Format",
   "product.cfg.sport": "Sport",
   "product.cfg.sportHint": "Determines the scoring and standings rules.",
+  "product.cfg.sportLocked": "The sport is set at creation and can no longer be changed.",
   "product.cfg.numGroups": "Number of groups (even)",
   "product.cfg.groupSize": "Teams per group",
   "product.cfg.qualifiers": "Qualifiers / group",
