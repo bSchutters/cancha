@@ -206,7 +206,7 @@ export function TournamentView({
             ))}
 
           {activeTab === 'pools' && hasGroups && (
-            <GroupStandings groups={data.groups} qualifiersPerGroup={data.format.qualifiersPerGroup} />
+            <GroupStandings groups={data.groups} qualifiersPerGroup={data.format.qualifiersPerGroup} sport={data.sport} />
           )}
 
           {activeTab === 'bracket' && hasKnockout && (

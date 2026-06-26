@@ -58,7 +58,13 @@ describe('computeStandings', () => {
 
   it('uses the sport profile points scheme (not hardcoded 3-1-0)', () => {
     // Same fixtures as the first test, but a profile where a win is worth 2.
-    const custom: SportProfile = { id: 'futsal', label: 'test', scoring: { win: 2, draw: 1, loss: 0 } }
+    const custom: SportProfile = {
+      id: 'futsal',
+      label: 'test',
+      scoring: { win: 2, draw: 1, loss: 0 },
+      drawsAllowed: true,
+      scoreLabel: 'goals',
+    }
     const results = [m(1, 2, 3, 0), m(1, 3, 1, 0), m(2, 3, 1, 0), m(1, 4, 2, 0), m(2, 4, 1, 0), m(3, 4, 1, 0)]
     const table = computeStandings(teams, results, custom)
     expect(table[0].teamId).toBe(1)
