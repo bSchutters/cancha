@@ -1047,6 +1047,7 @@ export const en: Dictionary = {
   "product.cfg.estMatches": "{total} matches ({group} groups + {finals} finals)",
   "product.cfg.estEnd": "estimated end ~{time}",
   "product.cfg.estTooLate": "Very long day: add courts, reduce the ranking depth, or move the start time earlier.",
+  "product.cfg.languages": "Languages",
   "product.cfg.courts": "Courts",
   "product.cfg.multiCourt": "Multiple courts",
   "product.cfg.numCourts": "Number of courts",
