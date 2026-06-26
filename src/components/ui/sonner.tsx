@@ -16,8 +16,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
+          // Use the themed "secondary" surface (warm cream in the Papier DA)
+          // instead of the popover surface, which is pure white in several
+          // palettes and made toasts look cold/off-theme on a cream page.
+          "--normal-bg": "var(--secondary)",
+          "--normal-text": "var(--secondary-foreground)",
           "--normal-border": "var(--border)",
         } as React.CSSProperties
       }
