@@ -221,10 +221,17 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
       if (res.ok) {
         const slug = data?.doc?.slug ?? initial?.slug
         toast.success(initial ? t('product.cfg.updated') : t('product.cfg.created'))
-        // Land in the tournament's chosen backoffice language, so changing it
-        // here takes effect immediately instead of keeping the current locale.
-        router.push(`/${s.manage_locale}/manage/${slug}`)
-        router.refresh()
+        const target = `/${s.manage_locale}/manage/${slug}`
+        // Land in the tournament's chosen backoffice language. When that crosses
+        // the [lang] segment, a soft navigation would remount the themed layout
+        // and make next-themes warn about its anti-flash <script> — so do a full
+        // page load on a locale change, and a soft navigation otherwise.
+        if (!window.location.pathname.startsWith(`/${s.manage_locale}/`)) {
+          window.location.assign(target)
+        } else {
+          router.push(target)
+          router.refresh()
+        }
       } else {
         const msg =
           data?.errors?.[0]?.data?.errors?.[0]?.message ??

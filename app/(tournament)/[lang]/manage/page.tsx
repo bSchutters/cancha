@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { LocaleLink } from '@/components/locale-link'
 import { getPayloadClient } from '@/lib/payload'
 import { getSessionUser, getUserTenantId } from '@/lib/tournament/session'
@@ -46,10 +45,13 @@ export default async function ManageHomePage({ params }: { params: Promise<{ lan
               status: string
               manage_locale?: string
             }
-            // Open each tournament's backoffice in its own configured manage language.
+            // Open each tournament's backoffice in its own configured manage
+            // language. A plain <a> (full load) instead of a soft navigation:
+            // crossing the [lang] segment would remount the themed layout and
+            // make next-themes warn about its anti-flash <script>.
             const manageLocale = isLocale(tour.manage_locale) ? tour.manage_locale : DEFAULT_LOCALE
             return (
-              <Link
+              <a
                 key={String(tour.id)}
                 href={`/${manageLocale}/manage/${tour.slug}`}
                 className="block rounded-xl border border-border bg-card p-5 transition-colors hover:bg-muted"
@@ -59,7 +61,7 @@ export default async function ManageHomePage({ params }: { params: Promise<{ lan
                   <Badge variant="secondary">{t(`product.manageStatus.${tour.status}`)}</Badge>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">/{tour.slug}</p>
-              </Link>
+              </a>
             )
           })}
         </div>
