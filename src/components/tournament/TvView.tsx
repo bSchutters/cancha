@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
-import { getSportProfile } from '@/lib/sport'
+import { getSportProfile, scoreLabelKeys } from '@/lib/sport'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { BracketView } from './BracketView'
@@ -155,15 +155,15 @@ type StatCol = { key: string; value: (s: PublicTournament['groups'][number]['sta
 // goals vs points labels for the for/against/diff columns.
 function statsFor(sportId: PublicTournament['sport']): StatCol[] {
   const profile = getSportProfile(sportId)
-  const pts = profile.scoreLabel === 'points'
+  const keys = scoreLabelKeys(profile.scoreLabel)
   return [
     { key: 'played', value: (s) => s.played },
     { key: 'wins', value: (s) => s.wins },
     ...(profile.drawsAllowed ? ([{ key: 'draws', value: (s) => s.draws }] as StatCol[]) : []),
     { key: 'losses', value: (s) => s.losses },
-    { key: pts ? 'pointsFor' : 'goalsFor', value: (s) => s.goalsFor },
-    { key: pts ? 'pointsAgainst' : 'goalsAgainst', value: (s) => s.goalsAgainst },
-    { key: pts ? 'pointsDiff' : 'goalDiff', value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
+    { key: keys.for, value: (s) => s.goalsFor },
+    { key: keys.against, value: (s) => s.goalsAgainst },
+    { key: keys.diff, value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
   ]
 }
 function StandingsGrid({ data, columns }: { data: PublicTournament; columns: string }) {

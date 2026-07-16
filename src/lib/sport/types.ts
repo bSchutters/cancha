@@ -12,7 +12,7 @@
 // something consumes it.
 
 /** Sport identifiers. Grows as sports are added, one profile at a time. */
-export type SportId = 'futsal' | 'basket' | 'handball'
+export type SportId = 'futsal' | 'basket' | 'handball' | 'padel'
 
 /** Points awarded in the group stage (round-robin). */
 export interface ScoringRules {
@@ -21,8 +21,8 @@ export interface ScoringRules {
   loss: number
 }
 
-/** Which noun the standings score columns use (goals vs points, …). */
-export type ScoreLabel = 'goals' | 'points'
+/** Which noun the standings score columns use (goals, points, or sets won). */
+export type ScoreLabel = 'goals' | 'points' | 'sets'
 
 export interface SportProfile {
   id: SportId

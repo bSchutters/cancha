@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { getSportProfile, DEFAULT_SPORT, ALL_SPORTS, futsal, basket, handball } from './index'
+import { getSportProfile, scoreLabelKeys, DEFAULT_SPORT, ALL_SPORTS, futsal, basket, handball, padel } from './index'
 
 describe('sport profile registry', () => {
   it('resolves a known sport by id', () => {
     expect(getSportProfile('futsal')).toBe(futsal)
     expect(getSportProfile('basket')).toBe(basket)
     expect(getSportProfile('handball')).toBe(handball)
+    expect(getSportProfile('padel')).toBe(padel)
   })
 
   it('falls back to the default for unknown / empty ids', () => {
@@ -33,9 +34,24 @@ describe('sport profile registry', () => {
     expect(handball.scoreLabel).toBe('goals')
   })
 
+  it('padel is set-based (no draws, sets labels, 1 pt per win)', () => {
+    expect(padel.scoring).toEqual({ win: 1, draw: 0, loss: 0 })
+    expect(padel.drawsAllowed).toBe(false)
+    expect(padel.scoreLabel).toBe('sets')
+  })
+
   it('exposes every registered profile', () => {
     expect(ALL_SPORTS).toContain(futsal)
     expect(ALL_SPORTS).toContain(basket)
     expect(ALL_SPORTS).toContain(handball)
+    expect(ALL_SPORTS).toContain(padel)
+  })
+})
+
+describe('scoreLabelKeys', () => {
+  it('maps each score label to the right i18n key suffixes', () => {
+    expect(scoreLabelKeys('goals')).toEqual({ for: 'goalsFor', against: 'goalsAgainst', diff: 'goalDiff' })
+    expect(scoreLabelKeys('points')).toEqual({ for: 'pointsFor', against: 'pointsAgainst', diff: 'pointsDiff' })
+    expect(scoreLabelKeys('sets')).toEqual({ for: 'setsFor', against: 'setsAgainst', diff: 'setsDiff' })
   })
 })
