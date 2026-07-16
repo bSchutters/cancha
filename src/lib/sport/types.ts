@@ -24,6 +24,9 @@ export interface ScoringRules {
 /** Which noun the standings score columns use (goals, points, or sets won). */
 export type ScoreLabel = 'goals' | 'points' | 'sets'
 
+/** What a competitor is: a team, a pair (padel), or a single player (ping-pong). */
+export type SportUnit = 'team' | 'pair' | 'solo'
+
 export interface SportProfile {
   id: SportId
   /** Human label for the registry / sport selector. */
@@ -34,4 +37,6 @@ export interface SportProfile {
   drawsAllowed: boolean
   /** Noun for the for/against/difference standings columns. */
   scoreLabel: ScoreLabel
+  /** Competitor type — drives the registration wording (team / pair / player). */
+  unit: SportUnit
 }

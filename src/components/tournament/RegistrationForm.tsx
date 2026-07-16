@@ -9,6 +9,7 @@ import { Loader2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useT } from '@/i18n/use-t'
+import { getSportProfile, DEFAULT_SPORT, type SportId } from '@/lib/sport'
 import { validateImageFile } from '@/lib/tournament/upload-media'
 import {
   Form,
@@ -30,12 +31,16 @@ export function RegistrationForm({
   slug,
   payment,
   closed = false,
+  sport = DEFAULT_SPORT,
 }: {
   slug: string
   payment: { iban: string | null; amount: number | null; communication: string | null } | null
   closed?: boolean
+  sport?: SportId
 }) {
   const t = useT()
+  // Competitor wording adapts to the sport: team / pair (padel) / player.
+  const unit = getSportProfile(sport).unit
   const [submitted, setSubmitted] = useState(false)
   const [waitlisted, setWaitlisted] = useState(false)
   const [logo, setLogo] = useState<File | null>(null)
@@ -128,9 +133,9 @@ export function RegistrationForm({
             name="teamName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('product.reg.teamName')}</FormLabel>
+                <FormLabel>{t(`product.reg.name.${unit}`)}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Los Amigos FC" {...field} />
+                  <Input placeholder={t(`product.reg.namePlaceholder.${unit}`)} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

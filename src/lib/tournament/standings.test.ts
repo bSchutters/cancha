@@ -64,6 +64,7 @@ describe('computeStandings', () => {
       scoring: { win: 2, draw: 1, loss: 0 },
       drawsAllowed: true,
       scoreLabel: 'goals',
+      unit: 'team',
     }
     const results = [m(1, 2, 3, 0), m(1, 3, 1, 0), m(2, 3, 1, 0), m(1, 4, 2, 0), m(2, 4, 1, 0), m(3, 4, 1, 0)]
     const table = computeStandings(teams, results, custom)

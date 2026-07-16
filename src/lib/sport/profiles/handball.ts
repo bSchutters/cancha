@@ -8,4 +8,5 @@ export const handball: SportProfile = {
   scoring: { win: 2, draw: 1, loss: 0 },
   drawsAllowed: true,
   scoreLabel: 'goals',
+  unit: 'team',
 }
