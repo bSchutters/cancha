@@ -40,6 +40,13 @@ describe('sport profile registry', () => {
     expect(padel.scoreLabel).toBe('sets')
   })
 
+  it('carries a competitor unit (padel is a pair, ball sports are teams)', () => {
+    expect(padel.unit).toBe('pair')
+    expect(futsal.unit).toBe('team')
+    expect(basket.unit).toBe('team')
+    expect(handball.unit).toBe('team')
+  })
+
   it('exposes every registered profile', () => {
     expect(ALL_SPORTS).toContain(futsal)
     expect(ALL_SPORTS).toContain(basket)

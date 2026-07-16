@@ -174,6 +174,7 @@ export function TournamentView({
             slug={slug}
             payment={data.payment}
             closed={data.status === 'registration_closed'}
+            sport={data.sport}
           />
           {data.teams.length > 0 && (
             <section>

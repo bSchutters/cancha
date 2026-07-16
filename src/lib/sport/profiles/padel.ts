@@ -12,4 +12,5 @@ export const padel: SportProfile = {
   scoring: { win: 1, draw: 0, loss: 0 },
   drawsAllowed: false,
   scoreLabel: 'sets',
+  unit: 'pair',
 }

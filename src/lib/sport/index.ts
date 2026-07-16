@@ -4,7 +4,7 @@ import { basket } from './profiles/basket'
 import { handball } from './profiles/handball'
 import { padel } from './profiles/padel'
 
-export type { SportId, SportProfile, ScoringRules, ScoreLabel } from './types'
+export type { SportId, SportProfile, ScoringRules, ScoreLabel, SportUnit } from './types'
 export { scoreLabelKeys } from './standings-labels'
 
 /** Default sport — what existing tournaments (and tournaments with no sport set) use. */

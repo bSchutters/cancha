@@ -9,4 +9,5 @@ export const basket: SportProfile = {
   scoring: { win: 2, draw: 0, loss: 1 },
   drawsAllowed: false,
   scoreLabel: 'points',
+  unit: 'team',
 }
