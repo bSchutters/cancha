@@ -1,9 +1,9 @@
 import { Client } from 'pg'
 import { TEST_DATABASE_URI } from '../../playwright.config'
 
-// Reset the throwaway database to a clean state before every run. We connect to
-// the default `postgres` database, drop + recreate `cancha_test`, and let the
-// webServer's first request push the fresh Payload schema.
+// Safety net: make sure the test database exists (scripts/e2e-pg.sh already
+// creates it). We DO NOT drop it here — the webServer may already have connected
+// and pushed the schema by the time this runs, and dropping would wipe it.
 export default async function globalSetup() {
   const url = new URL(TEST_DATABASE_URI)
   const dbName = url.pathname.replace(/^\//, '')
@@ -19,14 +19,10 @@ export default async function globalSetup() {
   } catch (err) {
     throw new Error(
       `E2E: cannot reach the local test Postgres at ${url.hostname}:${url.port}. ` +
-        `Start it with \`scripts/e2e-pg.sh\` first. (${(err as Error).message})`,
+        `Run \`pnpm e2e:pg\` first. (${(err as Error).message})`,
     )
   }
-  // Terminate stale connections so DROP DATABASE succeeds.
-  await admin.query(`select pg_terminate_backend(pid) from pg_stat_activity where datname = $1`, [dbName])
-  await admin.query(`drop database if exists ${dbName}`)
-  await admin.query(`create database ${dbName}`)
+  const exists = await admin.query('select 1 from pg_database where datname = $1', [dbName])
+  if (exists.rowCount === 0) await admin.query(`create database ${dbName}`)
   await admin.end()
-  // eslint-disable-next-line no-console
-  console.log(`[e2e] fresh database "${dbName}" ready`)
 }

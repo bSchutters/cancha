@@ -33,4 +33,31 @@ export async function seedUser(email: string, password: string, role: 'admin' | 
   })
 }
 
+/**
+ * Wait until the app (via Payload `push`) has created the schema. The webServer
+ * pushes lazily on its first request, which can land just after this hook
+ * starts, so we poll for the `users` table before seeding.
+ */
+export async function waitForSchema(timeoutMs = 60_000) {
+  const deadline = Date.now() + timeoutMs
+  for (;;) {
+    const ready = await withDb(async (c) => {
+      const r = await c.query(
+        `select 1 from information_schema.tables where table_schema = 'public' and table_name = 'users'`,
+      )
+      return (r.rowCount ?? 0) > 0
+    }).catch(() => false)
+    if (ready) return
+    if (Date.now() > deadline) throw new Error('E2E: schema was not pushed in time (no `users` table)')
+    await new Promise((r) => setTimeout(r, 500))
+  }
+}
+
+/** Remove any leftover e2e fixtures so each run starts clean (idempotent). */
+export async function resetE2eData() {
+  await withDb(async (c) => {
+    await c.query(`delete from users where email like '%@e2e.test'`)
+  })
+}
+
 export const ADMIN = { email: 'admin@e2e.test', password: 'E2eTest!2026' as const }

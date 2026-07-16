@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { seedUser, ADMIN } from './db'
+import { seedUser, waitForSchema, resetE2eData, ADMIN } from './db'
 
-// By the time tests run, Playwright has polled the webServer's health URL, which
-// triggered Payload's schema push — so the tables exist and we can seed.
+// Wait for the app to have pushed the schema, clear leftover fixtures, then seed.
 test.beforeAll(async () => {
+  await waitForSchema()
+  await resetE2eData()
   await seedUser(ADMIN.email, ADMIN.password, 'admin')
 })
 

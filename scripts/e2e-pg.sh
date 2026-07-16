@@ -26,4 +26,7 @@ else
   echo "[e2e-pg] started on 127.0.0.1:$PORT"
 fi
 
-# global-setup creates/drops the cancha_test database itself; nothing else to do.
+# Ensure the test database exists BEFORE Playwright boots the app (the isolated
+# server connects to it and pushes the schema). Idempotent.
+createdb -h 127.0.0.1 -p "$PORT" -U postgres cancha_test 2>/dev/null && \
+  echo "[e2e-pg] created database cancha_test" || echo "[e2e-pg] database cancha_test ready"
