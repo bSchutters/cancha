@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { seedUser, waitForSchema, resetE2eData, ADMIN } from './db'
+import { seedUser, seedPadelTournament, waitForSchema, resetE2eData, ADMIN } from './db'
 
 // Wait for the app to have pushed the schema, clear leftover fixtures, then seed.
 test.beforeAll(async () => {
@@ -14,24 +14,46 @@ test.describe('backoffice auth', () => {
     await page.locator('input[type="email"]').fill(ADMIN.email)
     await page.locator('input[type="password"]').fill(ADMIN.password)
     await page.locator('button[type="submit"]').click()
-    // Lands in the localized manage area.
     await expect(page).toHaveURL(/\/(fr|nl|en)\/manage/, { timeout: 15_000 })
   })
 })
 
-// Scaffold for the full padel flow. Fill in the selectors against the running
-// app (create tournament → choose Padel → seed teams in dev mode → enter a
-// set-by-set score → assert the standings show "Sets" and the public card shows
-// the per-set breakdown). Kept skipped until the selectors are pinned so the
-// suite stays green.
-test.describe('padel end-to-end', () => {
-  test.skip('records a set-by-set score and ranks by sets', async () => {
-    // 1. log in (see above)
-    // 2. /fr/manage/new → name it, choose Sport = Padel, save
-    // 3. enable dev mode + seed teams, run draw + schedule
-    // 4. /fr/manage/<slug>/scores → a match shows the per-set editor;
-    //    enter 6-4 / 3-6 / 6-2 → expect "Sets : 2-1", save
-    // 5. public /fr/<slug> → results card shows "2 - 1" with "6-4 3-6 6-2"
-    //    and the standings header reads "Sets gagnés/perdus"
+test.describe('padel (set-based sport)', () => {
+  test('public page ranks by sets and shows the per-set breakdown', async ({ page }) => {
+    const slug = await seedPadelTournament()
+
+    await page.goto(`/fr/${slug}`)
+
+    // The default "Poules" tab shows the standings. A set-based sport labels the
+    // score columns "Sets gagnés / perdus" (SG / SP) instead of "Buts".
+    const standings = page.locator('table').first()
+    await expect(standings.getByRole('columnheader', { name: 'SG' })).toBeVisible()
+    await expect(page.getByRole('columnheader', { name: 'SG' }).first()).toHaveAttribute(
+      'title',
+      'Sets gagnés',
+    )
+
+    // The calendar's match card shows the per-set game scores 6-4 / 3-6 / 6-2.
+    await page.getByRole('button', { name: 'Calendrier' }).click()
+    await expect(page.getByText('6-4', { exact: true })).toBeVisible()
+    await expect(page.getByText('3-6', { exact: true })).toBeVisible()
+    await expect(page.getByText('6-2', { exact: true })).toBeVisible()
+  })
+
+  test('the score editor uses per-set entry for a padel match', async ({ page }) => {
+    const slug = await seedPadelTournament()
+
+    // Log in, then open the tournament's score-entry page.
+    await page.goto('/fr/login')
+    await page.locator('input[type="email"]').fill(ADMIN.email)
+    await page.locator('input[type="password"]').fill(ADMIN.password)
+    await page.locator('button[type="submit"]').click()
+    await expect(page).toHaveURL(/\/manage/, { timeout: 15_000 })
+
+    await page.goto(`/fr/manage/${slug}/scores`)
+
+    // The set-based card shows the live "Sets" tally derived from the games.
+    await expect(page.getByText('Sets', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('2 - 1').first()).toBeVisible()
   })
 })
