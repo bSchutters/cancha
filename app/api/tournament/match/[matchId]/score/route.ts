@@ -12,6 +12,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (body?.clear) {
     return runAction(() => clearScore(auth.payload, Number(matchId)))
   }
+  const setScores = Array.isArray(body.setScores)
+    ? body.setScores.map((s: { home: unknown; away: unknown }) => ({ home: Number(s.home), away: Number(s.away) }))
+    : undefined
   return runAction(() =>
     enterScore(auth.payload, Number(matchId), {
       scoreHome: Number(body.scoreHome),
@@ -19,6 +22,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       fairplayWinner: body.fairplayWinner,
       penaltyHome: body.penaltyHome != null ? Number(body.penaltyHome) : null,
       penaltyAway: body.penaltyAway != null ? Number(body.penaltyAway) : null,
+      setScores,
     }),
   )
 }
