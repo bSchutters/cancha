@@ -152,6 +152,7 @@ export function MyTeamTab({
             groups={[group]}
             qualifiersPerGroup={data.format.qualifiersPerGroup}
             highlightTeamId={teamId}
+            sport={data.sport}
           />
         </section>
       )}

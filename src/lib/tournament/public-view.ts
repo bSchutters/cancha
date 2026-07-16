@@ -1,7 +1,7 @@
 import type { Payload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import { computeStandings } from './standings'
-import { getSportProfile } from '../sport'
+import { getSportProfile, type SportId } from '../sport'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { computeFinalRanking } from './final-ranking'
@@ -77,6 +77,7 @@ export interface PublicTournament extends PublicTournamentSummary {
   drawRevealed: boolean
   /** Global schedule delay in minutes (already applied to scheduledTime). */
   scheduleOffsetMin: number
+  sport: SportId
   format: { numGroups: number; qualifiersPerGroup: number }
   payment: { iban: string | null; amount: number | null; communication: string | null } | null
   groups: PublicGroup[]
@@ -476,6 +477,7 @@ export async function buildPublicTournament(
     description: t.description ?? null,
     drawRevealed: t.draw_revealed === true,
     scheduleOffsetMin: offset,
+    sport: getSportProfile(t.sport).id,
     format: { numGroups: t.num_groups ?? 0, qualifiersPerGroup: t.qualifiers_per_group ?? 0 },
     payment: registrationOpen
       ? {

@@ -1,13 +1,15 @@
 import type { SportId, SportProfile } from './types'
 import { futsal } from './profiles/futsal'
+import { basket } from './profiles/basket'
 
-export type { SportId, SportProfile, ScoringRules } from './types'
+export type { SportId, SportProfile, ScoringRules, ScoreLabel } from './types'
 
 /** Default sport — what existing tournaments (and tournaments with no sport set) use. */
 export const DEFAULT_SPORT: SportId = 'futsal'
 
 const PROFILES: Record<SportId, SportProfile> = {
   futsal,
+  basket,
 }
 
 /**
@@ -20,4 +22,4 @@ export function getSportProfile(id: SportId | string | null | undefined): SportP
 
 export const ALL_SPORTS: readonly SportProfile[] = Object.values(PROFILES)
 
-export { futsal }
+export { futsal, basket }
