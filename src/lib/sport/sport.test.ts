@@ -1,14 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { getSportProfile, DEFAULT_SPORT, ALL_SPORTS, futsal, basket } from './index'
+import { getSportProfile, DEFAULT_SPORT, ALL_SPORTS, futsal, basket, handball } from './index'
 
 describe('sport profile registry', () => {
   it('resolves a known sport by id', () => {
     expect(getSportProfile('futsal')).toBe(futsal)
     expect(getSportProfile('basket')).toBe(basket)
+    expect(getSportProfile('handball')).toBe(handball)
   })
 
   it('falls back to the default for unknown / empty ids', () => {
-    expect(getSportProfile('handball')).toBe(getSportProfile(DEFAULT_SPORT))
+    expect(getSportProfile('tennis')).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile(null)).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile(undefined)).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile('')).toBe(getSportProfile(DEFAULT_SPORT))
@@ -26,8 +27,15 @@ describe('sport profile registry', () => {
     expect(basket.scoreLabel).toBe('points')
   })
 
+  it('handball uses 2-1-0, draws allowed, goals labels', () => {
+    expect(handball.scoring).toEqual({ win: 2, draw: 1, loss: 0 })
+    expect(handball.drawsAllowed).toBe(true)
+    expect(handball.scoreLabel).toBe('goals')
+  })
+
   it('exposes every registered profile', () => {
     expect(ALL_SPORTS).toContain(futsal)
     expect(ALL_SPORTS).toContain(basket)
+    expect(ALL_SPORTS).toContain(handball)
   })
 })

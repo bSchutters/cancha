@@ -1,6 +1,7 @@
 import type { SportId, SportProfile } from './types'
 import { futsal } from './profiles/futsal'
 import { basket } from './profiles/basket'
+import { handball } from './profiles/handball'
 
 export type { SportId, SportProfile, ScoringRules, ScoreLabel } from './types'
 
@@ -10,6 +11,7 @@ export const DEFAULT_SPORT: SportId = 'futsal'
 const PROFILES: Record<SportId, SportProfile> = {
   futsal,
   basket,
+  handball,
 }
 
 /**
@@ -22,4 +24,4 @@ export function getSportProfile(id: SportId | string | null | undefined): SportP
 
 export const ALL_SPORTS: readonly SportProfile[] = Object.values(PROFILES)
 
-export { futsal, basket }
+export { futsal, basket, handball }
