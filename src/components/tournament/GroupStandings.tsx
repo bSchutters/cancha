@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
 import type { PublicGroup } from '@/lib/tournament/public-view'
-import { getSportProfile, DEFAULT_SPORT, type SportId } from '@/lib/sport'
+import { getSportProfile, scoreLabelKeys, DEFAULT_SPORT, type SportId } from '@/lib/sport'
 
 export function GroupStandings({
   groups,
@@ -22,16 +22,16 @@ export function GroupStandings({
 }) {
   const t = useT()
   // The sport decides whether draws can happen (so whether the column is shown)
-  // and which noun the for/against/diff columns use (goals vs points).
+  // and which noun the for/against/diff columns use (goals / points / sets).
   const profile = getSportProfile(sport)
   const showDraws = profile.drawsAllowed
-  const isPoints = profile.scoreLabel === 'points'
-  const forShort = t(isPoints ? 'product.standings.pointsFor.short' : 'product.standings.goalsFor.short')
-  const forTitle = t(isPoints ? 'product.standings.pointsFor.title' : 'product.standings.goalsFor.title')
-  const againstShort = t(isPoints ? 'product.standings.pointsAgainst.short' : 'product.standings.goalsAgainst.short')
-  const againstTitle = t(isPoints ? 'product.standings.pointsAgainst.title' : 'product.standings.goalsAgainst.title')
-  const diffShort = t(isPoints ? 'product.standings.pointsDiff.short' : 'product.standings.goalDiff.short')
-  const diffTitle = t(isPoints ? 'product.standings.pointsDiff.title' : 'product.standings.goalDiff.title')
+  const keys = scoreLabelKeys(profile.scoreLabel)
+  const forShort = t(`product.standings.${keys.for}.short`)
+  const forTitle = t(`product.standings.${keys.for}.title`)
+  const againstShort = t(`product.standings.${keys.against}.short`)
+  const againstTitle = t(`product.standings.${keys.against}.title`)
+  const diffShort = t(`product.standings.${keys.diff}.short`)
+  const diffTitle = t(`product.standings.${keys.diff}.title`)
   if (groups.length === 0) return null
   return (
     <div className={cn('grid gap-6', compact ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2')}>

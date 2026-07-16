@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { BracketView, type BracketMatchView } from '@/components/tournament/BracketView'
 import { useT } from '@/i18n/use-t'
 import { localizeFinalNote } from '@/lib/tournament/bracket-label'
-import { getSportProfile } from '@/lib/sport'
+import { getSportProfile, scoreLabelKeys } from '@/lib/sport'
 import type { ManageMatch, ManageTournament } from '@/lib/tournament/manage-view'
 
 function toBracketView(m: ManageMatch): BracketMatchView {
@@ -202,10 +202,7 @@ function GroupTable({ t, label }: { t: ManageTournament; label: string }) {
   const tr = useT()
   const group = t.groups.find((g) => g.label === label)
   if (!group) return null
-  const diffKey =
-    getSportProfile(t.sport).scoreLabel === 'points'
-      ? 'product.standings.pointsDiff.short'
-      : 'product.standings.goalDiff.short'
+  const diffKey = `product.standings.${scoreLabelKeys(getSportProfile(t.sport).scoreLabel).diff}.short`
   return (
     <Table>
       <TableHeader>
