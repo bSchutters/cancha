@@ -50,6 +50,7 @@ export interface PublicMatch {
   awayLogoUrl: string | null
   scoreHome: number | null
   scoreAway: number | null
+  setScores: { home: number; away: number }[]
   penaltyWinner: 'home' | 'away' | null
   penaltyHome: number | null
   penaltyAway: number | null
@@ -283,6 +284,9 @@ export async function buildPublicTournament(
     })(),
     scoreHome: typeof m.score_home === 'number' ? m.score_home : null,
     scoreAway: typeof m.score_away === 'number' ? m.score_away : null,
+    setScores: Array.isArray(m.set_scores)
+      ? m.set_scores.map((s: { home?: unknown; away?: unknown }) => ({ home: Number(s.home ?? 0), away: Number(s.away ?? 0) }))
+      : [],
     penaltyWinner: m.penalty_winner ?? null,
     penaltyHome: typeof m.penalty_home === 'number' ? m.penalty_home : null,
     penaltyAway: typeof m.penalty_away === 'number' ? m.penalty_away : null,
@@ -368,6 +372,7 @@ export async function buildPublicTournament(
           awayTeamId: m.awayTeamId,
           scoreHome: m.scoreHome,
           scoreAway: m.scoreAway,
+          setScores: m.setScores,
           penaltyWinner: m.penaltyWinner,
           status: m.status,
         })),
@@ -431,6 +436,7 @@ export async function buildPublicTournament(
       awayLogoUrl: null,
       scoreHome: null,
       scoreAway: null,
+      setScores: [],
       penaltyWinner: null,
       penaltyHome: null,
       penaltyAway: null,
