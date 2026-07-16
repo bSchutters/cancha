@@ -212,6 +212,7 @@ export function toPublicMatch(m: DemoMatch, teams: DemoTeam[]): PublicMatch {
     awayLogoUrl: null,
     scoreHome: finished ? m.hs : null,
     scoreAway: finished ? m.as : null,
+    setScores: [],
     penaltyWinner: null,
     penaltyHome: null,
     penaltyAway: null,
