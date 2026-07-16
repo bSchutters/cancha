@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { NumberStepper } from '@/components/tournament/NumberStepper'
 import { ConfirmDialog } from '@/components/tournament/manage/ConfirmDialog'
 import { useT } from '@/i18n/use-t'
+import { getSportProfile, DEFAULT_SPORT, type SportId } from '@/lib/sport'
 import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
 import type { ManageMatch, ManageReferee } from '@/lib/tournament/manage-view'
 
@@ -50,11 +51,15 @@ function IconBtn({
   )
 }
 
-function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: ManageReferee[] }) {
+function MatchScoreCard({ match, referees, sport }: { match: ManageMatch; referees: ManageReferee[]; sport: SportId }) {
   const t = useT()
   const router = useRouter()
+  const setBased = getSportProfile(sport).scoreLabel === 'sets'
   const [home, setHome] = useState<number | null>(match.scoreHome)
   const [away, setAway] = useState<number | null>(match.scoreAway)
+  const [sets, setSets] = useState<{ home: number | null; away: number | null }[]>(() =>
+    match.setScores.length ? match.setScores.map((s) => ({ home: s.home, away: s.away })) : [{ home: null, away: null }],
+  )
   const [fairplay, setFairplay] = useState<Fairplay>(match.fairplayWinner)
   const [penHome, setPenHome] = useState<number | null>(match.penaltyHome)
   const [penAway, setPenAway] = useState<number | null>(match.penaltyAway)
@@ -63,13 +68,25 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
   const [confirmReset, setConfirmReset] = useState(false)
 
   const isFinals = match.phase !== 'group' // knockout + classification
-  const bothEntered = home != null && away != null
-  const isDraw = bothEntered && home === away
-  const needsPenalty = isFinals && isDraw
+  // Set-based sports (padel…): the match score is the number of sets won.
+  const validSets = sets.filter((s) => s.home != null && s.away != null && s.home !== s.away)
+  const setsHome = validSets.filter((s) => (s.home as number) > (s.away as number)).length
+  const setsAway = validSets.filter((s) => (s.away as number) > (s.home as number)).length
+  const effHome = setBased ? setsHome : home
+  const effAway = setBased ? setsAway : away
+  const bothEntered = setBased ? validSets.length > 0 : home != null && away != null
+  const isDraw = setBased ? effHome === effAway : bothEntered && home === away
+  const needsPenalty = isFinals && isDraw && !setBased // no penalty shootout for set sports
+
+  const updateSet = (i: number, side: 'home' | 'away', v: number | null) =>
+    setSets((prev) => prev.map((s, idx) => (idx === i ? { ...s, [side]: v } : s)))
+  const addSet = () => setSets((prev) => [...prev, { home: null, away: null }])
+  const removeSet = (i: number) => setSets((prev) => prev.filter((_, idx) => idx !== i))
 
   const reset = async () => {
     setHome(null)
     setAway(null)
+    setSets([{ home: null, away: null }])
     setFairplay('none')
     setPenHome(null)
     setPenAway(null)
@@ -91,6 +108,10 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
       toast.error(t('product.scores.enterBoth'))
       return
     }
+    if (setBased && effHome === effAway) {
+      toast.error(t('product.scores.setsDecisive'))
+      return
+    }
     if (needsPenalty && (penHome == null || penAway == null || penHome === penAway)) {
       toast.error(t('product.scores.penaltyDecisive'))
       return
@@ -102,8 +123,9 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          scoreHome: home,
-          scoreAway: away,
+          scoreHome: effHome,
+          scoreAway: effAway,
+          setScores: setBased ? validSets : undefined,
           fairplayWinner: fairplay,
           penaltyHome: needsPenalty ? penHome : null,
           penaltyAway: needsPenalty ? penAway : null,
@@ -150,20 +172,61 @@ function MatchScoreCard({ match, referees }: { match: ManageMatch; referees: Man
         <span>{match.groupLabel ? `${t('product.poolLabel')} ${match.groupLabel}` : match.bracketLabel}</span>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
-            {match.homeName ? localizeFeederName(match.homeName, t) : t('product.match.tbd')}
-          </span>
-          <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
+      {setBased ? (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2 text-sm font-medium">
+            <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
+              {match.homeName ? localizeFeederName(match.homeName, t) : t('product.match.tbd')}
+            </span>
+            <span className={cn('min-w-0 truncate text-right', !match.awayName && 'italic text-muted-foreground')}>
+              {match.awayName ? localizeFeederName(match.awayName, t) : t('product.match.tbd')}
+            </span>
+          </div>
+          {sets.map((s, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="w-12 shrink-0 text-xs text-muted-foreground">
+                {t('product.scores.set')} {i + 1}
+              </span>
+              <NumberStepper value={s.home} onChange={(v) => updateSet(i, 'home', v)} disabled={locked || !match.homeName} size="sm" />
+              <span className="text-muted-foreground">-</span>
+              <NumberStepper value={s.away} onChange={(v) => updateSet(i, 'away', v)} disabled={locked || !match.awayName} size="sm" />
+              {!locked && sets.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeSet(i)}
+                  className="ml-auto text-lg leading-none text-muted-foreground hover:text-red-600"
+                  aria-label={t('product.scores.removeSet')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          {!locked && (
+            <button type="button" onClick={addSet} className="text-xs font-medium text-primary hover:underline">
+              + {t('product.scores.addSet')}
+            </button>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t('product.scores.setsWon')} : <span className="font-semibold text-foreground">{setsHome} - {setsAway}</span>
+          </p>
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-muted-foreground')}>
-            {match.awayName ? localizeFeederName(match.awayName, t) : t('product.match.tbd')}
-          </span>
-          <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
+      ) : (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className={cn('min-w-0 truncate', !match.homeName && 'italic text-muted-foreground')}>
+              {match.homeName ? localizeFeederName(match.homeName, t) : t('product.match.tbd')}
+            </span>
+            <NumberStepper value={home} onChange={setHome} disabled={locked || !match.homeName} size="sm" />
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className={cn('min-w-0 truncate', !match.awayName && 'italic text-muted-foreground')}>
+              {match.awayName ? localizeFeederName(match.awayName, t) : t('product.match.tbd')}
+            </span>
+            <NumberStepper value={away} onChange={setAway} disabled={locked || !match.awayName} size="sm" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Fair-play - labelled with team names */}
       <div className="mt-3">
@@ -268,7 +331,7 @@ function isComplete(s: Section): boolean {
   return s.matches.length > 0 && s.matches.every((m) => m.status === 'finished')
 }
 
-function SectionBlock({ section, referees }: { section: Section; referees: ManageReferee[] }) {
+function SectionBlock({ section, referees, sport }: { section: Section; referees: ManageReferee[]; sport: SportId }) {
   const done = section.matches.filter((m) => m.status === 'finished').length
   const total = section.matches.length
   const complete = done === total && total > 0
@@ -287,7 +350,7 @@ function SectionBlock({ section, referees }: { section: Section; referees: Manag
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
         {section.matches.map((m) => (
-          <MatchScoreCard key={String(m.id)} match={m} referees={referees} />
+          <MatchScoreCard key={String(m.id)} match={m} referees={referees} sport={sport} />
         ))}
       </div>
     </section>
@@ -305,9 +368,11 @@ function orderSections(sections: Section[]): Section[] {
 export function ScoresClient({
   matches,
   referees,
+  sport = DEFAULT_SPORT,
 }: {
   matches: ManageMatch[]
   referees: ManageReferee[]
+  sport?: SportId
 }) {
   const t = useT()
   const [filter, setFilter] = useState<'all' | 'pending'>('all')
@@ -366,7 +431,7 @@ export function ScoresClient({
       </div>
 
       {allSections.map((s) => (
-        <SectionBlock key={s.key} section={s} referees={referees} />
+        <SectionBlock key={s.key} section={s} referees={referees} sport={sport} />
       ))}
     </div>
   )

@@ -217,6 +217,20 @@ export const TournamentMatches: CollectionConfig = {
       label: 'Score extérieur',
     },
     {
+      name: 'set_scores',
+      type: 'array',
+      label: 'Scores par set',
+      labels: { singular: 'Set', plural: 'Sets' },
+      admin: {
+        description:
+          'Détail des jeux par set (sports en sets, ex. padel). Le score du match = nombre de sets gagnés.',
+      },
+      fields: [
+        { name: 'home', type: 'number', label: 'Jeux domicile' },
+        { name: 'away', type: 'number', label: 'Jeux extérieur' },
+      ],
+    },
+    {
       name: 'penalty_home',
       type: 'number',
       label: 'Tirs au but - domicile',

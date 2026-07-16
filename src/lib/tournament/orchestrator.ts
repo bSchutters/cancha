@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { drawGroups } from './draw'
 import { buildSchedule, buildScheduleMaps } from './schedule'
 import { computeStandings } from './standings'
+import { setsWon } from './sets'
 import { getSportProfile } from '../sport'
 import { rankAll, type RankingDepth } from './bracket'
 import type {
@@ -629,6 +630,9 @@ export interface ScoreInput {
   fairplayWinner?: 'home' | 'away' | 'none'
   penaltyHome?: number | null
   penaltyAway?: number | null
+  /** Per-set game scores for set-based sports (padel…). When present, the match
+   *  score (score_home/away) is derived from it as the number of sets won. */
+  setScores?: { home: number; away: number }[]
 }
 
 /** Enter (or correct) a match score. Hooks handle bracket propagation + cache. */
@@ -643,10 +647,15 @@ export async function enterScore(payload: Payload, matchId: Id, input: ScoreInpu
     throw new TournamentError('NOT_FOUND', 'Match introuvable')
   }
 
+  // Set-based sports (padel…): the match score is the number of sets won,
+  // derived from the per-set game scores.
+  const sets = input.setScores ?? []
+  const effective = sets.length ? setsWon(sets) : { home: input.scoreHome, away: input.scoreAway }
+
   const needsPenalties = match.phase !== 'group' // knockout + classification
-  const draw = input.scoreHome === input.scoreAway
+  const draw = effective.home === effective.away
   const hasPenalties = typeof input.penaltyHome === 'number' && typeof input.penaltyAway === 'number'
-  if (needsPenalties && draw) {
+  if (needsPenalties && draw && !sets.length) {
     if (!hasPenalties) {
       throw new TournamentError('VALIDATION_ERROR', 'Match nul : saisissez le score des tirs au but')
     }
@@ -654,17 +663,22 @@ export async function enterScore(payload: Payload, matchId: Id, input: ScoreInpu
       throw new TournamentError('VALIDATION_ERROR', 'Les tirs au but ne peuvent pas être à égalité')
     }
   }
+  // A set-based knockout match must be decided (someone wins more sets).
+  if (needsPenalties && draw && sets.length) {
+    throw new TournamentError('VALIDATION_ERROR', 'Le match doit avoir un vainqueur (nombre de sets différent)')
+  }
 
   await payload.update({
     collection: 'tournament-matches',
     id: matchId as number,
     data: {
-      score_home: input.scoreHome,
-      score_away: input.scoreAway,
+      score_home: effective.home,
+      score_away: effective.away,
+      set_scores: sets,
       fairplay_winner: input.fairplayWinner ?? 'none',
-      penalty_home: needsPenalties && draw ? input.penaltyHome : null,
-      penalty_away: needsPenalties && draw ? input.penaltyAway : null,
-      penalty_winner: needsPenalties && draw ? undefined : null, // derived in beforeChange
+      penalty_home: needsPenalties && draw && !sets.length ? input.penaltyHome : null,
+      penalty_away: needsPenalties && draw && !sets.length ? input.penaltyAway : null,
+      penalty_winner: needsPenalties && draw && !sets.length ? undefined : null, // derived in beforeChange
     },
   })
 
@@ -679,6 +693,7 @@ export async function clearScore(payload: Payload, matchId: Id) {
     data: {
       score_home: null,
       score_away: null,
+      set_scores: [],
       fairplay_winner: 'none',
       penalty_home: null,
       penalty_away: null,

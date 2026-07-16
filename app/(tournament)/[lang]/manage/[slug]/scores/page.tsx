@@ -19,7 +19,7 @@ export default async function ScoresPage({ params }: { params: Promise<{ lang: s
     <main className="mx-auto max-w-screen-2xl px-4 py-10">
       <TournamentNav slug={slug} active="scores" />
       <h1 className="mb-6 text-2xl font-bold">{tr('product.page.scoresTitle')}</h1>
-      <ScoresClient matches={t.matches} referees={t.referees} />
+      <ScoresClient matches={t.matches} referees={t.referees} sport={t.sport} />
     </main>
   )
 }
