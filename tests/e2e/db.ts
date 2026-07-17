@@ -63,6 +63,51 @@ export async function resetE2eData() {
 export const ADMIN = { email: 'admin@e2e.test', password: 'E2eTest!2026' as const }
 
 /**
+ * Seed a finished LEAGUE (championnat) — futsal, one round-robin group of three
+ * teams, all matches played. A league has no finals, so its standings are the
+ * result. Idempotent. Returns the public slug.
+ */
+export async function seedLeagueTournament() {
+  const slug = 'e2e-league'
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, ['e2e-league-club'])
+
+    const org = await c.query(`insert into organizations (name, slug) values ('E2E League Club', 'e2e-league-club') returning id`)
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, draw_revealed, tenant_id)
+       values ('E2E League', $1, 'futsal', 'league', 'finished', 1, 3, 1, true, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+    const team = async (name: string) =>
+      (
+        await c.query(
+          `insert into tournament_teams (tournament_id, name, representative_email, representative_phone, group_label, registration_status)
+           values ($1, $2, 'e2e@e2e.test', '+32000', 'A', 'confirmed') returning id`,
+          [tourId, name],
+        )
+      ).rows[0].id
+    const a = await team('Alpha FC')
+    const b = await team('Bravo FC')
+    const cc = await team('Charlie FC')
+    const match = async (home: number, away: number, sh: number, sa: number, round: number) =>
+      c.query(
+        `insert into tournament_matches (tournament_id, tenant_id, phase, group_label, round, court, scheduled_time, home_team_id, away_team_id, score_home, score_away, status)
+         values ($1, $2, 'group', 'A', $3, 1, '10:00', $4, $5, $6, $7, 'finished')`,
+        [tourId, orgId, round, home, away, sh, sa],
+      )
+    await match(a, b, 3, 1, 1)
+    await match(a, cc, 2, 0, 2)
+    await match(b, cc, 1, 1, 3)
+    return slug
+  })
+}
+
+/**
  * Seed a live Padel tournament with one finished group match whose per-set
  * scores are 6-4 / 3-6 / 6-2 (so the match is won 2 sets to 1). Idempotent —
  * clears any previous `e2e-padel` data first. Returns the public slug.

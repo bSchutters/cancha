@@ -142,6 +142,17 @@ export const Tournaments: CollectionConfig = {
       admin: { initCollapsed: true },
       fields: [
         {
+          name: 'format',
+          type: 'select',
+          defaultValue: 'groups_ko',
+          options: [
+            { label: 'Poules + phase finale', value: 'groups_ko' },
+            { label: 'Championnat (poules seules)', value: 'league' },
+          ],
+          label: 'Type de tournoi',
+          admin: { description: 'Poules suivies d’un tableau final, ou championnat (le classement des poules fait office de résultat).' },
+        },
+        {
           name: 'sport',
           type: 'select',
           defaultValue: DEFAULT_SPORT,

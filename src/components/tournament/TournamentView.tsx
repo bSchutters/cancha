@@ -46,6 +46,9 @@ export function TournamentView({
   const hasAnyCalendar = hasGroupCalendar || finalsCalendar.length > 0
   const isLanding = data.status === 'registration' || data.status === 'registration_closed'
   const finished = data.status === 'finished' || data.status === 'archived'
+  // A league has no final bracket: its pool standings ARE the result, so there's
+  // no separate "Résultats" (podium) tab.
+  const hasResults = finished && data.competitionFormat !== 'league'
   const followedTeam = followed ? data.teams.find((t) => String(t.id) === followed) : undefined
   const hasInfo = Boolean(
     (data.venue && (data.venue.name || data.venue.address || data.venue.mapsUrl || data.venue.mapUrl || data.venue.info)) ||
@@ -53,7 +56,7 @@ export function TournamentView({
   )
 
   const tabs = [
-    ...(finished ? [{ key: 'results', label: t('product.tab.results') }] : []),
+    ...(hasResults ? [{ key: 'results', label: t('product.tab.results') }] : []),
     ...(hasGroups ? [{ key: 'pools', label: t('product.tab.pools') }] : []),
     ...(hasKnockout ? [{ key: 'bracket', label: t('product.tab.bracket') }] : []),
     ...(hasAnyCalendar ? [{ key: 'calendar', label: t('product.tab.calendar') }] : []),
@@ -61,7 +64,7 @@ export function TournamentView({
     ...(hasInfo ? [{ key: 'info', label: t('product.tab.info') }] : []),
     { key: 'mine', label: t('product.tab.mine') },
   ]
-  const [tab, setTab] = useState(() => searchParams.get('tab') ?? (finished ? 'results' : 'pools'))
+  const [tab, setTab] = useState(() => searchParams.get('tab') ?? (hasResults ? 'results' : 'pools'))
   const activeTab = tabs.find((t) => t.key === tab) ? tab : tabs[0]?.key
 
   // Persist the active tab in the URL (shareable / restored on back) without a navigation.
@@ -187,7 +190,7 @@ export function TournamentView({
         </div>
       ) : (
         <div className="mt-6">
-          {activeTab === 'results' && finished && <Podium data={data} />}
+          {activeTab === 'results' && hasResults && <Podium data={data} />}
 
           {activeTab === 'mine' &&
             (followed ? (

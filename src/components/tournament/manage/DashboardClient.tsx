@@ -58,11 +58,14 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
   const tag = statusTag(t, tr)
 
   const capacity = t.format.numGroups * t.format.groupSize
+  const isLeague = t.competitionFormat === 'league'
   const drawDone = t.groups.length > 0
   const scheduleDone = t.matches.some((m) => m.phase === 'group')
   const knockoutDone = t.matches.some((m) => m.phase === 'knockout')
-  // The tournament can only be finished once the final phase exists and every match is played.
-  const allMatchesPlayed = knockoutDone && t.matches.every((m) => m.status === 'finished')
+  // Finishable once every match is played — for a league that's just the group
+  // matches; otherwise the final phase must exist too.
+  const allMatchesPlayed =
+    t.matches.length > 0 && t.matches.every((m) => m.status === 'finished') && (isLeague || knockoutDone)
 
   // Dev control states (disable an action once it is complete).
   const seedTarget = t.format.numGroups * t.format.groupSize
@@ -177,15 +180,17 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
             disabled={busy !== null || !drawDone || scheduleDone}
             onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
           />
-          <ControlButton
-            icon={<Trophy className="h-5 w-5" />}
-            label={tr('product.dash.finals')}
-            done={knockoutDone}
-            doneLabel={tr('product.dash.finalsDone')}
-            loading={busy === 'generate-knockout'}
-            disabled={busy !== null || !scheduleDone || knockoutDone}
-            onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
-          />
+          {!isLeague && (
+            <ControlButton
+              icon={<Trophy className="h-5 w-5" />}
+              label={tr('product.dash.finals')}
+              done={knockoutDone}
+              doneLabel={tr('product.dash.finalsDone')}
+              loading={busy === 'generate-knockout'}
+              disabled={busy !== null || !scheduleDone || knockoutDone}
+              onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
+            />
+          )}
           <ControlButton
             icon={<Flag className="h-5 w-5" />}
             label={tr('product.dash.finish')}
