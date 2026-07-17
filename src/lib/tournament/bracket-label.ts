@@ -1,32 +1,40 @@
 import type { Translate } from '@/i18n'
+import { classifyBracket } from './bracket-kind'
 
 // Knockout/classification labels are generated in French and stored on the match
-// (bracket.ts). They're a small, stable set + two parametrized patterns, so we
-// map them back to translation keys at render time. Anything unrecognized falls
-// through to the raw (French) label — same graceful degradation as before i18n.
-const EXACT: Record<string, string> = {
-  Finale: 'product.bracket.final',
-  'Demi-finale': 'product.bracket.semi',
-  'Quart de finale': 'product.bracket.quarter',
-  '8e de finale': 'product.bracket.r16',
-  '16e de finale': 'product.bracket.r32',
-  'Petite finale (3e place)': 'product.bracket.thirdPlace',
-  'Barrage classement': 'product.bracket.playoff',
-  Classement: 'product.bracket.ranking',
-}
-
+// (bracket.ts). classifyBracket turns a label into its typed identity; here we
+// map that identity to a translation key. Unknown labels fall through to the raw
+// (French) label — same graceful degradation as before i18n.
 /** Localize a stored (FR) bracket label. Returns '' for null, raw label if unknown. */
 export function localizeBracketLabel(label: string | null | undefined, t: Translate): string {
   if (!label) return ''
-  const key = EXACT[label]
-  if (key) return t(key)
-  let m = /^Tour \((\d+) matchs\)$/.exec(label)
-  if (m) return t('product.bracket.roundMatches').replace('{count}', m[1])
-  m = /^Places (\d+)-(\d+)$/.exec(label)
-  if (m) return t('product.bracket.placesRange').replace('{lo}', m[1]).replace('{hi}', m[2])
-  m = /^Place (\d+)$/.exec(label)
-  if (m) return t('product.bracket.placeSingle').replace('{n}', m[1])
-  return label
+  const k = classifyBracket(label)
+  switch (k.kind) {
+    case 'final':
+      return t('product.bracket.final')
+    case 'semi':
+      return t('product.bracket.semi')
+    case 'quarter':
+      return t('product.bracket.quarter')
+    case 'r16':
+      return t('product.bracket.r16')
+    case 'r32':
+      return t('product.bracket.r32')
+    case 'thirdPlace':
+      return t('product.bracket.thirdPlace')
+    case 'playoff':
+      return t('product.bracket.playoff')
+    case 'ranking':
+      return t('product.bracket.ranking')
+    case 'roundMatches':
+      return t('product.bracket.roundMatches').replace('{count}', String(k.count))
+    case 'placement':
+      return t('product.bracket.placesRange').replace('{lo}', String(k.lo)).replace('{hi}', String(k.hi))
+    case 'placeSingle':
+      return t('product.bracket.placeSingle').replace('{n}', String(k.n))
+    case 'other':
+      return k.raw
+  }
 }
 
 // Final-ranking notes are generated in French (final-ranking.ts noteFor()).

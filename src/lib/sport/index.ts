@@ -1,13 +1,26 @@
 import type { SportId, SportProfile } from './types'
 import { futsal } from './profiles/futsal'
+import { basket } from './profiles/basket'
+import { handball } from './profiles/handball'
+import { padel } from './profiles/padel'
+import { volleyball } from './profiles/volleyball'
+import { tennis } from './profiles/tennis'
+import { pingpong } from './profiles/pingpong'
 
-export type { SportId, SportProfile, ScoringRules } from './types'
+export type { SportId, SportProfile, ScoringRules, ScoreLabel, SportUnit } from './types'
+export { scoreLabelKeys } from './standings-labels'
 
 /** Default sport — what existing tournaments (and tournaments with no sport set) use. */
 export const DEFAULT_SPORT: SportId = 'futsal'
 
 const PROFILES: Record<SportId, SportProfile> = {
   futsal,
+  basket,
+  handball,
+  padel,
+  volleyball,
+  tennis,
+  pingpong,
 }
 
 /**
@@ -20,4 +33,4 @@ export function getSportProfile(id: SportId | string | null | undefined): SportP
 
 export const ALL_SPORTS: readonly SportProfile[] = Object.values(PROFILES)
 
-export { futsal }
+export { futsal, basket, handball, padel, volleyball, tennis, pingpong }

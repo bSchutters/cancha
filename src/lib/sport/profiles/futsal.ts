@@ -8,4 +8,7 @@ export const futsal: SportProfile = {
   id: 'futsal',
   label: 'Futsal / Football',
   scoring: { win: 3, draw: 1, loss: 0 },
+  drawsAllowed: true,
+  scoreLabel: 'goals',
+  unit: 'team',
 }

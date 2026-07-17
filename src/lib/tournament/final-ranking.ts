@@ -1,4 +1,5 @@
 import type { Id } from './types'
+import { isPlaceMatch as isPlaceLabel, isPetiteMatch as isPetiteLabel } from './bracket-kind'
 
 export interface FinalMatchInput {
   phase: 'group' | 'knockout' | 'classification'
@@ -26,7 +27,7 @@ export interface FinalRankEntry {
  * (e.g. "5-8"). Pure: returns team ids only - callers attach names/logos.
  */
 /** A placement match decides an exact place pair, e.g. "Places 5-6", "Places 9-10". */
-const isPlaceMatch = (m: FinalMatchInput) => /places?\s*\d+\s*[-–]\s*\d+/i.test(m.bracketLabel ?? '')
+const isPlaceMatch = (m: FinalMatchInput) => isPlaceLabel(m.bracketLabel)
 
 function noteFor(pos: number): string {
   if (pos === 1) return 'Champion'
@@ -56,7 +57,7 @@ export function computeFinalRanking(matches: FinalMatchInput[]): FinalRankEntry[
     return w === m.homeTeamId ? m.awayTeamId : m.homeTeamId
   }
 
-  const isPetite = (m: FinalMatchInput) => (m.bracketLabel ?? '').toLowerCase().includes('petite')
+  const isPetite = (m: FinalMatchInput) => isPetiteLabel(m.bracketLabel)
   const petiteMatch = ko.find((m) => m.round === maxRound && isPetite(m))
   const finalMatch = ko.find((m) => m.round === maxRound && !isPetite(m))
 

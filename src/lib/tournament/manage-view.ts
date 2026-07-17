@@ -6,7 +6,7 @@ import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { getSessionUser, getUserTenantId } from './session'
 import { computeFinalRanking as computeFinalRankingRaw, type FinalMatchInput } from './final-ranking'
-import type { Id, MatchResult, TeamRef } from './types'
+import type { Id, MatchResult, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
 import { isLocale, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
 
@@ -40,6 +40,7 @@ export interface ManageMatch {
   awayLogoUrl: string | null
   scoreHome: number | null
   scoreAway: number | null
+  setScores: { home: number; away: number }[]
   fairplayWinner: 'home' | 'away' | 'none'
   penaltyWinner: 'home' | 'away' | null
   penaltyHome: number | null
@@ -93,6 +94,7 @@ export interface ManageTournament {
   manageLocale: Locale
   publicLocale: Locale
   sport: SportId
+  competitionFormat: TournamentFormat
   format: {
     numGroups: number
     groupSize: number
@@ -248,6 +250,9 @@ export async function buildManageTournament(
     })(),
     scoreHome: typeof m.score_home === 'number' ? m.score_home : null,
     scoreAway: typeof m.score_away === 'number' ? m.score_away : null,
+    setScores: Array.isArray(m.set_scores)
+      ? m.set_scores.map((s: { home?: unknown; away?: unknown }) => ({ home: Number(s.home ?? 0), away: Number(s.away ?? 0) }))
+      : [],
     fairplayWinner: m.fairplay_winner ?? 'none',
     penaltyWinner: m.penalty_winner ?? null,
     penaltyHome: typeof m.penalty_home === 'number' ? m.penalty_home : null,
@@ -363,6 +368,7 @@ export async function buildManageTournament(
     manageLocale: isLocale(t.manage_locale) ? t.manage_locale : DEFAULT_LOCALE,
     publicLocale: isLocale(t.public_locale) ? t.public_locale : DEFAULT_LOCALE,
     sport: getSportProfile(t.sport).id,
+    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
     format: {
       numGroups: t.num_groups ?? 0,
       groupSize: t.group_size ?? 0,

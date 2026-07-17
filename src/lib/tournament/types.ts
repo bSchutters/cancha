@@ -2,6 +2,9 @@
 
 export type Id = number | string
 
+/** Competition structure: pools then a knockout bracket, or a pure league (pools only). */
+export type TournamentFormat = 'groups_ko' | 'league'
+
 export interface TeamRef {
   id: Id
   name: string

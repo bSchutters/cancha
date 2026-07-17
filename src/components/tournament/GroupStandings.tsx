@@ -5,19 +5,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { cn } from '@/lib/utils'
 import { useT } from '@/i18n/use-t'
 import type { PublicGroup } from '@/lib/tournament/public-view'
+import { getSportProfile, scoreLabelKeys, DEFAULT_SPORT, type SportId } from '@/lib/sport'
 
 export function GroupStandings({
   groups,
   qualifiersPerGroup,
   compact = false,
   highlightTeamId,
+  sport = DEFAULT_SPORT,
 }: {
   groups: PublicGroup[]
   qualifiersPerGroup: number
   compact?: boolean
   highlightTeamId?: string
+  sport?: SportId
 }) {
   const t = useT()
+  // The sport decides whether draws can happen (so whether the column is shown)
+  // and which noun the for/against/diff columns use (goals / points / sets).
+  const profile = getSportProfile(sport)
+  const showDraws = profile.drawsAllowed
+  const keys = scoreLabelKeys(profile.scoreLabel)
+  const forShort = t(`product.standings.${keys.for}.short`)
+  const forTitle = t(`product.standings.${keys.for}.title`)
+  const againstShort = t(`product.standings.${keys.against}.short`)
+  const againstTitle = t(`product.standings.${keys.against}.title`)
+  const diffShort = t(`product.standings.${keys.diff}.short`)
+  const diffTitle = t(`product.standings.${keys.diff}.title`)
   if (groups.length === 0) return null
   return (
     <div className={cn('grid gap-6', compact ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2')}>
@@ -38,20 +52,22 @@ export function GroupStandings({
                   <TableHead className="px-1 text-center" title={t('product.standings.wins.title')}>
                     {t('product.standings.wins.short')}
                   </TableHead>
-                  <TableHead className="px-1 text-center" title={t('product.standings.draws.title')}>
-                    {t('product.standings.draws.short')}
-                  </TableHead>
+                  {showDraws && (
+                    <TableHead className="px-1 text-center" title={t('product.standings.draws.title')}>
+                      {t('product.standings.draws.short')}
+                    </TableHead>
+                  )}
                   <TableHead className="px-1 text-center" title={t('product.standings.losses.title')}>
                     {t('product.standings.losses.short')}
                   </TableHead>
-                  <TableHead className="px-1 text-center" title={t('product.standings.goalsFor.title')}>
-                    {t('product.standings.goalsFor.short')}
+                  <TableHead className="px-1 text-center" title={forTitle}>
+                    {forShort}
                   </TableHead>
-                  <TableHead className="px-1 text-center" title={t('product.standings.goalsAgainst.title')}>
-                    {t('product.standings.goalsAgainst.short')}
+                  <TableHead className="px-1 text-center" title={againstTitle}>
+                    {againstShort}
                   </TableHead>
-                  <TableHead className="px-1 text-center" title={t('product.standings.goalDiff.title')}>
-                    {t('product.standings.goalDiff.short')}
+                  <TableHead className="px-1 text-center" title={diffTitle}>
+                    {diffShort}
                   </TableHead>
                   <TableHead className="px-1 text-center font-bold text-foreground">
                     {t('product.standings.points.short')}
@@ -86,7 +102,9 @@ export function GroupStandings({
                       </TableCell>
                       <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.played}</TableCell>
                       <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.wins}</TableCell>
-                      <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.draws}</TableCell>
+                      {showDraws && (
+                        <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.draws}</TableCell>
+                      )}
                       <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.losses}</TableCell>
                       <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.goalsFor}</TableCell>
                       <TableCell className="px-1 text-center tabular-nums text-muted-foreground">{s.goalsAgainst}</TableCell>

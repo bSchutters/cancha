@@ -80,6 +80,15 @@ export function MatchCard({ match, showMeta = true }: { match: PublicMatch; show
           penaltyWin={match.penaltyWinner === 'away'}
         />
       </div>
+      {match.setScores.length > 0 && (
+        <p className="mt-1.5 text-center text-xs tabular-nums text-muted-foreground">
+          {match.setScores.map((s, i) => (
+            <span key={i} className="mx-1">
+              {s.home}-{s.away}
+            </span>
+          ))}
+        </p>
+      )}
       {match.refereeName && (
         <p className="mt-1 text-xs text-muted-foreground">
           {t('product.match.referee')} : {match.refereeName}

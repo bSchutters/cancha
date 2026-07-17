@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import { localizeBracketLabel, localizeFeederName } from '@/lib/tournament/bracket-label'
+import { getSportProfile, scoreLabelKeys } from '@/lib/sport'
 import type { PublicMatch, PublicTournament } from '@/lib/tournament/public-view'
 import { useTournamentLive } from './useTournamentLive'
 import { BracketView } from './BracketView'
@@ -150,18 +151,24 @@ function CurrentMatchesPanel({ data }: { data: PublicTournament }) {
 
 type StatCol = { key: string; value: (s: PublicTournament['groups'][number]['standings'][number]) => string | number }
 
-const FULL_STATS: StatCol[] = [
-  { key: 'played', value: (s) => s.played },
-  { key: 'wins', value: (s) => s.wins },
-  { key: 'draws', value: (s) => s.draws },
-  { key: 'losses', value: (s) => s.losses },
-  { key: 'goalsFor', value: (s) => s.goalsFor },
-  { key: 'goalsAgainst', value: (s) => s.goalsAgainst },
-  { key: 'goalDiff', value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
-]
+// Columns depend on the sport: no draws column when the sport can't draw, and
+// goals vs points labels for the for/against/diff columns.
+function statsFor(sportId: PublicTournament['sport']): StatCol[] {
+  const profile = getSportProfile(sportId)
+  const keys = scoreLabelKeys(profile.scoreLabel)
+  return [
+    { key: 'played', value: (s) => s.played },
+    { key: 'wins', value: (s) => s.wins },
+    ...(profile.drawsAllowed ? ([{ key: 'draws', value: (s) => s.draws }] as StatCol[]) : []),
+    { key: 'losses', value: (s) => s.losses },
+    { key: keys.for, value: (s) => s.goalsFor },
+    { key: keys.against, value: (s) => s.goalsAgainst },
+    { key: keys.diff, value: (s) => (s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference) },
+  ]
+}
 function StandingsGrid({ data, columns }: { data: PublicTournament; columns: string }) {
   const t = useT()
-  const stats = FULL_STATS
+  const stats = statsFor(data.sport)
   const statCols = 'w-9 text-center tabular-nums'
   return (
     <div className={`grid ${columns} items-start gap-4`}>

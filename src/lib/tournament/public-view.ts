@@ -1,12 +1,12 @@
 import type { Payload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import { computeStandings } from './standings'
-import { getSportProfile } from '../sport'
+import { getSportProfile, type SportId } from '../sport'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { computeFinalRanking } from './final-ranking'
 import { rankAll, type RankingDepth } from './bracket'
-import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef } from './types'
+import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
 
 /** Reads the configured ranking depth from a tournament doc (default: full). */
@@ -50,6 +50,7 @@ export interface PublicMatch {
   awayLogoUrl: string | null
   scoreHome: number | null
   scoreAway: number | null
+  setScores: { home: number; away: number }[]
   penaltyWinner: 'home' | 'away' | null
   penaltyHome: number | null
   penaltyAway: number | null
@@ -77,6 +78,8 @@ export interface PublicTournament extends PublicTournamentSummary {
   drawRevealed: boolean
   /** Global schedule delay in minutes (already applied to scheduledTime). */
   scheduleOffsetMin: number
+  sport: SportId
+  competitionFormat: TournamentFormat
   format: { numGroups: number; qualifiersPerGroup: number }
   payment: { iban: string | null; amount: number | null; communication: string | null } | null
   groups: PublicGroup[]
@@ -282,6 +285,9 @@ export async function buildPublicTournament(
     })(),
     scoreHome: typeof m.score_home === 'number' ? m.score_home : null,
     scoreAway: typeof m.score_away === 'number' ? m.score_away : null,
+    setScores: Array.isArray(m.set_scores)
+      ? m.set_scores.map((s: { home?: unknown; away?: unknown }) => ({ home: Number(s.home ?? 0), away: Number(s.away ?? 0) }))
+      : [],
     penaltyWinner: m.penalty_winner ?? null,
     penaltyHome: typeof m.penalty_home === 'number' ? m.penalty_home : null,
     penaltyAway: typeof m.penalty_away === 'number' ? m.penalty_away : null,
@@ -367,6 +373,7 @@ export async function buildPublicTournament(
           awayTeamId: m.awayTeamId,
           scoreHome: m.scoreHome,
           scoreAway: m.scoreAway,
+          setScores: m.setScores,
           penaltyWinner: m.penaltyWinner,
           status: m.status,
         })),
@@ -430,6 +437,7 @@ export async function buildPublicTournament(
       awayLogoUrl: null,
       scoreHome: null,
       scoreAway: null,
+      setScores: [],
       penaltyWinner: null,
       penaltyHome: null,
       penaltyAway: null,
@@ -476,6 +484,8 @@ export async function buildPublicTournament(
     description: t.description ?? null,
     drawRevealed: t.draw_revealed === true,
     scheduleOffsetMin: offset,
+    sport: getSportProfile(t.sport).id,
+    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
     format: { numGroups: t.num_groups ?? 0, qualifiersPerGroup: t.qualifiers_per_group ?? 0 },
     payment: registrationOpen
       ? {
