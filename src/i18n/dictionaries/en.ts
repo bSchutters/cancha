@@ -1167,6 +1167,7 @@ export const en: Dictionary = {
   "product.bracket.winnersSide": "Winners bracket",
   "product.bracket.losersSide": "Losers bracket",
   "product.bracket.grandFinal": "Grand final",
+  "product.bracket.repechage": "Losers round {n}",
   "product.ranking.champion": "Champion",
   "product.ranking.finalist": "Runner-up",
   "product.ranking.third": "3rd place",

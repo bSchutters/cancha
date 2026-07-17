@@ -1167,6 +1167,7 @@ export const nl: Dictionary = {
   "product.bracket.winnersSide": "Winnaarsschema",
   "product.bracket.losersSide": "Verliezersschema",
   "product.bracket.grandFinal": "Grote finale",
+  "product.bracket.repechage": "Herkansing {n}",
   "product.ranking.champion": "Kampioen",
   "product.ranking.finalist": "Finalist",
   "product.ranking.third": "3e plaats",

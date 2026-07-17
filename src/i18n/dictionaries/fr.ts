@@ -1166,6 +1166,7 @@ export const fr: Record<string, string> = {
   "product.bracket.winnersSide": "Tableau des gagnants",
   "product.bracket.losersSide": "Tableau des perdants",
   "product.bracket.grandFinal": "Grande finale",
+  "product.bracket.repechage": "Repêchage {n}",
   "product.ranking.champion": "Champion",
   "product.ranking.finalist": "Finaliste",
   "product.ranking.third": "3e place",
