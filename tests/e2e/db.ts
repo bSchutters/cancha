@@ -61,3 +61,63 @@ export async function resetE2eData() {
 }
 
 export const ADMIN = { email: 'admin@e2e.test', password: 'E2eTest!2026' as const }
+
+/**
+ * Seed a live Padel tournament with one finished group match whose per-set
+ * scores are 6-4 / 3-6 / 6-2 (so the match is won 2 sets to 1). Idempotent —
+ * clears any previous `e2e-padel` data first. Returns the public slug.
+ */
+export async function seedPadelTournament() {
+  const oid = () => crypto.randomBytes(12).toString('hex')
+  const slug = 'e2e-padel'
+  return withDb(async (c) => {
+    // Clean previous run (matches cascade their set_scores rows).
+    await c.query(
+      `delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`,
+      [slug],
+    )
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, ['e2e-club'])
+
+    const org = await c.query(`insert into organizations (name, slug) values ('E2E Club', 'e2e-club') returning id`)
+    const orgId = org.rows[0].id
+
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, status, num_groups, group_size, qualifiers_per_group, draw_revealed, tenant_id)
+       values ('E2E Padel', $1, 'padel', 'live', 2, 2, 1, true, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+
+    const team = async (name: string) =>
+      (
+        await c.query(
+          `insert into tournament_teams (tournament_id, name, representative_email, representative_phone, group_label, registration_status)
+           values ($1, $2, 'e2e@e2e.test', '+32000', 'A', 'confirmed') returning id`,
+          [tourId, name],
+        )
+      ).rows[0].id
+    const home = await team('Dupont / Martin')
+    const away = await team('Nadal / Federer')
+
+    const match = await c.query(
+      `insert into tournament_matches (tournament_id, tenant_id, phase, group_label, round, court, scheduled_time, home_team_id, away_team_id, score_home, score_away, status)
+       values ($1, $2, 'group', 'A', 1, 1, '10:00', $3, $4, 2, 1, 'finished') returning id`,
+      [tourId, orgId, home, away],
+    )
+    const matchId = match.rows[0].id
+    const sets = [
+      [6, 4],
+      [3, 6],
+      [6, 2],
+    ]
+    for (let i = 0; i < sets.length; i++) {
+      await c.query(
+        `insert into tournament_matches_set_scores (_order, _parent_id, id, home, away) values ($1, $2, $3, $4, $5)`,
+        [i + 1, matchId, oid(), sets[i][0], sets[i][1]],
+      )
+    }
+    return slug
+  })
+}
