@@ -1,5 +1,6 @@
 import type { CourtConfig, DrawnGroup, Id, ScheduledMatch, TimeParams } from './types'
 import { makeRng, shuffle, type Rng } from './rng'
+import { isPlaceMatch, isPetiteMatch } from './bracket-kind'
 
 const BYE = Symbol('bye')
 type Slot = Id | typeof BYE
@@ -124,8 +125,6 @@ function addMinutes(hhmm: string, min: number): string {
   return toHHMM(((toMinutes(hhmm) + min) % 1440 + 1440) % 1440)
 }
 
-const isPlaceMatch = (label?: string | null) => /places?\s*\d+\s*[-–]\s*\d+/i.test(label ?? '')
-const isPetiteMatch = (label?: string | null) => (label ?? '').toLowerCase().includes('petite')
 
 /**
  * Multi-chain finals scheduler. Generalises the old even/odd interleave to any
