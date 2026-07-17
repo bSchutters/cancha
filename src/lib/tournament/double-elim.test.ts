@@ -91,6 +91,21 @@ describe('generateDoubleElim', () => {
     }
   })
 
+  it('leaves the winner-source key null on loser-fed slots (so they read "Perdant")', () => {
+    for (const n of [4, 8, 16]) {
+      const ms = generateDoubleElim(teams(n))
+      const map = byKey(ms)
+      for (const m of ms) {
+        if (!m.loserNextMatchKey || !m.loserNextSlot) continue
+        const target = map.get(m.loserNextMatchKey)!
+        const sourceKey = m.loserNextSlot === 'home' ? target.homeSourceKey : target.awaySourceKey
+        // A slot fed by a loser must NOT also declare a winner source, or the
+        // public placeholder would wrongly read "Vainqueur …".
+        expect(sourceKey ?? null).toBeNull()
+      }
+    }
+  })
+
   it('sends the WB champion and the LB champion to the grand final', () => {
     const ms = generateDoubleElim(teams(8))
     const map = byKey(ms)

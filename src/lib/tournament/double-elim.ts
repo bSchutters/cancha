@@ -119,8 +119,9 @@ export function generateDoubleElim(teams: SeededTeam[]): BracketMatch[] {
   const firstLosers = wbByRound[0]
   for (let i = 0; i < firstLosers.length / 2; i++) {
     const key = `LB-R${lbRoundNum}-M${i}`
-    const homeSrc = firstLosers[2 * i]
-    const awaySrc = firstLosers[2 * i + 1]
+    // Both slots are fed by WB-R1 LOSERS: leave the (winner) source keys null so
+    // the placeholder reads "Perdant …", not "Vainqueur …". The loser links carry
+    // the routing, exactly like a 3rd-place match.
     add({
       key,
       phase: 'knockout',
@@ -129,15 +130,15 @@ export function generateDoubleElim(teams: SeededTeam[]): BracketMatch[] {
       bracketSide: 'losers',
       homeTeamId: null,
       awayTeamId: null,
-      homeSourceKey: homeSrc,
-      awaySourceKey: awaySrc,
+      homeSourceKey: null,
+      awaySourceKey: null,
       nextMatchKey: null,
       nextSlot: null,
       loserNextMatchKey: null,
       loserNextSlot: null,
     })
-    linkLoser(homeSrc, key, 'home')
-    linkLoser(awaySrc, key, 'away')
+    linkLoser(firstLosers[2 * i], key, 'home')
+    linkLoser(firstLosers[2 * i + 1], key, 'away')
     cur.push(key)
   }
   lbRoundNum++
@@ -148,6 +149,8 @@ export function generateDoubleElim(teams: SeededTeam[]): BracketMatch[] {
     const next: string[] = []
     for (let i = 0; i < cur.length; i++) {
       const key = `LB-R${lbRoundNum}-M${i}`
+      // Home = LB survivor (winner-fed → source key set). Away = demoted WB loser
+      // (loser-fed → source key null so the placeholder reads "Perdant …").
       add({
         key,
         phase: 'knockout',
@@ -157,7 +160,7 @@ export function generateDoubleElim(teams: SeededTeam[]): BracketMatch[] {
         homeTeamId: null,
         awayTeamId: null,
         homeSourceKey: cur[i],
-        awaySourceKey: wbLosers[i],
+        awaySourceKey: null,
         nextMatchKey: null,
         nextSlot: null,
         loserNextMatchKey: null,
