@@ -60,6 +60,9 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
   const capacity = t.format.numGroups * t.format.groupSize
   const isLeague = t.competitionFormat === 'league'
   const isSingleElim = t.competitionFormat === 'single_elim'
+  const isDoubleElim = t.competitionFormat === 'double_elim'
+  // Single and double elimination share the same "generate the bracket" step.
+  const isBracket = isSingleElim || isDoubleElim
   const isSwiss = t.competitionFormat === 'swiss'
   const drawDone = t.groups.length > 0
   const scheduleDone = t.matches.some((m) => m.phase === 'group')
@@ -188,7 +191,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
               disabled={busy !== null || !canGenSwiss || t.counts.confirmed < 2}
               onClick={() => post('generate-swiss-round', tr('product.dash.lbl.swissRound'))}
             />
-          ) : isSingleElim ? (
+          ) : isBracket ? (
             <ControlButton
               icon={<Trophy className="h-5 w-5" />}
               label={tr('product.dash.genBracket')}

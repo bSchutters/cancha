@@ -126,6 +126,39 @@ export async function seedSingleElimTournament() {
 }
 
 /**
+ * Seed a double-elimination tournament with 4 confirmed teams (a power of two)
+ * and NO matches yet — ready for the "Générer le tableau" action. Idempotent.
+ * Returns the slug.
+ */
+export async function seedDoubleElimTournament() {
+  const slug = 'e2e-double'
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, ['e2e-double-club'])
+
+    const org = await c.query(`insert into organizations (name, slug) values ('E2E Double Club', 'e2e-double-club') returning id`)
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, tenant_id)
+       values ('E2E Double', $1, 'futsal', 'double_elim', 'registration_closed', 2, 2, 1, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+    for (const name of ['Duo A', 'Duo B', 'Duo C', 'Duo D']) {
+      await c.query(
+        // tenant_id must match the tournament's — match creation validates it.
+        `insert into tournament_teams (tournament_id, tenant_id, name, representative_email, representative_phone, registration_status)
+         values ($1, $2, $3, 'e2e@e2e.test', '+32000', 'confirmed')`,
+        [tourId, orgId, name],
+      )
+    }
+    return slug
+  })
+}
+
+/**
  * Seed a finished LEAGUE (championnat) — futsal, one round-robin group of three
  * teams, all matches played. A league has no finals, so its standings are the
  * result. Idempotent. Returns the public slug.

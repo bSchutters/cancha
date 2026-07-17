@@ -8,8 +8,12 @@ export type Id = number | string
  *  - league: pools only (the standings are the result)
  *  - single_elim: a single-elimination bracket seeded from all teams (no pools)
  *  - swiss: fixed number of rounds, each paired by current score (no elimination)
+ *  - double_elim: winners + losers brackets; a team is out after two losses
  */
-export type TournamentFormat = 'groups_ko' | 'league' | 'single_elim' | 'swiss'
+export type TournamentFormat = 'groups_ko' | 'league' | 'single_elim' | 'swiss' | 'double_elim'
+
+/** Which half of a double-elimination draw a match belongs to. */
+export type BracketSide = 'winners' | 'losers' | 'grand_final'
 
 export interface TeamRef {
   id: Id
@@ -98,4 +102,6 @@ export interface BracketMatch {
   /** For semifinals feeding a 3rd-place match: where the LOSER goes. */
   loserNextMatchKey?: string | null
   loserNextSlot?: 'home' | 'away' | null
+  /** In a double-elimination draw, which half this match sits in. */
+  bracketSide?: BracketSide
 }

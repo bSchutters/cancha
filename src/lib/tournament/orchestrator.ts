@@ -7,6 +7,7 @@ import { getSportProfile } from '../sport'
 import { makeRng, shuffle } from './rng'
 import { pairSwissRound, type SwissMatchResult } from './swiss'
 import { rankAll, generateKnockout, type RankingDepth } from './bracket'
+import { generateDoubleElim as buildDoubleElim, isPowerOfTwo } from './double-elim'
 import type {
   CourtConfig,
   DrawnGroup,
@@ -427,6 +428,105 @@ export async function generateSingleElim(payload: Payload, tournamentId: Id) {
         tournament: tournamentId,
         phase: b.phase,
         bracket_label: b.bracketLabel,
+        round: b.round,
+        scheduled_time: sched.time ?? undefined,
+        court: sched.court ?? undefined,
+        home_team: b.homeTeamId ?? undefined,
+        away_team: b.awayTeamId ?? undefined,
+        fairplay_winner: 'none',
+        status: 'scheduled',
+      },
+    })
+    keyToId.set(b.key, created.id as number)
+  }
+  for (const b of all) {
+    const data: AnyDoc = {}
+    if (b.nextMatchKey && keyToId.has(b.nextMatchKey)) {
+      data.next_match = keyToId.get(b.nextMatchKey)
+      data.next_slot = b.nextSlot
+    }
+    if (b.loserNextMatchKey && keyToId.has(b.loserNextMatchKey)) {
+      data.loser_next_match = keyToId.get(b.loserNextMatchKey)
+      data.loser_next_slot = b.loserNextSlot
+    }
+    if (b.homeSourceKey && keyToId.has(b.homeSourceKey)) data.home_source_match = keyToId.get(b.homeSourceKey)
+    if (b.awaySourceKey && keyToId.has(b.awaySourceKey)) data.away_source_match = keyToId.get(b.awaySourceKey)
+    if (Object.keys(data).length > 0) {
+      await payload.update({ collection: 'tournament-matches', id: keyToId.get(b.key)!, data })
+    }
+  }
+
+  await payload.update({ collection: 'tournaments', id: tournamentId, data: { status: 'live' } })
+  return { matches: all.length }
+}
+
+/**
+ * Dispatch the "Générer le tableau" action to the right bracket builder based on
+ * the tournament's format (single vs double elimination).
+ */
+export async function generateBracket(payload: Payload, tournamentId: Id) {
+  const tournament = await loadTournament(payload, tournamentId)
+  if (tournament.format === 'double_elim') return generateDoubleElim(payload, tournamentId)
+  return generateSingleElim(payload, tournamentId)
+}
+
+/**
+ * Double-elimination format: seed ALL confirmed teams into a winners + losers
+ * draw. Everyone starts in the winners bracket; a first loss demotes to the
+ * losers bracket, a second loss eliminates. Winner AND loser propagation are
+ * both handled by the match afterChange hook (loser routing already exists for
+ * 3rd-place matches), so we only persist the links. Power-of-two fields only.
+ */
+export async function generateDoubleElim(payload: Payload, tournamentId: Id) {
+  const tournament = await loadTournament(payload, tournamentId)
+  if (tournament.format !== 'double_elim') {
+    throw new TournamentError('PRECONDITION_FAILED', 'Ce tournoi n’est pas en double élimination.')
+  }
+  const existing = await payload.find({
+    collection: 'tournament-matches',
+    where: { tournament: { equals: tournamentId } },
+    limit: 1,
+    depth: 0,
+  })
+  if (existing.docs.length > 0) {
+    throw new TournamentError('PRECONDITION_FAILED', 'Le tableau existe déjà. Réinitialisez-le avant de régénérer.')
+  }
+  const teamDocs = await confirmedTeams(payload, tournamentId)
+  if (!isPowerOfTwo(teamDocs.length)) {
+    throw new TournamentError(
+      'PRECONDITION_FAILED',
+      'La double élimination demande un nombre d’équipes en puissance de deux (4, 8, 16…).',
+    )
+  }
+
+  const seeded = shuffle(
+    teamDocs.map((t) => ({ id: t.id as Id, name: String(t.name) })),
+    makeRng(Date.now()),
+  )
+  const all = buildDoubleElim(seeded)
+
+  const { scheduleOf } = buildScheduleMaps(
+    all.map((b) => ({
+      id: b.key,
+      phase: b.phase,
+      round: b.round,
+      bracketLabel: b.bracketLabel,
+      nextMatchId: b.nextMatchKey,
+      loserNextMatchId: b.loserNextMatchKey,
+    })),
+    scheduleConfigOf(tournament),
+  )
+
+  const keyToId = new Map<string, number>()
+  for (const b of all) {
+    const sched = scheduleOf({ id: b.key, phase: b.phase, round: b.round })
+    const created = await payload.create({
+      collection: 'tournament-matches',
+      data: {
+        tournament: tournamentId,
+        phase: b.phase,
+        bracket_label: b.bracketLabel,
+        bracket_side: b.bracketSide,
         round: b.round,
         scheduled_time: sched.time ?? undefined,
         court: sched.court ?? undefined,
