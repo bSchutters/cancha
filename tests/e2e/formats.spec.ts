@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { seedUser, seedLeagueTournament, seedSingleElimTournament, waitForSchema, ADMIN } from './db'
+import { seedUser, seedLeagueTournament, seedSingleElimTournament, seedSwissTournament, waitForSchema, ADMIN } from './db'
 
 async function login(page: import('@playwright/test').Page) {
   await page.goto('/fr/login')
@@ -44,5 +44,24 @@ test.describe('single-elimination format', () => {
     // The generated bracket shows up as an "Arbre" (bracket) tab on the public page.
     await page.goto(`/fr/${slug}`)
     await expect(page.getByRole('button', { name: 'Arbre' })).toBeVisible()
+  })
+})
+
+test.describe('swiss format', () => {
+  test('generates a round via the dashboard and shows the standings', async ({ page }) => {
+    const slug = await seedSwissTournament()
+    await login(page)
+    await page.goto(`/fr/manage/${slug}`)
+
+    // One repeatable "Générer la ronde suivante" step (starts at round 0/3).
+    const [resp] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/generate-swiss-round') && r.request().method() === 'POST'),
+      page.getByRole('button', { name: /Générer la ronde suivante/ }).click(),
+    ])
+    expect(resp.ok()).toBeTruthy()
+
+    // The public page now ranks the teams (one pool, seeded by score).
+    await page.goto(`/fr/${slug}`)
+    await expect(page.getByText('Swiss A').first()).toBeVisible()
   })
 })
