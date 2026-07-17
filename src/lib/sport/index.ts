@@ -3,6 +3,9 @@ import { futsal } from './profiles/futsal'
 import { basket } from './profiles/basket'
 import { handball } from './profiles/handball'
 import { padel } from './profiles/padel'
+import { volleyball } from './profiles/volleyball'
+import { tennis } from './profiles/tennis'
+import { pingpong } from './profiles/pingpong'
 
 export type { SportId, SportProfile, ScoringRules, ScoreLabel, SportUnit } from './types'
 export { scoreLabelKeys } from './standings-labels'
@@ -15,6 +18,9 @@ const PROFILES: Record<SportId, SportProfile> = {
   basket,
   handball,
   padel,
+  volleyball,
+  tennis,
+  pingpong,
 }
 
 /**
@@ -27,4 +33,4 @@ export function getSportProfile(id: SportId | string | null | undefined): SportP
 
 export const ALL_SPORTS: readonly SportProfile[] = Object.values(PROFILES)
 
-export { futsal, basket, handball, padel }
+export { futsal, basket, handball, padel, volleyball, tennis, pingpong }

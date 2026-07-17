@@ -12,7 +12,14 @@
 // something consumes it.
 
 /** Sport identifiers. Grows as sports are added, one profile at a time. */
-export type SportId = 'futsal' | 'basket' | 'handball' | 'padel'
+export type SportId =
+  | 'futsal'
+  | 'basket'
+  | 'handball'
+  | 'padel'
+  | 'volleyball'
+  | 'tennis'
+  | 'pingpong'
 
 /** Points awarded in the group stage (round-robin). */
 export interface ScoringRules {
