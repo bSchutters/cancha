@@ -136,6 +136,17 @@ export const TournamentMatches: CollectionConfig = {
       admin: { condition: (data) => data?.phase !== 'group' },
     },
     {
+      name: 'bracket_side',
+      type: 'select',
+      options: [
+        { label: 'Tableau des gagnants', value: 'winners' },
+        { label: 'Tableau des perdants', value: 'losers' },
+        { label: 'Grande finale', value: 'grand_final' },
+      ],
+      label: 'Côté (double élimination)',
+      admin: { condition: (data) => data?.phase !== 'group', description: 'Renseigné uniquement en double élimination.' },
+    },
+    {
       name: 'scheduled_time',
       type: 'text',
       label: 'Heure (HH:MM)',

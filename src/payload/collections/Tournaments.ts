@@ -149,10 +149,11 @@ export const Tournaments: CollectionConfig = {
             { label: 'Poules + phase finale', value: 'groups_ko' },
             { label: 'Championnat (poules seules)', value: 'league' },
             { label: 'Élimination directe', value: 'single_elim' },
+            { label: 'Double élimination', value: 'double_elim' },
             { label: 'Ronde suisse', value: 'swiss' },
           ],
           label: 'Type de tournoi',
-          admin: { description: 'Poules + tableau, championnat, élimination directe, ou ronde suisse.' },
+          admin: { description: 'Poules + tableau, championnat, élimination directe, double élimination, ou ronde suisse.' },
         },
         {
           name: 'swiss_rounds',

@@ -22,6 +22,10 @@ export function localizeBracketLabel(label: string | null | undefined, t: Transl
       return t('product.bracket.r32')
     case 'thirdPlace':
       return t('product.bracket.thirdPlace')
+    case 'grandFinal':
+      return t('product.bracket.grandFinal')
+    case 'repechage':
+      return t('product.bracket.repechage').replace('{n}', String(k.n))
     case 'playoff':
       return t('product.bracket.playoff')
     case 'ranking':

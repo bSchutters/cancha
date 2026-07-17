@@ -13,6 +13,8 @@ export type BracketKind =
   | { kind: 'r16' } // 8e de finale
   | { kind: 'r32' } // 16e de finale
   | { kind: 'thirdPlace' } // petite finale
+  | { kind: 'grandFinal' } // grande finale (double élimination)
+  | { kind: 'repechage'; n: number } // "Repêchage N" (tableau des perdants)
   | { kind: 'playoff' } // barrage classement
   | { kind: 'ranking' } // classement
   | { kind: 'roundMatches'; count: number } // "Tour (N matchs)"
@@ -27,6 +29,7 @@ const EXACT: Record<string, BracketKind> = {
   '8e de finale': { kind: 'r16' },
   '16e de finale': { kind: 'r32' },
   'Petite finale (3e place)': { kind: 'thirdPlace' },
+  'Grande finale': { kind: 'grandFinal' },
   'Barrage classement': { kind: 'playoff' },
   Classement: { kind: 'ranking' },
 }
@@ -37,6 +40,8 @@ export function classifyBracket(label: string | null | undefined): BracketKind {
   if (exact) return exact
   let m = /^Tour \((\d+) matchs\)$/.exec(label)
   if (m) return { kind: 'roundMatches', count: Number(m[1]) }
+  m = /^Repêchage (\d+)$/.exec(label)
+  if (m) return { kind: 'repechage', n: Number(m[1]) }
   // Lenient (matches the old final-ranking/schedule predicate): spaces, en-dash.
   m = /places?\s*(\d+)\s*[-–]\s*(\d+)/i.exec(label)
   if (m) return { kind: 'placement', lo: Number(m[1]), hi: Number(m[2]) }

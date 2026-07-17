@@ -15,7 +15,7 @@ function isPow2(n: number): boolean {
  * lowest seed, etc. Byes (seed numbers greater than the team count) naturally
  * fall to the top seeds, so a round never exceeds size/2 real matches.
  */
-function standardSeedOrder(size: number): number[] {
+export function standardSeedOrder(size: number): number[] {
   if (size <= 1) return [1]
   let seeds = [1, 2]
   while (seeds.length < size) {
@@ -30,7 +30,7 @@ function standardSeedOrder(size: number): number[] {
   return seeds
 }
 
-function roundLabel(matchesInRound: number): string {
+export function roundLabel(matchesInRound: number): string {
   switch (matchesInRound) {
     case 1:
       return 'Finale'
