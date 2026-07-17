@@ -95,6 +95,7 @@ export interface ManageTournament {
   publicLocale: Locale
   sport: SportId
   competitionFormat: TournamentFormat
+  swissRounds: number
   format: {
     numGroups: number
     groupSize: number
@@ -368,7 +369,8 @@ export async function buildManageTournament(
     manageLocale: isLocale(t.manage_locale) ? t.manage_locale : DEFAULT_LOCALE,
     publicLocale: isLocale(t.public_locale) ? t.public_locale : DEFAULT_LOCALE,
     sport: getSportProfile(t.sport).id,
-    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
+    competitionFormat: (['league', 'single_elim', 'swiss'].includes(t.format) ? t.format : 'groups_ko') as TournamentFormat,
+    swissRounds: typeof t.swiss_rounds === 'number' ? t.swiss_rounds : 5,
     format: {
       numGroups: t.num_groups ?? 0,
       groupSize: t.group_size ?? 0,

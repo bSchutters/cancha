@@ -2,8 +2,14 @@
 
 export type Id = number | string
 
-/** Competition structure: pools then a knockout bracket, or a pure league (pools only). */
-export type TournamentFormat = 'groups_ko' | 'league'
+/**
+ * Competition structure:
+ *  - groups_ko: pools then a knockout bracket (default)
+ *  - league: pools only (the standings are the result)
+ *  - single_elim: a single-elimination bracket seeded from all teams (no pools)
+ *  - swiss: fixed number of rounds, each paired by current score (no elimination)
+ */
+export type TournamentFormat = 'groups_ko' | 'league' | 'single_elim' | 'swiss'
 
 export interface TeamRef {
   id: Id

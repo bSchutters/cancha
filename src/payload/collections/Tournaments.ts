@@ -148,9 +148,23 @@ export const Tournaments: CollectionConfig = {
           options: [
             { label: 'Poules + phase finale', value: 'groups_ko' },
             { label: 'Championnat (poules seules)', value: 'league' },
+            { label: 'Élimination directe', value: 'single_elim' },
+            { label: 'Ronde suisse', value: 'swiss' },
           ],
           label: 'Type de tournoi',
-          admin: { description: 'Poules suivies d’un tableau final, ou championnat (le classement des poules fait office de résultat).' },
+          admin: { description: 'Poules + tableau, championnat, élimination directe, ou ronde suisse.' },
+        },
+        {
+          name: 'swiss_rounds',
+          type: 'number',
+          defaultValue: 5,
+          min: 1,
+          max: 20,
+          label: 'Nombre de rondes (suisse)',
+          admin: {
+            condition: (data) => data?.format === 'swiss',
+            description: 'Nombre de rondes jouées en système suisse.',
+          },
         },
         {
           name: 'sport',

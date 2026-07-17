@@ -59,13 +59,29 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
   const capacity = t.format.numGroups * t.format.groupSize
   const isLeague = t.competitionFormat === 'league'
+  const isSingleElim = t.competitionFormat === 'single_elim'
+  const isSwiss = t.competitionFormat === 'swiss'
   const drawDone = t.groups.length > 0
   const scheduleDone = t.matches.some((m) => m.phase === 'group')
   const knockoutDone = t.matches.some((m) => m.phase === 'knockout')
-  // Finishable once every match is played — for a league that's just the group
-  // matches; otherwise the final phase must exist too.
+
+  // Swiss: rounds are group-phase matches; a new round needs the current one done.
+  const swissRoundNums = t.matches.filter((m) => m.phase === 'group').map((m) => m.round ?? 0)
+  const currentSwissRound = swissRoundNums.length ? Math.max(...swissRoundNums) : 0
+  const currentSwissDone =
+    currentSwissRound === 0 ||
+    t.matches
+      .filter((m) => m.phase === 'group' && (m.round ?? 0) === currentSwissRound)
+      .every((m) => m.status === 'finished')
+  const allSwissRoundsDone = currentSwissRound >= t.swissRounds
+  const canGenSwiss = currentSwissRound < t.swissRounds && currentSwissDone
+
+  // Finishable once every match is played — for a league / swiss that's just the
+  // group matches; otherwise the final phase must exist too.
   const allMatchesPlayed =
-    t.matches.length > 0 && t.matches.every((m) => m.status === 'finished') && (isLeague || knockoutDone)
+    t.matches.length > 0 &&
+    t.matches.every((m) => m.status === 'finished') &&
+    (isLeague || knockoutDone || (isSwiss && allSwissRoundsDone))
 
   // Dev control states (disable an action once it is complete).
   const seedTarget = t.format.numGroups * t.format.groupSize
@@ -162,34 +178,58 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         <h2 className="mb-1 flex items-center gap-2 font-bold text-primary">{tr('product.dash.controlCenter')}</h2>
         <p className="mb-4 text-xs text-muted-foreground">{tr('product.dash.controlIntro')}</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <ControlButton
-            icon={<Dices className="h-5 w-5" />}
-            label={tr('product.dash.draw')}
-            done={drawDone}
-            doneLabel={tr('product.dash.drawDone')}
-            loading={busy === 'draw'}
-            disabled={busy !== null || drawDone}
-            onClick={() => post('draw', tr('product.dash.lbl.draw'))}
-          />
-          <ControlButton
-            icon={<CalendarClock className="h-5 w-5" />}
-            label={tr('product.dash.schedule')}
-            done={scheduleDone}
-            doneLabel={tr('product.dash.scheduleDone')}
-            loading={busy === 'generate-schedule'}
-            disabled={busy !== null || !drawDone || scheduleDone}
-            onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
-          />
-          {!isLeague && (
+          {isSwiss ? (
+            <ControlButton
+              icon={<Dices className="h-5 w-5" />}
+              label={`${tr('product.dash.swissNextRound')} (${currentSwissRound}/${t.swissRounds})`}
+              done={allSwissRoundsDone}
+              doneLabel={tr('product.dash.swissDone')}
+              loading={busy === 'generate-swiss-round'}
+              disabled={busy !== null || !canGenSwiss || t.counts.confirmed < 2}
+              onClick={() => post('generate-swiss-round', tr('product.dash.lbl.swissRound'))}
+            />
+          ) : isSingleElim ? (
             <ControlButton
               icon={<Trophy className="h-5 w-5" />}
-              label={tr('product.dash.finals')}
+              label={tr('product.dash.genBracket')}
               done={knockoutDone}
-              doneLabel={tr('product.dash.finalsDone')}
-              loading={busy === 'generate-knockout'}
-              disabled={busy !== null || !scheduleDone || knockoutDone}
-              onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
+              doneLabel={tr('product.dash.genBracketDone')}
+              loading={busy === 'generate-bracket'}
+              disabled={busy !== null || knockoutDone || t.counts.confirmed < 2}
+              onClick={() => post('generate-bracket', tr('product.dash.lbl.genBracket'))}
             />
+          ) : (
+            <>
+              <ControlButton
+                icon={<Dices className="h-5 w-5" />}
+                label={tr('product.dash.draw')}
+                done={drawDone}
+                doneLabel={tr('product.dash.drawDone')}
+                loading={busy === 'draw'}
+                disabled={busy !== null || drawDone}
+                onClick={() => post('draw', tr('product.dash.lbl.draw'))}
+              />
+              <ControlButton
+                icon={<CalendarClock className="h-5 w-5" />}
+                label={tr('product.dash.schedule')}
+                done={scheduleDone}
+                doneLabel={tr('product.dash.scheduleDone')}
+                loading={busy === 'generate-schedule'}
+                disabled={busy !== null || !drawDone || scheduleDone}
+                onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
+              />
+              {!isLeague && (
+                <ControlButton
+                  icon={<Trophy className="h-5 w-5" />}
+                  label={tr('product.dash.finals')}
+                  done={knockoutDone}
+                  doneLabel={tr('product.dash.finalsDone')}
+                  loading={busy === 'generate-knockout'}
+                  disabled={busy !== null || !scheduleDone || knockoutDone}
+                  onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
+                />
+              )}
+            </>
           )}
           <ControlButton
             icon={<Flag className="h-5 w-5" />}

@@ -59,6 +59,7 @@ type FormState = {
   public_locale: Locale
   sport: SportId
   format: TournamentFormat
+  swiss_rounds: number
   num_groups: number
   group_size: number
   qualifiers_per_group: number
@@ -96,6 +97,7 @@ function initialState(t?: ManageTournament): FormState {
     public_locale: t?.publicLocale ?? DEFAULT_LOCALE,
     sport: t?.sport ?? DEFAULT_SPORT,
     format: t?.competitionFormat ?? 'groups_ko',
+    swiss_rounds: t?.swissRounds ?? 5,
     num_groups: t?.format.numGroups ?? 4,
     group_size: t?.format.groupSize ?? 4,
     qualifiers_per_group: t?.format.qualifiersPerGroup ?? 2,
@@ -286,10 +288,17 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
             <SelectContent>
               <SelectItem value="groups_ko">{t('product.cfg.formatGroupsKo')}</SelectItem>
               <SelectItem value="league">{t('product.cfg.formatLeague')}</SelectItem>
+              <SelectItem value="single_elim">{t('product.cfg.formatSingleElim')}</SelectItem>
+              <SelectItem value="swiss">{t('product.cfg.formatSwiss')}</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">{t('product.cfg.formatHint')}</p>
         </div>
+        {s.format === 'swiss' && (
+          <div className="sm:max-w-xs">
+            <Num label={t('product.cfg.swissRounds')} value={s.swiss_rounds} onChange={(n) => set('swiss_rounds', n)} max={20} />
+          </div>
+        )}
         <div className="space-y-1 sm:max-w-xs">
           <Label>{t('product.cfg.sport')}</Label>
           {initial ? (
