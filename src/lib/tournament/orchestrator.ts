@@ -5,6 +5,7 @@ import { computeStandings } from './standings'
 import { setsWon } from './sets'
 import { getSportProfile } from '../sport'
 import { makeRng, shuffle } from './rng'
+import { pairSwissRound, type SwissMatchResult } from './swiss'
 import { rankAll, generateKnockout, type RankingDepth } from './bracket'
 import type {
   CourtConfig,
@@ -456,6 +457,99 @@ export async function generateSingleElim(payload: Payload, tournamentId: Id) {
 
   await payload.update({ collection: 'tournaments', id: tournamentId, data: { status: 'live' } })
   return { matches: all.length }
+}
+
+/**
+ * Swiss system: generate the NEXT round by pairing teams on their current score
+ * (no elimination). Repeatable — each call creates one round, up to swiss_rounds.
+ * Swiss matches are modelled as group-phase matches in a single pool 'A', so the
+ * existing standings compute the live ranking (byes are a win for pairing; the
+ * displayed standings ignore them, so an even field is recommended).
+ */
+export async function generateSwissRound(payload: Payload, tournamentId: Id) {
+  const tournament = await loadTournament(payload, tournamentId)
+  if (tournament.format !== 'swiss') {
+    throw new TournamentError('PRECONDITION_FAILED', 'Ce tournoi n’est pas en système suisse.')
+  }
+  const totalRounds = typeof tournament.swiss_rounds === 'number' ? tournament.swiss_rounds : 5
+  const teamDocs = await confirmedTeams(payload, tournamentId)
+  if (teamDocs.length < 2) {
+    throw new TournamentError('PRECONDITION_FAILED', 'Au moins 2 équipes confirmées sont nécessaires.')
+  }
+
+  const existing = await payload.find({
+    collection: 'tournament-matches',
+    where: { and: [{ tournament: { equals: tournamentId } }, { phase: { equals: 'group' } }] },
+    limit: 5000,
+    depth: 0,
+  })
+  const docs = existing.docs as AnyDoc[]
+  const currentRound = docs.length ? Math.max(...docs.map((m) => m.round ?? 0)) : 0
+  if (currentRound >= totalRounds) {
+    throw new TournamentError('PRECONDITION_FAILED', 'Toutes les rondes ont déjà été générées.')
+  }
+  if (currentRound > 0) {
+    const pending = docs.filter((m) => (m.round ?? 0) === currentRound && m.away_team != null && m.status !== 'finished')
+    if (pending.length > 0) {
+      throw new TournamentError('PRECONDITION_FAILED', 'Terminez la ronde en cours avant de générer la suivante.')
+    }
+  }
+
+  const played: SwissMatchResult[] = docs.map((m) => ({
+    homeTeamId: idOf(m.home_team),
+    awayTeamId: m.away_team != null ? idOf(m.away_team) : null,
+    scoreHome: m.score_home ?? null,
+    scoreAway: m.score_away ?? null,
+  }))
+  const teams: TeamRef[] = teamDocs.map((t) => ({ id: t.id as Id, name: String(t.name) }))
+  const pairings = pairSwissRound(teams, played, getSportProfile(tournament.sport).scoring, makeRng(Date.now() + currentRound))
+  const nextRound = currentRound + 1
+
+  // First round: put every team in one pool so the standings render, go live.
+  if (currentRound === 0) {
+    for (const t of teamDocs) {
+      await payload.update({ collection: 'tournament-teams', id: t.id as number, data: { group_label: 'A' } })
+    }
+  }
+
+  const courts = tournament.multi_court ? Math.max(1, tournament.num_courts ?? 1) : 1
+  let court = 1
+  for (const p of pairings) {
+    if (p.away == null) {
+      // Bye: a finished, opponent-less win.
+      await payload.create({
+        collection: 'tournament-matches',
+        data: {
+          tournament: tournamentId,
+          phase: 'group',
+          group_label: 'A',
+          round: nextRound,
+          home_team: p.home,
+          fairplay_winner: 'none',
+          status: 'finished',
+        },
+      })
+    } else {
+      await payload.create({
+        collection: 'tournament-matches',
+        data: {
+          tournament: tournamentId,
+          phase: 'group',
+          group_label: 'A',
+          round: nextRound,
+          court: courts > 1 ? court : undefined,
+          home_team: p.home,
+          away_team: p.away,
+          fairplay_winner: 'none',
+          status: 'scheduled',
+        },
+      })
+      court = (court % courts) + 1
+    }
+  }
+
+  await payload.update({ collection: 'tournaments', id: tournamentId, data: { status: 'live' } })
+  return { round: nextRound, totalRounds }
 }
 
 function idOf(rel: unknown): Id {

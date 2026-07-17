@@ -46,9 +46,10 @@ export function TournamentView({
   const hasAnyCalendar = hasGroupCalendar || finalsCalendar.length > 0
   const isLanding = data.status === 'registration' || data.status === 'registration_closed'
   const finished = data.status === 'finished' || data.status === 'archived'
-  // A league has no final bracket: its pool standings ARE the result, so there's
-  // no separate "Résultats" (podium) tab.
-  const hasResults = finished && data.competitionFormat !== 'league'
+  // Only bracket formats have a podium: a league / swiss tournament's standings
+  // ARE the result, so there's no separate "Résultats" (podium) tab.
+  const hasResults =
+    finished && (data.competitionFormat === 'groups_ko' || data.competitionFormat === 'single_elim')
   const followedTeam = followed ? data.teams.find((t) => String(t.id) === followed) : undefined
   const hasInfo = Boolean(
     (data.venue && (data.venue.name || data.venue.address || data.venue.mapsUrl || data.venue.mapUrl || data.venue.info)) ||
