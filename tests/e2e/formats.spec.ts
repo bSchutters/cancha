@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test'
-import { seedUser, seedLeagueTournament, seedSingleElimTournament, seedSwissTournament, waitForSchema, ADMIN } from './db'
+import {
+  seedUser,
+  seedLeagueTournament,
+  seedSingleElimTournament,
+  seedDoubleElimTournament,
+  seedSwissTournament,
+  waitForSchema,
+  ADMIN,
+} from './db'
 
 async function login(page: import('@playwright/test').Page) {
   await page.goto('/fr/login')
@@ -44,6 +52,28 @@ test.describe('single-elimination format', () => {
     // The generated bracket shows up as an "Arbre" (bracket) tab on the public page.
     await page.goto(`/fr/${slug}`)
     await expect(page.getByRole('button', { name: 'Arbre' })).toBeVisible()
+  })
+})
+
+test.describe('double-elimination format', () => {
+  test('generates winners + losers brackets shown as sections on the public page', async ({ page }) => {
+    const slug = await seedDoubleElimTournament()
+    await login(page)
+    await page.goto(`/fr/manage/${slug}`)
+
+    // Same single "Générer le tableau" action as single elimination.
+    const [resp] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/generate-bracket') && r.request().method() === 'POST'),
+      page.getByRole('button', { name: 'Générer le tableau' }).click(),
+    ])
+    expect(resp.ok()).toBeTruthy()
+
+    // The public bracket tab shows both halves of the draw.
+    await page.goto(`/fr/${slug}`)
+    await page.getByRole('button', { name: 'Arbre' }).click()
+    await expect(page.getByRole('heading', { level: 3, name: 'Tableau des gagnants' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 3, name: 'Tableau des perdants' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 3, name: 'Grande finale' })).toBeVisible()
   })
 })
 

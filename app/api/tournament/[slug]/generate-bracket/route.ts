@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server'
-import { generateSingleElim } from '@/lib/tournament/orchestrator'
+import { generateBracket } from '@/lib/tournament/orchestrator'
 import { requireManager, runAction, unauthorized } from '@/lib/tournament/server'
 
 export const dynamic = 'force-dynamic'
@@ -9,5 +9,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const auth = await requireManager(request)
   if (!auth) return unauthorized()
   const { slug } = await params
-  return runAction(() => generateSingleElim(auth.payload, Number(slug)))
+  return runAction(() => generateBracket(auth.payload, Number(slug)))
 }

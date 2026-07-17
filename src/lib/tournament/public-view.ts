@@ -42,6 +42,7 @@ export interface PublicMatch {
   court: number | null
   scheduledTime: string | null
   bracketLabel: string | null
+  bracketSide: 'winners' | 'losers' | 'grand_final' | null
   homeTeamId: Id | null
   awayTeamId: Id | null
   homeName: string | null
@@ -265,6 +266,7 @@ export async function buildPublicTournament(
     court: m.phase === 'group' ? (m.court ?? null) : sched.court,
     scheduledTime: addOffset(sched.time, offset),
     bracketLabel: m.bracket_label ?? null,
+    bracketSide: m.bracket_side ?? null,
     homeTeamId: idOf(m.home_team),
     awayTeamId: idOf(m.away_team),
     homeName: (() => {
@@ -429,6 +431,7 @@ export async function buildPublicTournament(
       court: sched.court,
       scheduledTime: addOffset(sched.time, offset),
       bracketLabel: b.bracketLabel,
+      bracketSide: null,
       homeTeamId: null,
       awayTeamId: null,
       homeName: null,
@@ -485,7 +488,7 @@ export async function buildPublicTournament(
     drawRevealed: t.draw_revealed === true,
     scheduleOffsetMin: offset,
     sport: getSportProfile(t.sport).id,
-    competitionFormat: (['league', 'single_elim', 'swiss'].includes(t.format) ? t.format : 'groups_ko') as TournamentFormat,
+    competitionFormat: (['league', 'single_elim', 'double_elim', 'swiss'].includes(t.format) ? t.format : 'groups_ko') as TournamentFormat,
     format: { numGroups: t.num_groups ?? 0, qualifiersPerGroup: t.qualifiers_per_group ?? 0 },
     payment: registrationOpen
       ? {

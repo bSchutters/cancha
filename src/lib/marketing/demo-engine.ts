@@ -204,6 +204,7 @@ export function toPublicMatch(m: DemoMatch, teams: DemoTeam[]): PublicMatch {
     court: m.court,
     scheduledTime: m.time,
     bracketLabel: m.bracketLabel,
+    bracketSide: null,
     homeTeamId: m.homeId == null ? null : String(m.homeId),
     awayTeamId: m.awayId == null ? null : String(m.awayId),
     homeName: nameById(teams, m.homeId),
