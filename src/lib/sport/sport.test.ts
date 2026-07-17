@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { getSportProfile, scoreLabelKeys, DEFAULT_SPORT, ALL_SPORTS, futsal, basket, handball, padel } from './index'
+import {
+  getSportProfile,
+  scoreLabelKeys,
+  DEFAULT_SPORT,
+  ALL_SPORTS,
+  futsal,
+  basket,
+  handball,
+  padel,
+  volleyball,
+  tennis,
+  pingpong,
+} from './index'
 
 describe('sport profile registry', () => {
   it('resolves a known sport by id', () => {
@@ -7,10 +19,13 @@ describe('sport profile registry', () => {
     expect(getSportProfile('basket')).toBe(basket)
     expect(getSportProfile('handball')).toBe(handball)
     expect(getSportProfile('padel')).toBe(padel)
+    expect(getSportProfile('volleyball')).toBe(volleyball)
+    expect(getSportProfile('tennis')).toBe(tennis)
+    expect(getSportProfile('pingpong')).toBe(pingpong)
   })
 
   it('falls back to the default for unknown / empty ids', () => {
-    expect(getSportProfile('tennis')).toBe(getSportProfile(DEFAULT_SPORT))
+    expect(getSportProfile('chess')).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile(null)).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile(undefined)).toBe(getSportProfile(DEFAULT_SPORT))
     expect(getSportProfile('')).toBe(getSportProfile(DEFAULT_SPORT))
@@ -40,6 +55,16 @@ describe('sport profile registry', () => {
     expect(padel.scoreLabel).toBe('sets')
   })
 
+  it('adds volley/tennis/ping-pong as set-based sports', () => {
+    for (const p of [volleyball, tennis, pingpong]) {
+      expect(p.scoreLabel).toBe('sets')
+      expect(p.drawsAllowed).toBe(false)
+    }
+    expect(volleyball.unit).toBe('team')
+    expect(tennis.unit).toBe('solo')
+    expect(pingpong.unit).toBe('solo')
+  })
+
   it('carries a competitor unit (padel is a pair, ball sports are teams)', () => {
     expect(padel.unit).toBe('pair')
     expect(futsal.unit).toBe('team')
@@ -48,10 +73,9 @@ describe('sport profile registry', () => {
   })
 
   it('exposes every registered profile', () => {
-    expect(ALL_SPORTS).toContain(futsal)
-    expect(ALL_SPORTS).toContain(basket)
-    expect(ALL_SPORTS).toContain(handball)
-    expect(ALL_SPORTS).toContain(padel)
+    for (const p of [futsal, basket, handball, padel, volleyball, tennis, pingpong]) {
+      expect(ALL_SPORTS).toContain(p)
+    }
   })
 })
 
