@@ -42,4 +42,12 @@ describe('localizeBracketLabel / localizeFinalNote', () => {
     expect(localizeFinalNote('Champion', t)).toBe('product.ranking.champion')
     expect(localizeFinalNote('Inconnu', t)).toBe('Inconnu')
   })
+
+  it('localizes the double-elimination labels (grand final + numbered losers rounds)', () => {
+    expect(localizeBracketLabel('Grande finale', t)).toBe('product.bracket.grandFinal')
+    expect(localizeBracketLabel('Repêchage 1', t)).toBe('product.bracket.repechage'.replace('{n}', '1'))
+    // The round number is substituted, not the literal placeholder.
+    const tn = (key: string) => (key === 'product.bracket.repechage' ? 'Losers round {n}' : key)
+    expect(localizeBracketLabel('Repêchage 3', tn)).toBe('Losers round 3')
+  })
 })
