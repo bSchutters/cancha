@@ -286,6 +286,7 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
             <SelectContent>
               <SelectItem value="groups_ko">{t('product.cfg.formatGroupsKo')}</SelectItem>
               <SelectItem value="league">{t('product.cfg.formatLeague')}</SelectItem>
+              <SelectItem value="single_elim">{t('product.cfg.formatSingleElim')}</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">{t('product.cfg.formatHint')}</p>
