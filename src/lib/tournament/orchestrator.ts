@@ -210,6 +210,9 @@ export async function generateSchedule(payload: Payload, tournamentId: Id) {
 /** Generate the knockout bracket + classification matches once all group matches are played. */
 export async function generateKnockoutPhase(payload: Payload, tournamentId: Id) {
   const tournament = await loadTournament(payload, tournamentId)
+  if (tournament.format === 'league') {
+    throw new TournamentError('PRECONDITION_FAILED', 'Ce tournoi est un championnat : il n’a pas de phase finale.')
+  }
   const teams = await confirmedTeams(payload, tournamentId)
   const groupMatches = await groupPhaseMatches(payload, tournamentId)
 

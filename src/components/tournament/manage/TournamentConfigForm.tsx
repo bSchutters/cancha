@@ -21,6 +21,7 @@ import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE, type Locale } from '@/i18n/config'
 import { ALL_SPORTS, DEFAULT_SPORT, type SportId } from '@/lib/sport'
+import type { TournamentFormat } from '@/lib/tournament/types'
 
 /** Returns the first config inconsistency message, or null if the form is valid. */
 function validateConfig(s: FormState, t: Translate): string | null {
@@ -42,7 +43,9 @@ function validateConfig(s: FormState, t: Translate): string | null {
   if (s.group_size < 2) return t('product.cfg.err.minGroupSize')
   if (s.qualifiers_per_group < 1) return t('product.cfg.err.minQualifiers')
   if (s.qualifiers_per_group > s.group_size) return t('product.cfg.err.qualifiersExceed')
-  if (s.num_groups % 2 !== 0) return t('product.cfg.err.groupsEven')
+  // Even groups are only required for the knockout cross-pairing; a league (pools
+  // only) can have any number of groups, including a single round-robin.
+  if (s.format !== 'league' && s.num_groups % 2 !== 0) return t('product.cfg.err.groupsEven')
   if (s.match_duration_min < 1) return t('product.cfg.err.matchDuration')
   if (s.multi_court && s.num_courts < 1) return t('product.cfg.err.minCourts')
   return null
@@ -55,6 +58,7 @@ type FormState = {
   manage_locale: Locale
   public_locale: Locale
   sport: SportId
+  format: TournamentFormat
   num_groups: number
   group_size: number
   qualifiers_per_group: number
@@ -91,6 +95,7 @@ function initialState(t?: ManageTournament): FormState {
     manage_locale: t?.manageLocale ?? DEFAULT_LOCALE,
     public_locale: t?.publicLocale ?? DEFAULT_LOCALE,
     sport: t?.sport ?? DEFAULT_SPORT,
+    format: t?.competitionFormat ?? 'groups_ko',
     num_groups: t?.format.numGroups ?? 4,
     group_size: t?.format.groupSize ?? 4,
     qualifiers_per_group: t?.format.qualifiersPerGroup ?? 2,
@@ -272,6 +277,19 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">{t('product.cfg.format')}</h2>
+        <div className="space-y-1 sm:max-w-xs">
+          <Label>{t('product.cfg.formatType')}</Label>
+          <Select value={s.format} onValueChange={(v) => set('format', v as TournamentFormat)}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="groups_ko">{t('product.cfg.formatGroupsKo')}</SelectItem>
+              <SelectItem value="league">{t('product.cfg.formatLeague')}</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">{t('product.cfg.formatHint')}</p>
+        </div>
         <div className="space-y-1 sm:max-w-xs">
           <Label>{t('product.cfg.sport')}</Label>
           {initial ? (

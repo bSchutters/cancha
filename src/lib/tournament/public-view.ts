@@ -6,7 +6,7 @@ import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { computeFinalRanking } from './final-ranking'
 import { rankAll, type RankingDepth } from './bracket'
-import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef } from './types'
+import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
 
 /** Reads the configured ranking depth from a tournament doc (default: full). */
@@ -79,6 +79,7 @@ export interface PublicTournament extends PublicTournamentSummary {
   /** Global schedule delay in minutes (already applied to scheduledTime). */
   scheduleOffsetMin: number
   sport: SportId
+  competitionFormat: TournamentFormat
   format: { numGroups: number; qualifiersPerGroup: number }
   payment: { iban: string | null; amount: number | null; communication: string | null } | null
   groups: PublicGroup[]
@@ -484,6 +485,7 @@ export async function buildPublicTournament(
     drawRevealed: t.draw_revealed === true,
     scheduleOffsetMin: offset,
     sport: getSportProfile(t.sport).id,
+    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
     format: { numGroups: t.num_groups ?? 0, qualifiersPerGroup: t.qualifiers_per_group ?? 0 },
     payment: registrationOpen
       ? {
