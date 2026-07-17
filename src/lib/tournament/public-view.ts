@@ -485,7 +485,7 @@ export async function buildPublicTournament(
     drawRevealed: t.draw_revealed === true,
     scheduleOffsetMin: offset,
     sport: getSportProfile(t.sport).id,
-    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
+    competitionFormat: t.format === 'league' || t.format === 'single_elim' ? t.format : 'groups_ko',
     format: { numGroups: t.num_groups ?? 0, qualifiersPerGroup: t.qualifiers_per_group ?? 0 },
     payment: registrationOpen
       ? {

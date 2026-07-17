@@ -59,6 +59,7 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
 
   const capacity = t.format.numGroups * t.format.groupSize
   const isLeague = t.competitionFormat === 'league'
+  const isSingleElim = t.competitionFormat === 'single_elim'
   const drawDone = t.groups.length > 0
   const scheduleDone = t.matches.some((m) => m.phase === 'group')
   const knockoutDone = t.matches.some((m) => m.phase === 'knockout')
@@ -162,34 +163,48 @@ export function DashboardClient({ initial, isOwner = false }: { initial: ManageT
         <h2 className="mb-1 flex items-center gap-2 font-bold text-primary">{tr('product.dash.controlCenter')}</h2>
         <p className="mb-4 text-xs text-muted-foreground">{tr('product.dash.controlIntro')}</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <ControlButton
-            icon={<Dices className="h-5 w-5" />}
-            label={tr('product.dash.draw')}
-            done={drawDone}
-            doneLabel={tr('product.dash.drawDone')}
-            loading={busy === 'draw'}
-            disabled={busy !== null || drawDone}
-            onClick={() => post('draw', tr('product.dash.lbl.draw'))}
-          />
-          <ControlButton
-            icon={<CalendarClock className="h-5 w-5" />}
-            label={tr('product.dash.schedule')}
-            done={scheduleDone}
-            doneLabel={tr('product.dash.scheduleDone')}
-            loading={busy === 'generate-schedule'}
-            disabled={busy !== null || !drawDone || scheduleDone}
-            onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
-          />
-          {!isLeague && (
+          {isSingleElim ? (
             <ControlButton
               icon={<Trophy className="h-5 w-5" />}
-              label={tr('product.dash.finals')}
+              label={tr('product.dash.genBracket')}
               done={knockoutDone}
-              doneLabel={tr('product.dash.finalsDone')}
-              loading={busy === 'generate-knockout'}
-              disabled={busy !== null || !scheduleDone || knockoutDone}
-              onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
+              doneLabel={tr('product.dash.genBracketDone')}
+              loading={busy === 'generate-bracket'}
+              disabled={busy !== null || knockoutDone || t.counts.confirmed < 2}
+              onClick={() => post('generate-bracket', tr('product.dash.lbl.genBracket'))}
             />
+          ) : (
+            <>
+              <ControlButton
+                icon={<Dices className="h-5 w-5" />}
+                label={tr('product.dash.draw')}
+                done={drawDone}
+                doneLabel={tr('product.dash.drawDone')}
+                loading={busy === 'draw'}
+                disabled={busy !== null || drawDone}
+                onClick={() => post('draw', tr('product.dash.lbl.draw'))}
+              />
+              <ControlButton
+                icon={<CalendarClock className="h-5 w-5" />}
+                label={tr('product.dash.schedule')}
+                done={scheduleDone}
+                doneLabel={tr('product.dash.scheduleDone')}
+                loading={busy === 'generate-schedule'}
+                disabled={busy !== null || !drawDone || scheduleDone}
+                onClick={() => post('generate-schedule', tr('product.dash.lbl.schedule'))}
+              />
+              {!isLeague && (
+                <ControlButton
+                  icon={<Trophy className="h-5 w-5" />}
+                  label={tr('product.dash.finals')}
+                  done={knockoutDone}
+                  doneLabel={tr('product.dash.finalsDone')}
+                  loading={busy === 'generate-knockout'}
+                  disabled={busy !== null || !scheduleDone || knockoutDone}
+                  onClick={() => post('generate-knockout', tr('product.dash.lbl.finals'))}
+                />
+              )}
+            </>
           )}
           <ControlButton
             icon={<Flag className="h-5 w-5" />}

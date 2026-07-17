@@ -368,7 +368,7 @@ export async function buildManageTournament(
     manageLocale: isLocale(t.manage_locale) ? t.manage_locale : DEFAULT_LOCALE,
     publicLocale: isLocale(t.public_locale) ? t.public_locale : DEFAULT_LOCALE,
     sport: getSportProfile(t.sport).id,
-    competitionFormat: t.format === 'league' ? 'league' : 'groups_ko',
+    competitionFormat: t.format === 'league' || t.format === 'single_elim' ? t.format : 'groups_ko',
     format: {
       numGroups: t.num_groups ?? 0,
       groupSize: t.group_size ?? 0,

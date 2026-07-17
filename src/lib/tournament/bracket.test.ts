@@ -3,6 +3,35 @@ import { generateKnockout, rankAll } from './bracket'
 import { fairplayRanking } from './fairplay'
 import type { MatchResult, QualifiedTeam, TeamRef } from './types'
 
+// Single-elimination seeding: all teams as one group of seeds 1..N (the path
+// used by generateSingleElim). A field of 6 → an 8-slot bracket with 2 byes.
+describe('generateKnockout - single group (single elimination)', () => {
+  const solo: QualifiedTeam[] = Array.from({ length: 6 }, (_, i) => ({
+    teamId: `T${i + 1}`,
+    teamName: `T${i + 1}`,
+    group: 'A',
+    rankInGroup: i + 1,
+  }))
+  const bracket = generateKnockout(solo, 1, solo.length)
+
+  it('produces a knockout bracket with a single final', () => {
+    expect(bracket.length).toBeGreaterThan(0)
+    const finals = bracket.filter((m) => m.bracketLabel === 'Finale')
+    expect(finals).toHaveLength(1)
+    // 6 teams → 3 rounds (quarters with byes, semis, final).
+    expect(Math.max(...bracket.map((m) => m.round))).toBe(3)
+  })
+
+  it('non-terminal matches point at a next match', () => {
+    // The final and the petite finale (3rd place) are terminal — everything else
+    // must feed forward.
+    for (const m of bracket) {
+      if (m.bracketLabel === 'Finale' || m.bracketLabel.includes('Petite')) continue
+      expect(m.nextMatchKey).toBeTruthy()
+    }
+  })
+})
+
 // 4 groups (A-D), 2 qualifiers each → 8 teams.
 const qualified: QualifiedTeam[] = []
 for (const g of ['A', 'B', 'C', 'D']) {

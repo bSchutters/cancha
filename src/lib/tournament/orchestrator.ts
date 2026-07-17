@@ -4,7 +4,8 @@ import { buildSchedule, buildScheduleMaps } from './schedule'
 import { computeStandings } from './standings'
 import { setsWon } from './sets'
 import { getSportProfile } from '../sport'
-import { rankAll, type RankingDepth } from './bracket'
+import { makeRng, shuffle } from './rng'
+import { rankAll, generateKnockout, type RankingDepth } from './bracket'
 import type {
   CourtConfig,
   DrawnGroup,
@@ -364,6 +365,97 @@ export async function generateKnockoutPhase(payload: Payload, tournamentId: Id) 
   const koCount = all.filter((b) => b.phase === 'knockout').length
   const clCount = all.filter((b) => b.phase === 'classification').length
   return { knockout: koCount, classification: clCount, qualified: qualified.length }
+}
+
+/**
+ * Single-elimination format: seed ALL confirmed teams straight into one knockout
+ * bracket (random draw, byes for non-powers-of-two), schedule it, go live. No
+ * group phase. Winner propagation is handled by the match afterChange hook, same
+ * as the groups→knockout bracket.
+ */
+export async function generateSingleElim(payload: Payload, tournamentId: Id) {
+  const tournament = await loadTournament(payload, tournamentId)
+  if (tournament.format !== 'single_elim') {
+    throw new TournamentError('PRECONDITION_FAILED', 'Ce tournoi n’est pas en élimination directe.')
+  }
+  const existing = await payload.find({
+    collection: 'tournament-matches',
+    where: { tournament: { equals: tournamentId } },
+    limit: 1,
+    depth: 0,
+  })
+  if (existing.docs.length > 0) {
+    throw new TournamentError('PRECONDITION_FAILED', 'Le tableau existe déjà. Réinitialisez-le avant de régénérer.')
+  }
+  const teamDocs = await confirmedTeams(payload, tournamentId)
+  if (teamDocs.length < 2) {
+    throw new TournamentError('PRECONDITION_FAILED', 'Au moins 2 équipes confirmées sont nécessaires.')
+  }
+
+  // Random seeding: shuffle, then treat the order as seeds 1..N of a single group.
+  const seeded = shuffle(
+    teamDocs.map((t) => ({ id: t.id as Id, name: String(t.name) })),
+    makeRng(Date.now()),
+  )
+  const qualified: QualifiedTeam[] = seeded.map((t, i) => ({
+    teamId: t.id,
+    teamName: t.name,
+    group: 'A',
+    rankInGroup: i + 1,
+  }))
+  const all = generateKnockout(qualified, 1, qualified.length)
+
+  const { scheduleOf } = buildScheduleMaps(
+    all.map((b) => ({
+      id: b.key,
+      phase: b.phase,
+      round: b.round,
+      bracketLabel: b.bracketLabel,
+      nextMatchId: b.nextMatchKey,
+      loserNextMatchId: b.loserNextMatchKey,
+    })),
+    scheduleConfigOf(tournament),
+  )
+
+  const keyToId = new Map<string, number>()
+  for (const b of all) {
+    const sched = scheduleOf({ id: b.key, phase: b.phase, round: b.round })
+    const created = await payload.create({
+      collection: 'tournament-matches',
+      data: {
+        tournament: tournamentId,
+        phase: b.phase,
+        bracket_label: b.bracketLabel,
+        round: b.round,
+        scheduled_time: sched.time ?? undefined,
+        court: sched.court ?? undefined,
+        home_team: b.homeTeamId ?? undefined,
+        away_team: b.awayTeamId ?? undefined,
+        fairplay_winner: 'none',
+        status: 'scheduled',
+      },
+    })
+    keyToId.set(b.key, created.id as number)
+  }
+  for (const b of all) {
+    const data: AnyDoc = {}
+    if (b.nextMatchKey && keyToId.has(b.nextMatchKey)) {
+      data.next_match = keyToId.get(b.nextMatchKey)
+      data.next_slot = b.nextSlot
+    }
+    if (b.loserNextMatchKey && keyToId.has(b.loserNextMatchKey)) {
+      data.loser_next_match = keyToId.get(b.loserNextMatchKey)
+      data.loser_next_slot = b.loserNextSlot
+    }
+    if (b.homeSourceKey && keyToId.has(b.homeSourceKey)) data.home_source_match = keyToId.get(b.homeSourceKey)
+    if (b.awaySourceKey && keyToId.has(b.awaySourceKey)) data.away_source_match = keyToId.get(b.awaySourceKey)
+    if (Object.keys(data).length > 0) {
+      await payload.update({ collection: 'tournament-matches', id: keyToId.get(b.key)!, data })
+    }
+  }
+
+  await payload.update({ collection: 'tournaments', id: tournamentId, data: { status: 'live' } })
+  return { matches: all.length }
 }
 
 function idOf(rel: unknown): Id {

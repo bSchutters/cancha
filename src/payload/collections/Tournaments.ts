@@ -148,6 +148,7 @@ export const Tournaments: CollectionConfig = {
           options: [
             { label: 'Poules + phase finale', value: 'groups_ko' },
             { label: 'Championnat (poules seules)', value: 'league' },
+            { label: 'Élimination directe', value: 'single_elim' },
           ],
           label: 'Type de tournoi',
           admin: { description: 'Poules suivies d’un tableau final, ou championnat (le classement des poules fait office de résultat).' },
