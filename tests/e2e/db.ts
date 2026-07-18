@@ -126,6 +126,175 @@ export async function seedSingleElimTournament() {
 }
 
 /**
+ * Seed a groups + knockout tournament (the DEFAULT format): 8 confirmed teams,
+ * 2 pools of 4, 2 qualifiers each, no draw and no matches yet. Ready to drive
+ * the full organizer flow: draw, schedule, then finals. Returns the slug.
+ */
+export async function seedGroupsKoTournament(slug = 'e2e-groups') {
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, [`${slug}-club`])
+
+    const org = await c.query(`insert into organizations (name, slug) values ($1, $2) returning id`, [
+      `E2E Groups Club ${slug}`,
+      `${slug}-club`,
+    ])
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, tenant_id)
+       values ('E2E Groups', $1, 'futsal', 'groups_ko', 'registration_closed', 2, 4, 2, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+    for (let i = 1; i <= 8; i++) {
+      await c.query(
+        `insert into tournament_teams (tournament_id, tenant_id, name, representative_email, representative_phone, registration_status)
+         values ($1, $2, $3, 'e2e@e2e.test', '+32000', 'confirmed')`,
+        [tourId, orgId, `Équipe ${i}`],
+      )
+    }
+    return slug
+  })
+}
+
+/**
+ * Mark every GROUP match of a tournament as played, with varied scores so the
+ * standings produce a clear order (no ties on points). Used to unlock the
+ * "phase finale" step without driving dozens of score inputs by hand — score
+ * entry itself is covered by the padel spec.
+ */
+export async function finishAllGroupMatches(slug: string) {
+  await withDb(async (c) => {
+    const res = await c.query(
+      `select m.id from tournament_matches m
+       join tournaments t on t.id = m.tournament_id
+       where t.slug = $1 and m.phase = 'group' order by m.id`,
+      [slug],
+    )
+    for (let i = 0; i < res.rows.length; i++) {
+      // Cycle a few distinct results so teams don't all end up level.
+      const [h, a] = [
+        [3, 0],
+        [1, 0],
+        [2, 1],
+        [0, 2],
+        [4, 1],
+        [1, 3],
+      ][i % 6]
+      await c.query(`update tournament_matches set score_home = $2, score_away = $3, status = 'finished' where id = $1`, [
+        res.rows[i].id,
+        h,
+        a,
+      ])
+    }
+    return res.rows.length
+  })
+}
+
+/**
+ * Seed a finished 3-team league for ANY sport, with a fixed result pattern so
+ * the expected standings are known up front:
+ *
+ *   withDraws  : Alpha beats Bravo, Alpha beats Charlie, Bravo draws Charlie
+ *   without    : Alpha beats Bravo, Alpha beats Charlie, Bravo beats Charlie
+ *
+ * Only the sport changes between runs, so any difference in the rendered
+ * standings is attributable to the sport profile. Idempotent per sport.
+ */
+export async function seedSportLeague(sport: string, withDraws: boolean) {
+  const slug = `e2e-sport-${sport}`
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, [`${slug}-club`])
+
+    const org = await c.query(`insert into organizations (name, slug) values ($1, $2) returning id`, [
+      `E2E ${sport}`,
+      `${slug}-club`,
+    ])
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, draw_revealed, tenant_id)
+       values ($1, $2, $3, 'league', 'finished', 1, 3, 1, true, $4) returning id`,
+      [`E2E ${sport}`, slug, sport, orgId],
+    )
+    const tourId = tour.rows[0].id
+    const team = async (name: string) =>
+      (
+        await c.query(
+          `insert into tournament_teams (tournament_id, tenant_id, name, representative_email, representative_phone, group_label, registration_status)
+           values ($1, $2, $3, 'e2e@e2e.test', '+32000', 'A', 'confirmed') returning id`,
+          [tourId, orgId, name],
+        )
+      ).rows[0].id
+    const a = await team('Alpha')
+    const b = await team('Bravo')
+    const cc = await team('Charlie')
+    const match = async (home: number, away: number, sh: number, sa: number, round: number) =>
+      c.query(
+        `insert into tournament_matches (tournament_id, tenant_id, phase, group_label, round, court, scheduled_time, home_team_id, away_team_id, score_home, score_away, status)
+         values ($1, $2, 'group', 'A', $3, 1, '10:00', $4, $5, $6, $7, 'finished')`,
+        [tourId, orgId, round, home, away, sh, sa],
+      )
+    await match(a, b, 3, 1, 1)
+    await match(a, cc, 2, 0, 2)
+    if (withDraws) await match(b, cc, 1, 1, 3)
+    else await match(b, cc, 2, 1, 3)
+    return slug
+  })
+}
+
+/**
+ * Seed a finished RUGBY league — three teams, all matches played. Rugby scores
+ * 4 points for a win and 2 for a draw (not futsal's 3-1-0), so the leader ends
+ * on 8 points: a total no other registered sport would produce. Proves the sport
+ * profile really drives the standings. Idempotent. Returns the slug.
+ */
+export async function seedRugbyTournament() {
+  const slug = 'e2e-rugby'
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, ['e2e-rugby-club'])
+
+    const org = await c.query(`insert into organizations (name, slug) values ('E2E Rugby Club', 'e2e-rugby-club') returning id`)
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, draw_revealed, tenant_id)
+       values ('E2E Rugby', $1, 'rugby', 'league', 'finished', 1, 3, 1, true, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+    const team = async (name: string) =>
+      (
+        await c.query(
+          `insert into tournament_teams (tournament_id, tenant_id, name, representative_email, representative_phone, group_label, registration_status)
+           values ($1, $2, $3, 'e2e@e2e.test', '+32000', 'A', 'confirmed') returning id`,
+          [tourId, orgId, name],
+        )
+      ).rows[0].id
+    const a = await team('Lions RC')
+    const b = await team('Ours RC')
+    const cc = await team('Aigles RC')
+    const match = async (home: number, away: number, sh: number, sa: number, round: number) =>
+      c.query(
+        `insert into tournament_matches (tournament_id, tenant_id, phase, group_label, round, court, scheduled_time, home_team_id, away_team_id, score_home, score_away, status)
+         values ($1, $2, 'group', 'A', $3, 1, '10:00', $4, $5, $6, $7, 'finished')`,
+        [tourId, orgId, round, home, away, sh, sa],
+      )
+    // Lions win twice (4 + 4 = 8 pts). Ours and Aigles draw (2 pts each).
+    await match(a, b, 20, 10, 1)
+    await match(a, cc, 15, 5, 2)
+    await match(b, cc, 12, 12, 3)
+    return slug
+  })
+}
+
+/**
  * Seed a double-elimination tournament with 4 confirmed teams (a power of two)
  * and NO matches yet — ready for the "Générer le tableau" action. Idempotent.
  * Returns the slug.

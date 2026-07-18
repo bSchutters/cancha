@@ -8,6 +8,7 @@ import {
   waitForSchema,
   ADMIN,
 } from './db'
+import { publicUrl } from './helpers'
 
 async function login(page: import('@playwright/test').Page) {
   await page.goto('/fr/login')
@@ -25,7 +26,7 @@ test.beforeAll(async () => {
 test.describe('league format (championnat)', () => {
   test('public page shows the standings and no finals/bracket', async ({ page }) => {
     const slug = await seedLeagueTournament()
-    await page.goto(`/fr/${slug}`)
+    await page.goto(publicUrl('fr', slug))
 
     // The pools tab (standings) is the result — a seeded team is listed.
     await expect(page.getByText('Alpha FC').first()).toBeVisible()
@@ -50,7 +51,7 @@ test.describe('single-elimination format', () => {
     expect(resp.ok()).toBeTruthy()
 
     // The generated bracket shows up as an "Arbre" (bracket) tab on the public page.
-    await page.goto(`/fr/${slug}`)
+    await page.goto(publicUrl('fr', slug))
     await expect(page.getByRole('button', { name: 'Arbre' })).toBeVisible()
   })
 })
@@ -69,7 +70,7 @@ test.describe('double-elimination format', () => {
     expect(resp.ok()).toBeTruthy()
 
     // The public bracket tab shows both halves of the draw.
-    await page.goto(`/fr/${slug}`)
+    await page.goto(publicUrl('fr', slug))
     await page.getByRole('button', { name: 'Arbre' }).click()
     await expect(page.getByRole('heading', { level: 3, name: 'Tableau des gagnants' })).toBeVisible()
     await expect(page.getByRole('heading', { level: 3, name: 'Tableau des perdants' })).toBeVisible()
@@ -91,7 +92,7 @@ test.describe('swiss format', () => {
     expect(resp.ok()).toBeTruthy()
 
     // The public page now ranks the teams (one pool, seeded by score).
-    await page.goto(`/fr/${slug}`)
+    await page.goto(publicUrl('fr', slug))
     await expect(page.getByText('Swiss A').first()).toBeVisible()
   })
 })

@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e:pg": "bash scripts/e2e-pg.sh",
-    "test:e2e": "bash scripts/e2e-pg.sh && playwright test",
+    "test:e2e": "bash scripts/e2e-pg.sh && rm -rf .next/cache && playwright test",
     "payload": "node --env-file=.env node_modules/payload/bin.js",
     "migrate": "node --env-file=.env node_modules/payload/bin.js migrate",
     "migrate:create": "node --env-file=.env node_modules/payload/bin.js migrate:create",
