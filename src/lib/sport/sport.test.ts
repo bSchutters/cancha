@@ -19,6 +19,9 @@ import {
   waterpolo,
   petanque,
   darts,
+  esportTeam,
+  esportSolo,
+  esportFoot,
 } from './index'
 
 describe('sport profile registry', () => {
@@ -97,9 +100,29 @@ describe('sport profile registry', () => {
       waterpolo,
       petanque,
       darts,
+      esportTeam,
+      esportSolo,
+      esportFoot,
     ]) {
       expect(ALL_SPORTS).toContain(p)
     }
+  })
+
+  it('models esport as best-of series, except football games which count goals', () => {
+    // Team and solo esport are the same ruleset with a different competitor unit.
+    for (const p of [esportTeam, esportSolo]) {
+      expect(p.scoreLabel).toBe('sets')
+      expect(p.drawsAllowed).toBe(false)
+      expect(p.scoring).toEqual({ win: 1, draw: 0, loss: 0 })
+    }
+    expect(esportTeam.unit).toBe('team')
+    expect(esportSolo.unit).toBe('solo')
+
+    // FIFA-likes are a single game counted in goals, and can end level.
+    expect(esportFoot.scoreLabel).toBe('goals')
+    expect(esportFoot.drawsAllowed).toBe(true)
+    expect(esportFoot.scoring).toEqual({ win: 3, draw: 1, loss: 0 })
+    expect(esportFoot.unit).toBe('solo')
   })
 
   it('resolves each newly added sport by id', () => {

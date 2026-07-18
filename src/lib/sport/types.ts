@@ -28,6 +28,9 @@ export type SportId =
   | 'waterpolo'
   | 'petanque'
   | 'darts'
+  | 'esport_team'
+  | 'esport_solo'
+  | 'esport_foot'
 
 /** Points awarded in the group stage (round-robin). */
 export interface ScoringRules {

@@ -14,6 +14,9 @@ import { rugby } from './profiles/rugby'
 import { waterpolo } from './profiles/waterpolo'
 import { petanque } from './profiles/petanque'
 import { darts } from './profiles/darts'
+import { esportTeam } from './profiles/esport-team'
+import { esportSolo } from './profiles/esport-solo'
+import { esportFoot } from './profiles/esport-foot'
 
 export type { SportId, SportProfile, ScoringRules, ScoreLabel, SportUnit } from './types'
 export { scoreLabelKeys } from './standings-labels'
@@ -37,6 +40,9 @@ const PROFILES: Record<SportId, SportProfile> = {
   waterpolo,
   petanque,
   darts,
+  esport_team: esportTeam,
+  esport_solo: esportSolo,
+  esport_foot: esportFoot,
 }
 
 /**
@@ -65,4 +71,7 @@ export {
   waterpolo,
   petanque,
   darts,
+  esportTeam,
+  esportSolo,
+  esportFoot,
 }
