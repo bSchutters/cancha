@@ -44,6 +44,11 @@ const SPORTS: SportCase[] = [
   { id: 'badminton', label: 'Badminton', draws: false, points: ['2', '1', '0'], cols: ['SG', 'SP'] },
   { id: 'squash', label: 'Squash', draws: false, points: ['2', '1', '0'], cols: ['SG', 'SP'] },
   { id: 'darts', label: 'Fléchettes', draws: false, points: ['2', '1', '0'], cols: ['SG', 'SP'] },
+  // Esport: best-of series behave like any sets sport, whatever the unit.
+  { id: 'esport_team', label: 'Esport (équipe)', draws: false, points: ['2', '1', '0'], cols: ['SG', 'SP'] },
+  { id: 'esport_solo', label: 'Esport (solo)', draws: false, points: ['2', '1', '0'], cols: ['SG', 'SP'] },
+  // Football games are the exception: one game, goals, draws allowed.
+  { id: 'esport_foot', label: 'Jeu de foot (FIFA, eFootball)', draws: true, points: ['6', '1', '1'], cols: ['BP', 'BC'] },
 ]
 
 test.beforeAll(async () => {
