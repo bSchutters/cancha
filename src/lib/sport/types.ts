@@ -20,6 +20,14 @@ export type SportId =
   | 'volleyball'
   | 'tennis'
   | 'pingpong'
+  | 'badminton'
+  | 'squash'
+  | 'beachvolley'
+  | 'hockey'
+  | 'rugby'
+  | 'waterpolo'
+  | 'petanque'
+  | 'darts'
 
 /** Points awarded in the group stage (round-robin). */
 export interface ScoringRules {

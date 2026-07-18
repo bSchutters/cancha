@@ -126,6 +126,53 @@ export async function seedSingleElimTournament() {
 }
 
 /**
+ * Seed a finished RUGBY league — three teams, all matches played. Rugby scores
+ * 4 points for a win and 2 for a draw (not futsal's 3-1-0), so the leader ends
+ * on 8 points: a total no other registered sport would produce. Proves the sport
+ * profile really drives the standings. Idempotent. Returns the slug.
+ */
+export async function seedRugbyTournament() {
+  const slug = 'e2e-rugby'
+  return withDb(async (c) => {
+    await c.query(`delete from tournament_matches where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournament_teams where tournament_id in (select id from tournaments where slug = $1)`, [slug])
+    await c.query(`delete from tournaments where slug = $1`, [slug])
+    await c.query(`delete from organizations where slug = $1`, ['e2e-rugby-club'])
+
+    const org = await c.query(`insert into organizations (name, slug) values ('E2E Rugby Club', 'e2e-rugby-club') returning id`)
+    const orgId = org.rows[0].id
+    const tour = await c.query(
+      `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, draw_revealed, tenant_id)
+       values ('E2E Rugby', $1, 'rugby', 'league', 'finished', 1, 3, 1, true, $2) returning id`,
+      [slug, orgId],
+    )
+    const tourId = tour.rows[0].id
+    const team = async (name: string) =>
+      (
+        await c.query(
+          `insert into tournament_teams (tournament_id, tenant_id, name, representative_email, representative_phone, group_label, registration_status)
+           values ($1, $2, $3, 'e2e@e2e.test', '+32000', 'A', 'confirmed') returning id`,
+          [tourId, orgId, name],
+        )
+      ).rows[0].id
+    const a = await team('Lions RC')
+    const b = await team('Ours RC')
+    const cc = await team('Aigles RC')
+    const match = async (home: number, away: number, sh: number, sa: number, round: number) =>
+      c.query(
+        `insert into tournament_matches (tournament_id, tenant_id, phase, group_label, round, court, scheduled_time, home_team_id, away_team_id, score_home, score_away, status)
+         values ($1, $2, 'group', 'A', $3, 1, '10:00', $4, $5, $6, $7, 'finished')`,
+        [tourId, orgId, round, home, away, sh, sa],
+      )
+    // Lions win twice (4 + 4 = 8 pts). Ours and Aigles draw (2 pts each).
+    await match(a, b, 20, 10, 1)
+    await match(a, cc, 15, 5, 2)
+    await match(b, cc, 12, 12, 3)
+    return slug
+  })
+}
+
+/**
  * Seed a double-elimination tournament with 4 confirmed teams (a power of two)
  * and NO matches yet — ready for the "Générer le tableau" action. Idempotent.
  * Returns the slug.
