@@ -11,6 +11,14 @@ import {
   volleyball,
   tennis,
   pingpong,
+  badminton,
+  squash,
+  beachvolley,
+  hockey,
+  rugby,
+  waterpolo,
+  petanque,
+  darts,
 } from './index'
 
 describe('sport profile registry', () => {
@@ -73,8 +81,68 @@ describe('sport profile registry', () => {
   })
 
   it('exposes every registered profile', () => {
-    for (const p of [futsal, basket, handball, padel, volleyball, tennis, pingpong]) {
+    for (const p of [
+      futsal,
+      basket,
+      handball,
+      padel,
+      volleyball,
+      tennis,
+      pingpong,
+      badminton,
+      squash,
+      beachvolley,
+      hockey,
+      rugby,
+      waterpolo,
+      petanque,
+      darts,
+    ]) {
       expect(ALL_SPORTS).toContain(p)
+    }
+  })
+
+  it('resolves each newly added sport by id', () => {
+    expect(getSportProfile('badminton')).toBe(badminton)
+    expect(getSportProfile('squash')).toBe(squash)
+    expect(getSportProfile('beachvolley')).toBe(beachvolley)
+    expect(getSportProfile('hockey')).toBe(hockey)
+    expect(getSportProfile('rugby')).toBe(rugby)
+    expect(getSportProfile('waterpolo')).toBe(waterpolo)
+    expect(getSportProfile('petanque')).toBe(petanque)
+    expect(getSportProfile('darts')).toBe(darts)
+  })
+
+  it('gives the racket / precision singles sports a sets score and a solo unit', () => {
+    for (const p of [badminton, squash, darts]) {
+      expect(p.scoreLabel).toBe('sets')
+      expect(p.drawsAllowed).toBe(false)
+      expect(p.unit).toBe('solo')
+    }
+    // Beach volley is the pair variant of volleyball.
+    expect(beachvolley.unit).toBe('pair')
+    expect(beachvolley.scoreLabel).toBe('sets')
+  })
+
+  it('gives the field team sports draws and their real group scoring', () => {
+    expect(hockey.scoring).toEqual({ win: 3, draw: 1, loss: 0 })
+    expect(waterpolo.scoring).toEqual({ win: 3, draw: 1, loss: 0 })
+    expect(rugby.scoring).toEqual({ win: 4, draw: 2, loss: 0 })
+    for (const p of [hockey, waterpolo, rugby]) {
+      expect(p.drawsAllowed).toBe(true)
+      expect(p.unit).toBe('team')
+    }
+  })
+
+  it('pétanque has no draws (a game is played to 13) and counts points', () => {
+    expect(petanque.drawsAllowed).toBe(false)
+    expect(petanque.scoreLabel).toBe('points')
+  })
+
+  it('every profile id matches its registry key (no copy-paste slip)', () => {
+    for (const p of ALL_SPORTS) {
+      expect(getSportProfile(p.id)).toBe(p)
+      expect(p.label.length).toBeGreaterThan(0)
     }
   })
 })

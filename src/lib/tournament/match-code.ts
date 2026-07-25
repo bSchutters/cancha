@@ -1,4 +1,5 @@
 import type { Id } from './types'
+import { classifyBracket } from './bracket-kind'
 
 export interface CodeableMatch {
   id: Id
@@ -21,6 +22,15 @@ function byPlayOrder(a: CodeableMatch, b: CodeableMatch): number {
 
 /** Short abbreviation for a knockout / classification bracket label. */
 function koAbbr(label: string): string {
+  // Double-elimination labels first, via the typed classifier: "Grande finale"
+  // contains "finale", so the substring rules below would code it 'F' — exactly
+  // like the winners final — and every "Repêchage N" collapsed to 'RE', making
+  // codes repeat across losers rounds. Two matches sharing a code is a real
+  // problem when announcing or entering a score.
+  const kind = classifyBracket(label)
+  if (kind.kind === 'grandFinal') return 'GF'
+  if (kind.kind === 'repechage') return `LB${kind.n}`
+
   // Order matters: "quart de finale" / "demi-finale" / "huitième de finale" all
   // contain "finale", so the specific rounds must be matched before plain "Finale".
   const l = label.toLowerCase()

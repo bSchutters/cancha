@@ -11,8 +11,9 @@ export default defineConfig({
     },
   },
   test: {
-    // Scope: the pure engines under src/lib (tournament structure + sport rules).
-    include: ['src/lib/**/*.test.ts'],
+    // Scope: pure (non-DOM) tests anywhere under src — the engines in src/lib
+    // (tournament structure + sport rules) plus the i18n dictionary checks.
+    include: ['src/**/*.test.ts'],
     environment: 'node',
   },
 })

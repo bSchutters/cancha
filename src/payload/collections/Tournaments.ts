@@ -3,6 +3,7 @@ import { isAdmin, isAdminOrManager, isAdminField } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE } from '@/i18n/config'
 import { ALL_SPORTS, DEFAULT_SPORT } from '@/lib/sport'
+import { setTenantFromUser } from '../hooks/tenantFromUser'
 
 const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tournament-${doc.slug}`]
 
@@ -39,6 +40,9 @@ export const Tournaments: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    // Assign the creator's organization: the plugin only fills `tenant` from the
+    // admin-UI cookie, which the custom /manage interface never sets.
+    beforeValidate: [setTenantFromUser],
     beforeChange: [
       async ({ data, req, originalDoc }) => {
         // A single tournament can be "live" at a time.

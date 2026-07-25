@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrManager } from '../access'
+import { isAdmin, isAdminOrManager, isAdminOrManagerField } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
 import { registrationCapacity } from '../hooks/registrationCapacity'
 import { setTenantFromTournament } from '../hooks/tenantFromTournament'
@@ -68,12 +68,15 @@ export const TournamentTeams: CollectionConfig = {
       type: 'email',
       required: true,
       label: 'Email du représentant',
+      // Personal data: never served to anonymous REST callers (see isAdminOrManagerField).
+      access: { read: isAdminOrManagerField },
     },
     {
       name: 'representative_phone',
       type: 'text',
       required: true,
       label: 'Téléphone du représentant',
+      access: { read: isAdminOrManagerField },
     },
     {
       name: 'registration_status',

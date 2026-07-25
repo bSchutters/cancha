@@ -33,6 +33,10 @@ const PROCESS = [
   { icon: Radio, key: 'endirect' },
 ]
 
+// The five competition formats the engine supports. Ordered from the most common
+// (what most one-day tournaments run) to the most specialised.
+const FORMATS = ['groupsKo', 'league', 'singleElim', 'doubleElim', 'swiss'] as const
+
 type Feature = {
   icon: LucideIcon
   key: string
@@ -333,6 +337,38 @@ export function HomeSections({ t }: { t: Translate }) {
       </section>
 
       <Testimonials t={t} />
+
+      {/* Competition formats */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-5xl px-4 py-24 sm:px-6">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <span className="text-sm font-semibold text-primary">{t('home.formats.eyebrow')}</span>
+            <h2 style={display} className="mt-2 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              {t('home.formats.title')}
+            </h2>
+            <p className="mt-3 text-muted-foreground">{t('home.formats.subcopy')}</p>
+          </Reveal>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FORMATS.map((key) => (
+              <Reveal key={key} className="rounded-2xl border border-border bg-card p-6">
+                <h3 style={display} className="text-lg font-medium">
+                  {t(`home.formats.${key}.title`)}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  {t(`home.formats.${key}.desc`)}
+                </p>
+                <p className="mt-4 text-xs font-medium uppercase tracking-wide text-primary">
+                  {t(`home.formats.${key}.when`)}
+                </p>
+              </Reveal>
+            ))}
+            <Reveal className="flex flex-col justify-center rounded-2xl border border-primary/15 bg-primary/[0.06] p-6">
+              <p className="text-sm leading-relaxed text-muted-foreground">{t('home.formats.footnote')}</p>
+            </Reveal>
+          </div>
+        </div>
+      </section>
 
       {/* Audience */}
       <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">

@@ -9,6 +9,7 @@ import { LogoutButton } from '@/components/tournament/manage/LogoutButton'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
+import { isDemoUser } from '@/lib/demo/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +57,14 @@ export default async function ManageLayout({
             )}
           </LocaleLink>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            {/* Demo visitors only: the console logo goes to /manage, so a curious
+                visitor has no way back to the site. A real organizer working in
+                their console does not need this in the way. */}
+            {isDemoUser(user) && (
+              <LocaleLink href="/" className="hidden hover:text-foreground sm:inline">
+                {t('product.manage.backToSite')}
+              </LocaleLink>
+            )}
             <LocaleLink href="/manage/apparence" className="hover:text-foreground">
               {t('product.manage.appearance')}
             </LocaleLink>

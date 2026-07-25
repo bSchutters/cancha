@@ -42,6 +42,22 @@ export function getUserTenantId(user: SessionUser | null): number | string | nul
 }
 
 /**
+ * EVERY organization the user belongs to (the plugin allows several).
+ *
+ * Returns `null` only for a super-admin, meaning "no tenant restriction". A
+ * manager with no organization yields `[]`, which callers must read as "access
+ * to nothing" — never as "access to everything". That distinction is what
+ * `getUserTenantId` cannot express, since it collapses both cases to null.
+ */
+export function getUserTenantIds(user: SessionUser | null): (number | string)[] | null {
+  if (isSuperAdmin(user)) return null
+  return (user?.tenants ?? [])
+    .map((t) => t?.tenant)
+    .filter((t): t is number | string | { id: number | string } => t != null)
+    .map((t) => (typeof t === 'object' ? t.id : t))
+}
+
+/**
  * The single owner of the tool (developer). Only this user may see/use the dev
  * mode - set OWNER_EMAIL in the environment. Falls back to closed (no owner) so
  * dev features stay hidden if the env var is missing.

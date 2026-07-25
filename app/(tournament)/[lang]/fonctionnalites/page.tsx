@@ -129,6 +129,23 @@ export default async function FonctionnalitesPage({ params }: { params: Promise<
         })}
       </div>
 
+      {/* Capabilities the spotlight tour does not cover, but that decide a sale:
+          the competition formats, set-based scoring and the three languages. */}
+      <div className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
+        <div className="grid gap-4 border-t border-border pt-16 sm:grid-cols-3">
+          {['formats', 'sets', 'langues'].map((key) => (
+            <Reveal key={key} className="rounded-2xl border border-border bg-card p-6">
+              <h3 style={display} className="text-lg font-medium">
+                {t(`fonctionnalites.extra.${key}.title`)}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {t(`fonctionnalites.extra.${key}.desc`)}
+              </p>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+
       <CtaSection title={t('fonctionnalites.cta.title')} />
     </MarketingShell>
   )
