@@ -55,10 +55,15 @@ export interface ScheduledMatch {
   awayTeamId: Id
 }
 
-/** A played (or partially played) group match used to compute standings. */
+/**
+ * A played (or partially played) group match used to compute standings.
+ *
+ * `awayTeamId` is null for a Swiss BYE: an odd field leaves one team without an
+ * opponent that round, which counts as a win even though no match is played.
+ */
 export interface MatchResult {
   homeTeamId: Id
-  awayTeamId: Id
+  awayTeamId: Id | null
   scoreHome: number | null
   scoreAway: number | null
   fairplayWinner: 'home' | 'away' | 'none'

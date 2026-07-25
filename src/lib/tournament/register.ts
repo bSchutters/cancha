@@ -81,16 +81,40 @@ export async function registerTeam(payload: Payload, slug: string, raw: unknown,
     },
   })
 
-  await sendConfirmationEmail(tournament, input, waitlisted).catch((err) => {
+  await sendConfirmationEmail(payload, tournament, input, waitlisted).catch((err) => {
     console.error('Registration email failed (non-blocking):', err)
   })
 
   return { ok: true, waitlisted }
 }
 
-async function sendConfirmationEmail(tournament: AnyDoc, input: RegistrationInput, waitlisted: boolean) {
+/**
+ * Name of the organization running the tournament, for the email signature.
+ * Falls back to the tournament name — never to another club's name.
+ */
+async function organizerName(payload: Payload, tournament: AnyDoc): Promise<string> {
+  const tenant = tournament.tenant
+  const id = tenant != null && typeof tenant === 'object' ? (tenant as { id?: unknown }).id : tenant
+  if (id == null) return String(tournament.name ?? '')
+  try {
+    const org = await payload.findByID({ collection: 'organizations', id: id as number, depth: 0 })
+    return String((org as AnyDoc)?.name ?? tournament.name ?? '')
+  } catch {
+    return String(tournament.name ?? '')
+  }
+}
+
+async function sendConfirmationEmail(
+  payload: Payload,
+  tournament: AnyDoc,
+  input: RegistrationInput,
+  waitlisted: boolean,
+) {
   if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) return
   const resend = new Resend(process.env.RESEND_API_KEY)
+  // Multi-tenant: every club signs its own emails. This was hardcoded to a single
+  // club, so every organization's registrants received mail from that club.
+  const organizer = await organizerName(payload, tournament)
 
   const payment: string[] = []
   if (tournament.payment_amount) payment.push(`Montant : ${tournament.payment_amount} €`)
@@ -104,14 +128,14 @@ async function sendConfirmationEmail(tournament: AnyDoc, input: RegistrationInpu
   const body = waitlisted
     ? `Bonjour,\n\nLe tournoi ${tournament.name} est complet : l’équipe « ${input.teamName} » ` +
       `est inscrite sur la liste d’attente. Nous vous contacterons si une place se libère.\n\n` +
-      `À très bientôt,\nL’équipe UD Asturiana`
+      `À très bientôt,\nL’équipe ${organizer}`
     : `Bonjour,\n\nNous avons bien reçu l’inscription de l’équipe « ${input.teamName} » ` +
       `au tournoi ${tournament.name}.\n\nVotre inscription est en attente de validation. ` +
       `Elle sera confirmée dès réception du paiement.${paymentBlock}\n\n` +
-      `À très bientôt,\nL’équipe UD Asturiana`
+      `À très bientôt,\nL’équipe ${organizer}`
 
   await resend.emails.send({
-    from: `UD Asturiana Cup <${process.env.RESEND_FROM_EMAIL}>`,
+    from: `${organizer} <${process.env.RESEND_FROM_EMAIL}>`,
     to: input.email,
     subject: waitlisted ? `Liste d’attente - ${tournament.name}` : `Inscription reçue - ${tournament.name}`,
     text: body,

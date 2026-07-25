@@ -23,7 +23,10 @@ export function fairplayRanking(
 
   for (const m of results) {
     if (m.fairplayWinner === 'home') points.set(m.homeTeamId, (points.get(m.homeTeamId) ?? 0) + 1)
-    else if (m.fairplayWinner === 'away') points.set(m.awayTeamId, (points.get(m.awayTeamId) ?? 0) + 1)
+    // A bye (no opponent) can never award a fair-play point.
+    else if (m.fairplayWinner === 'away' && m.awayTeamId != null) {
+      points.set(m.awayTeamId, (points.get(m.awayTeamId) ?? 0) + 1)
+    }
   }
 
   const ranked = teams

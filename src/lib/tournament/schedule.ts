@@ -140,7 +140,7 @@ function addMinutes(hhmm: string, min: number): string {
  * For the standard 4-groups / 4-courts format this reproduces the hand-tuned
  * layout: quarts → placement T1 → demis+5-8 → placement T2 → final+petite.
  */
-function scheduleFinals(finals: ScheduleMatch[], courts: number): Map<Id, number> {
+export function scheduleFinals(finals: ScheduleMatch[], courts: number): Map<Id, number> {
   const C = Math.max(1, courts)
   // Dependency graph: B depends on A when A feeds B (winner or loser).
   const prereq = new Map<Id, Id[]>()
@@ -155,9 +155,15 @@ function scheduleFinals(finals: ScheduleMatch[], courts: number): Map<Id, number
     (m) => m.phase === 'knockout' && !isPlaceMatch(m.bracketLabel) && !isPetiteMatch(m.bracketLabel),
   )
   const maxKoRound = koReal.length ? Math.max(...koReal.map((m) => m.round ?? 1)) : 0
-  const finalM =
-    koReal.find((m) => (m.round ?? 1) === maxKoRound && m.nextMatchId == null) ??
-    koReal.find((m) => (m.round ?? 1) === maxKoRound)
+  // The true final is the match nothing follows (the sink of the feeder graph),
+  // NOT the highest round number. In double elimination the grand final is round
+  // 1 of its own side while the losers bracket climbs higher, so going by round
+  // picked the losers final and scheduled the grand final BEFORE the match that
+  // decides one of its two teams.
+  const sinks = koReal.filter((m) => m.nextMatchId == null)
+  const finalM = sinks.length
+    ? sinks.reduce((best, m) => ((m.round ?? 1) > (best.round ?? 1) ? m : best))
+    : koReal.find((m) => (m.round ?? 1) === maxKoRound)
   const petiteM = finals.find((m) => isPetiteMatch(m.bracketLabel))
   const lastIds = new Set<Id>([finalM?.id, petiteM?.id].filter((x): x is Id => x != null))
 
