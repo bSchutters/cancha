@@ -1286,4 +1286,9 @@ export const en: Dictionary = {
   "product.ranking.eliminated": "Eliminated",
   "product.feeder.winner": "Winner {code}",
   "product.feeder.loser": "Loser {code}",
+  "product.manage.backToSite": "Back to the site",
+  "product.login.demoTitle": "Demo account",
+  "product.login.demoFill": "Fill in automatically",
+  "product.cfg.demoBlocked": "Creation is blocked in demo mode. Use the tournaments already available.",
+  "product.cfg.demoBlockedHint": "You are on the demo account: the form is browsable, but creating is blocked. Try the tournaments already available instead.",
 }

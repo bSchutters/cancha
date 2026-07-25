@@ -1286,4 +1286,9 @@ export const nl: Dictionary = {
   "product.ranking.eliminated": "Uitgeschakeld",
   "product.feeder.winner": "Winnaar {code}",
   "product.feeder.loser": "Verliezer {code}",
+  "product.manage.backToSite": "Terug naar de site",
+  "product.login.demoTitle": "Demo-account",
+  "product.login.demoFill": "Automatisch invullen",
+  "product.cfg.demoBlocked": "Aanmaken is geblokkeerd in demomodus. Gebruik de bestaande toernooien.",
+  "product.cfg.demoBlockedHint": "Je gebruikt het demo-account: het formulier is te bekijken, maar aanmaken is geblokkeerd. Test liever de bestaande toernooien.",
 }

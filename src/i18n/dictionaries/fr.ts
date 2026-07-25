@@ -1285,4 +1285,9 @@ export const fr: Record<string, string> = {
   "product.ranking.eliminated": "Éliminé",
   "product.feeder.winner": "Vainqueur {code}",
   "product.feeder.loser": "Perdant {code}",
+  "product.manage.backToSite": "Retour au site",
+  "product.login.demoTitle": "Compte de démonstration",
+  "product.login.demoFill": "Remplir automatiquement",
+  "product.cfg.demoBlocked": "Création bloquée en mode démo. Utilisez les tournois déjà disponibles.",
+  "product.cfg.demoBlockedHint": "Vous êtes sur le compte de démonstration : le formulaire est consultable, mais la création est bloquée. Testez plutôt les tournois déjà disponibles.",
 }
