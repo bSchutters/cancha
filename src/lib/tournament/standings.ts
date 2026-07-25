@@ -34,6 +34,8 @@ function headToHead(
 
   for (const m of results) {
     if (!isPlayed(m)) continue
+    // A bye has no opponent, so it is not a head-to-head result.
+    if (m.awayTeamId == null) continue
     if (!ids.has(m.homeTeamId) || !ids.has(m.awayTeamId)) continue
     const h = mini.get(m.homeTeamId)!
     const a = mini.get(m.awayTeamId)!
@@ -76,6 +78,18 @@ export function computeStandings(
   teams.forEach((t) => table.set(t.id, blankStanding(t)))
 
   for (const m of results) {
+    // Swiss bye: no opponent, no score, but it counts as a win — the pairing
+    // engine already ranks it that way, so the table must agree or the team
+    // silently loses those points in the published standings.
+    if (m.awayTeamId == null) {
+      const solo = table.get(m.homeTeamId)
+      if (solo) {
+        solo.played++
+        solo.wins++
+        solo.points += scoring.win
+      }
+      continue
+    }
     if (!isPlayed(m)) continue
     const home = table.get(m.homeTeamId)
     const away = table.get(m.awayTeamId)

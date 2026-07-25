@@ -13,6 +13,42 @@ const m = (
   fp: MatchResult['fairplayWinner'] = 'none',
 ): MatchResult => ({ homeTeamId: h, awayTeamId: a, scoreHome: sh, scoreAway: sa, fairplayWinner: fp })
 
+/** A Swiss bye: the team is idle that round, which counts as a win. */
+const bye = (h: number): MatchResult => ({
+  homeTeamId: h,
+  awayTeamId: null,
+  scoreHome: null,
+  scoreAway: null,
+  fairplayWinner: 'none',
+})
+
+describe('computeStandings — Swiss bye', () => {
+  it('awards the win points for a bye', () => {
+    // T1 is idle in round 1 (odd field), then beats T2. Both wins must count.
+    const table = computeStandings(teams, [bye(1), m(1, 2, 2, 0)])
+    const t1 = table.find((s) => s.teamId === 1)!
+    expect(t1.played).toBe(2)
+    expect(t1.wins).toBe(2)
+    expect(t1.points).toBe(6) // futsal 3-1-0
+  })
+
+  it('uses the sport’s own win value for a bye', () => {
+    const rugby = { scoring: { win: 4, draw: 2, loss: 0 } } as SportProfile
+    const table = computeStandings(teams, [bye(1)], rugby)
+    expect(table.find((s) => s.teamId === 1)!.points).toBe(4)
+  })
+
+  it('never credits goals or a fair-play point to a bye', () => {
+    const table = computeStandings(teams, [bye(1)])
+    const t1 = table.find((s) => s.teamId === 1)!
+    expect(t1.goalsFor).toBe(0)
+    expect(t1.goalsAgainst).toBe(0)
+    expect(t1.fairplayPoints).toBe(0)
+    // And no phantom opponent got anything.
+    expect(table.filter((s) => s.played > 0)).toHaveLength(1)
+  })
+})
+
 describe('computeStandings', () => {
   it('orders by points then goal difference', () => {
     const results = [m(1, 2, 3, 0), m(1, 3, 1, 0), m(2, 3, 1, 0), m(1, 4, 2, 0), m(2, 4, 1, 0), m(3, 4, 1, 0)]

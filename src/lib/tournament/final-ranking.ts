@@ -1,5 +1,5 @@
 import type { Id } from './types'
-import { isPlaceMatch as isPlaceLabel, isPetiteMatch as isPetiteLabel } from './bracket-kind'
+import { isPlaceMatch as isPlaceLabel, isPetiteMatch as isPetiteLabel, classifyBracket } from './bracket-kind'
 
 export interface FinalMatchInput {
   phase: 'group' | 'knockout' | 'classification'
@@ -37,10 +37,81 @@ function noteFor(pos: number): string {
   return 'Classement'
 }
 
+const winnerOfMatch = (m: FinalMatchInput): Id | null => {
+  if (m.scoreHome == null || m.scoreAway == null) return null
+  if (m.scoreHome > m.scoreAway) return m.homeTeamId
+  if (m.scoreAway > m.scoreHome) return m.awayTeamId
+  if (m.penaltyWinner === 'home') return m.homeTeamId
+  if (m.penaltyWinner === 'away') return m.awayTeamId
+  return null
+}
+
+const loserOfMatch = (m: FinalMatchInput): Id | null => {
+  const w = winnerOfMatch(m)
+  if (w == null) return null
+  return w === m.homeTeamId ? m.awayTeamId : m.homeTeamId
+}
+
+/**
+ * Ranking for a DOUBLE-ELIMINATION draw.
+ *
+ * The single-elimination logic cannot be reused: it treats the highest-numbered
+ * round as the final, but here the grand final is round 1 of its own side while
+ * the losers bracket climbs to a much higher number — so it crowned the losers
+ * finalist and pushed the real champion to the bottom.
+ *
+ * The ordering principle is different too. Every team except the champion is
+ * eliminated exactly once, by its SECOND defeat, which always happens either in
+ * the grand final or in a losers round. Surviving longer in the losers bracket
+ * therefore means a better place, and teams knocked out in the same losers round
+ * share a tier.
+ *
+ * Returns null when the draw has no grand final (i.e. it is not double
+ * elimination), so the caller falls back to the standard logic.
+ */
+function rankDoubleElim(ko: FinalMatchInput[]): FinalRankEntry[] | null {
+  const grandFinal = ko.find((m) => classifyBracket(m.bracketLabel).kind === 'grandFinal')
+  if (!grandFinal) return null
+
+  const entries: FinalRankEntry[] = []
+  const seen = new Set<Id>()
+  const push = (teamId: Id | null, position: number, positionLabel: string) => {
+    if (teamId == null || seen.has(teamId)) return
+    seen.add(teamId)
+    entries.push({ position, positionLabel, teamId, note: noteFor(position) })
+  }
+
+  push(winnerOfMatch(grandFinal), 1, '1')
+  push(loserOfMatch(grandFinal), 2, '2')
+
+  // Losers rounds, latest first: the last one eliminates 3rd place, and so on.
+  const byRound = new Map<number, Id[]>()
+  for (const m of ko) {
+    const k = classifyBracket(m.bracketLabel)
+    if (k.kind !== 'repechage') continue
+    const out = loserOfMatch(m)
+    if (out == null || seen.has(out)) continue
+    byRound.set(k.n, [...(byRound.get(k.n) ?? []), out])
+  }
+
+  let position = entries.length + 1
+  for (const round of [...byRound.keys()].sort((a, b) => b - a)) {
+    const tier = byRound.get(round)!.filter((id) => !seen.has(id))
+    if (tier.length === 0) continue
+    const last = position + tier.length - 1
+    const label = tier.length > 1 ? `${position}-${last}` : String(position)
+    for (const id of tier) push(id, position, label)
+    position = last + 1
+  }
+  return entries
+}
+
 export function computeFinalRanking(matches: FinalMatchInput[]): FinalRankEntry[] {
   // The real bracket = knockout matches that don't decide an explicit place pair.
   const ko = matches.filter((m) => m.phase === 'knockout' && !isPlaceMatch(m))
   if (ko.length === 0) return []
+  const doubleElim = rankDoubleElim(ko)
+  if (doubleElim) return doubleElim
   const maxRound = Math.max(...ko.map((m) => m.round ?? 1))
 
   const winnerOf = (m: FinalMatchInput): Id | null => {
