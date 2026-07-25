@@ -91,6 +91,136 @@ export const SPORTS: SportContent[] = [
       'Plusieurs tables jouées en parallèle',
     ],
   },
+  {
+    slug: 'handball',
+    name: 'Handball',
+    eyebrow: 'Logiciel de tournoi de handball',
+    h1: 'Votre tournoi de handball, géré de bout en bout',
+    intro:
+      'Poules, calendrier sur plusieurs salles et classements au barème officiel : Cancha suit vos rencontres de handball du tirage au sort jusqu’au podium.',
+    formats: [
+      'Handball à 7 ou à 4 (mini-hand)',
+      'Barème 2-1-0 avec matchs nuls',
+      'Poules puis phase finale',
+    ],
+  },
+  {
+    slug: 'tennis',
+    name: 'Tennis',
+    eyebrow: 'Logiciel de tournoi de tennis',
+    h1: 'Organisez votre tournoi de tennis sans paperasse',
+    intro:
+      'Saisissez le score set par set : Cancha calcule le nombre de sets gagnés, met à jour le classement et fait avancer le tableau tout seul.',
+    formats: [
+      'Simples ou doubles',
+      'Score set par set, sans match nul',
+      'Planning réparti sur tous vos courts',
+    ],
+  },
+  {
+    slug: 'badminton',
+    name: 'Badminton',
+    eyebrow: 'Logiciel de tournoi de badminton',
+    h1: 'Votre tournoi de badminton, du tirage au tableau final',
+    intro:
+      'Les matchs s’enchaînent vite au badminton : Cancha répartit les rencontres sur vos terrains, encaisse les scores manche par manche et recale le planning en cas de retard.',
+    formats: [
+      'Simples, doubles ou doubles mixtes',
+      'Score manche par manche',
+      'Rotation rapide sur plusieurs terrains',
+    ],
+  },
+  {
+    slug: 'squash',
+    name: 'Squash',
+    eyebrow: 'Logiciel de tournoi de squash',
+    h1: 'Gérez votre tournoi de squash court par court',
+    intro:
+      'Avec peu de courts et beaucoup de joueurs, le planning est le nerf de la guerre. Cancha construit le calendrier, affiche qui joue où, et met le classement à jour à chaque manche saisie.',
+    formats: [
+      'Tableaux individuels',
+      'Score en manches gagnantes',
+      'Planning optimisé sur un nombre de courts limité',
+    ],
+  },
+  {
+    slug: 'beach-volley',
+    name: 'Beach-volley',
+    eyebrow: 'Logiciel de tournoi de beach-volley',
+    h1: 'Votre tournoi de beach-volley, organisé sur le sable',
+    intro:
+      'Inscriptions par paires, poules équilibrées et classement aux sets : Cancha gère votre tournoi de beach-volley pendant que vous gardez les yeux sur les terrains.',
+    formats: [
+      'Tournoi par paires (2 contre 2)',
+      'Score en sets gagnés',
+      'Plusieurs terrains de sable en parallèle',
+    ],
+  },
+  {
+    slug: 'hockey',
+    name: 'Hockey',
+    eyebrow: 'Logiciel de tournoi de hockey',
+    h1: 'Votre tournoi de hockey, du tirage au classement final',
+    intro:
+      'Cancha gère les poules, le calendrier sur plusieurs terrains et le classement au barème 3-1-0, avec les matchs nuls que le hockey autorise en phase de groupes.',
+    formats: [
+      'Hockey sur gazon ou en salle',
+      'Barème 3-1-0 avec matchs nuls',
+      'Poules puis phase finale',
+    ],
+  },
+  {
+    slug: 'rugby',
+    name: 'Rugby',
+    eyebrow: 'Logiciel de tournoi de rugby',
+    h1: 'Organisez votre tournoi de rugby, barème officiel compris',
+    intro:
+      'Cancha applique le barème rugby (4 points la victoire, 2 le nul) et tient le classement à jour à chaque score saisi, sur un ou plusieurs terrains.',
+    formats: [
+      'Rugby à 7, à 10 ou à 15',
+      'Barème 4-2-0 avec matchs nuls',
+      'Tournoi sur une journée, plusieurs terrains',
+    ],
+  },
+  {
+    slug: 'water-polo',
+    name: 'Water-polo',
+    eyebrow: 'Logiciel de tournoi de water-polo',
+    h1: 'Votre tournoi de water-polo, planifié bassin par bassin',
+    intro:
+      'Créneaux de bassin serrés, équipes nombreuses : Cancha construit un calendrier réaliste, suit les buts et publie le classement en direct pour le public au bord de l’eau.',
+    formats: [
+      'Tournoi en bassin, équipes complètes',
+      'Barème 3-1-0 avec matchs nuls',
+      'Créneaux calés sur la disponibilité du bassin',
+    ],
+  },
+  {
+    slug: 'petanque',
+    name: 'Pétanque',
+    eyebrow: 'Logiciel de tournoi de pétanque',
+    h1: 'Votre concours de pétanque, sans feuille de match perdue',
+    intro:
+      'Doublettes, triplettes ou tête-à-tête : Cancha gère les inscriptions, tire les parties et tient le classement à jour pendant que vous annoncez les résultats au micro.',
+    formats: [
+      'Doublettes, triplettes ou tête-à-tête',
+      'Parties en 13 points, sans match nul',
+      'Plusieurs terrains joués en parallèle',
+    ],
+  },
+  {
+    slug: 'flechettes',
+    name: 'Fléchettes',
+    eyebrow: 'Logiciel de tournoi de fléchettes',
+    h1: 'Votre tournoi de fléchettes, des poules à la finale',
+    intro:
+      'Cancha compte les manches gagnées, fait avancer le tableau et affiche le classement sur un écran, pour que le café suive la soirée sans que vous couriez partout.',
+    formats: [
+      'Tournoi individuel ou par équipes',
+      'Score en manches gagnantes',
+      'Plusieurs cibles jouées en parallèle',
+    ],
+  },
 ]
 
 export type ProfileContent = {
