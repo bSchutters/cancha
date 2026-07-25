@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { generateBracket } from '@/lib/tournament/orchestrator'
 import { requireTournamentManager, runAction, unauthorized } from '@/lib/tournament/server'
+import { withTournamentLock } from '@/lib/tournament/lock'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -9,5 +10,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { slug } = await params
   const auth = await requireTournamentManager(request, slug)
   if (!auth) return unauthorized()
-  return runAction(() => generateBracket(auth.payload, auth.tournamentId))
+  return runAction(() => withTournamentLock(auth.tournamentId, () => generateBracket(auth.payload, auth.tournamentId)))
 }

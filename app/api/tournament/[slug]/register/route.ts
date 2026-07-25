@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getPayloadClient } from '@/lib/payload'
 import { registerTeam } from '@/lib/tournament/register'
 import { TournamentError } from '@/lib/tournament/orchestrator'
+import { rateLimited, clientIp } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,8 +13,20 @@ const ERROR_STATUS: Record<string, number> = {
   VALIDATION_ERROR: 400,
 }
 
+/** Biggest team logo accepted, in bytes. Generous for a crest, small enough that
+ *  the upload cannot be used to burn blob storage. */
+const MAX_LOGO_BYTES = 2 * 1024 * 1024
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  // Public endpoint that both writes rows and sends an email on every call, so
+  // it is the natural target for a script: cap it per client.
+  if (rateLimited('register', clientIp(request), 10)) {
+    return NextResponse.json(
+      { error: { code: 'RATE_LIMITED', message: 'Trop de tentatives, réessayez dans une minute.' } },
+      { status: 429 },
+    )
+  }
   try {
     const payload = await getPayloadClient()
     const contentType = request.headers.get('content-type') ?? ''
@@ -30,6 +43,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         website: fd.get('website'),
       }
       const file = fd.get('logo')
+      if (file instanceof File && file.size > MAX_LOGO_BYTES) {
+        return NextResponse.json(
+          { error: { code: 'VALIDATION_ERROR', message: 'Logo trop volumineux (2 Mo maximum).' } },
+          { status: 400 },
+        )
+      }
+      // `file.type` is client-declared and trivially spoofed, so it is a filter,
+      // not a guarantee; the size cap above is what bounds the damage.
       if (file instanceof File && file.size > 0 && file.type.startsWith('image/')) {
         const buffer = Buffer.from(await file.arrayBuffer())
         const media = await payload.create({
