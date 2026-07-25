@@ -37,6 +37,8 @@ export default defineConfig({
       DATABASE_URI: TEST_DATABASE_URI,
       PAYLOAD_SECRET: 'e2e-test-secret-key-1234567890',
       NODE_ENV: 'development',
+      // The live demo is opt-in per deployment; turn it on so its spec can run.
+      DEMO_ENABLED: 'true',
     },
   },
 })

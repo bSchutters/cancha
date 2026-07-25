@@ -2,6 +2,14 @@ import type { Metadata } from 'next'
 import { MarketingShell } from '@/components/marketing/shell'
 import { DemoExplorer } from '@/components/marketing/demo-explorer'
 import { CtaSection } from '@/components/marketing/cta-section'
+import { LiveDemo } from '@/components/marketing/live-demo'
+import { isDemoEnabled } from '@/lib/demo/config'
+import {
+  DEMO_SHOWCASE_SLUG,
+  DEMO_PLAYGROUND_NAME,
+  DEMO_EMAIL,
+  DEMO_PASSWORD,
+} from '@/lib/demo/seed'
 import { display } from '@/components/marketing/theme'
 import { makeT } from '@/i18n'
 import { isLocale, DEFAULT_LOCALE } from '@/i18n/config'
@@ -34,6 +42,16 @@ export default async function DemoPage({ params }: { params: Promise<{ lang: str
       <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
         <DemoExplorer />
       </section>
+
+      {/* Only on a deployment that opted into the public demo (DEMO_ENABLED). */}
+      {isDemoEnabled() && (
+        <LiveDemo
+          showcaseSlug={DEMO_SHOWCASE_SLUG}
+          playgroundName={DEMO_PLAYGROUND_NAME}
+          email={DEMO_EMAIL}
+          password={DEMO_PASSWORD}
+        />
+      )}
 
       <CtaSection title={t('demo.cta.title')} />
     </MarketingShell>
