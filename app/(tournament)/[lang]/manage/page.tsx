@@ -1,6 +1,6 @@
 import { LocaleLink } from '@/components/locale-link'
 import { getPayloadClient } from '@/lib/payload'
-import { getSessionUser, getUserTenantId } from '@/lib/tournament/session'
+import { getSessionUser, getUserTenantIds } from '@/lib/tournament/session'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { makeT } from '@/i18n'
@@ -12,11 +12,12 @@ export default async function ManageHomePage({ params }: { params: Promise<{ lan
   const { lang } = await params
   const t = makeT(isLocale(lang) ? lang : DEFAULT_LOCALE)
   const payload = await getPayloadClient()
-  // A manager only lists their own organization's tournaments (super-admin: all).
-  const tenantId = getUserTenantId(await getSessionUser())
+  // A manager only lists their own organizations' tournaments (super-admin: all).
+  // An empty list means a manager with no organization: they must see nothing.
+  const tenantIds = getUserTenantIds(await getSessionUser())
   const res = await payload.find({
     collection: 'tournaments',
-    where: tenantId != null ? { tenant: { equals: tenantId } } : undefined,
+    where: tenantIds !== null ? { tenant: { in: tenantIds.length ? tenantIds : [-1] } } : undefined,
     sort: '-edition_date',
     limit: 200,
     depth: 0,

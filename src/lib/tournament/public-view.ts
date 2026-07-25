@@ -6,6 +6,7 @@ import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { computeFinalRanking } from './final-ranking'
 import { rankAll, type RankingDepth } from './bracket'
+import { safeExternalUrl } from './safe-url'
 import type { BracketMatch, Id, MatchResult, QualifiedTeam, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
 
@@ -509,14 +510,14 @@ export async function buildPublicTournament(
       id: sp.id,
       name: sp.name,
       logoUrl: sp.logo && typeof sp.logo === 'object' ? (sp.logo.url ?? null) : null,
-      url: sp.url ?? null,
+      url: safeExternalUrl(sp.url),
     })),
     venue:
       t.venue_name || t.venue_address || t.venue_maps_url || t.venue_map || t.practical_info
         ? {
             name: t.venue_name ?? null,
             address: t.venue_address ?? null,
-            mapsUrl: t.venue_maps_url ?? null,
+            mapsUrl: safeExternalUrl(t.venue_maps_url),
             mapUrl: visualUrl(t.venue_map),
             info: t.practical_info ?? null,
           }

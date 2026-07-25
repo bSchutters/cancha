@@ -924,11 +924,35 @@ export interface ScoreInput {
   setScores?: { home: number; away: number }[]
 }
 
+/**
+ * Highest score accepted for a single match. Well above any real result (a 200-point
+ * basketball game is already unheard of) while keeping the number small enough that
+ * a typo or a hostile payload cannot wreck goal difference across the standings.
+ */
+const MAX_SCORE = 999
+
+/**
+ * A score must be a real, non-negative whole number. `typeof x === 'number'` is not
+ * enough: NaN is a number, and the route builds values with `Number(...)`, which
+ * turns any junk input into NaN.
+ */
+function assertScore(value: unknown, label: string): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0 || value > MAX_SCORE) {
+    throw new TournamentError('VALIDATION_ERROR', `${label} : score invalide (entier entre 0 et ${MAX_SCORE})`)
+  }
+  return value
+}
+
 /** Enter (or correct) a match score. Hooks handle bracket propagation + cache. */
 export async function enterScore(payload: Payload, matchId: Id, input: ScoreInput) {
-  if (typeof input.scoreHome !== 'number' || typeof input.scoreAway !== 'number') {
-    throw new TournamentError('VALIDATION_ERROR', 'Scores requis')
+  assertScore(input.scoreHome, 'Domicile')
+  assertScore(input.scoreAway, 'Extérieur')
+  for (const [i, s] of (input.setScores ?? []).entries()) {
+    assertScore(s.home, `Set ${i + 1} domicile`)
+    assertScore(s.away, `Set ${i + 1} extérieur`)
   }
+  if (input.penaltyHome != null) assertScore(input.penaltyHome, 'Tirs au but domicile')
+  if (input.penaltyAway != null) assertScore(input.penaltyAway, 'Tirs au but extérieur')
   let match: AnyDoc
   try {
     match = await payload.findByID({ collection: 'tournament-matches', id: matchId as number, depth: 0 })

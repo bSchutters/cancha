@@ -4,7 +4,8 @@ import { getSportProfile, type SportId } from '../sport'
 import { fairplayRanking } from './fairplay'
 import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
-import { getSessionUser, getUserTenantId } from './session'
+import { getSessionUser, getUserTenantIds } from './session'
+import { safeExternalUrl } from './safe-url'
 import { computeFinalRanking as computeFinalRankingRaw, type FinalMatchInput } from './final-ranking'
 import type { Id, MatchResult, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
@@ -152,13 +153,16 @@ export async function buildManageTournament(
   payload: Payload,
   slug: string,
 ): Promise<ManageTournament | null> {
-  // Tenant isolation: a manager can only load their own organization's tournament
+  // Tenant isolation: a manager can only load their own organizations' tournament
   // (a super-admin is not scoped). Slug uniqueness is per-tenant, so we filter on both.
-  const tenantId = getUserTenantId(await getSessionUser())
+  // `null` means super-admin (unrestricted); an EMPTY list means a manager with no
+  // organization, who must see nothing rather than everything.
+  const tenantIds = getUserTenantIds(await getSessionUser())
+  if (tenantIds !== null && tenantIds.length === 0) return null
   const slugFilter = { slug: { equals: slug } }
   const res = await payload.find({
     collection: 'tournaments',
-    where: tenantId != null ? { and: [slugFilter, { tenant: { equals: tenantId } }] } : slugFilter,
+    where: tenantIds !== null ? { and: [slugFilter, { tenant: { in: tenantIds } }] } : slugFilter,
     limit: 1,
     depth: 1,
   })
@@ -411,7 +415,7 @@ export async function buildManageTournament(
     venue: {
       name: t.venue_name ?? null,
       address: t.venue_address ?? null,
-      mapsUrl: t.venue_maps_url ?? null,
+      mapsUrl: safeExternalUrl(t.venue_maps_url),
       mapId: t.venue_map && typeof t.venue_map === 'object' ? (t.venue_map.id ?? null) : (t.venue_map ?? null),
       mapUrl: t.venue_map && typeof t.venue_map === 'object' ? (t.venue_map.url ?? null) : null,
       info: t.practical_info ?? null,
@@ -432,7 +436,7 @@ export async function buildManageTournament(
       id: sp.id,
       name: sp.name,
       logoUrl: sp.logo && typeof sp.logo === 'object' ? (sp.logo.url ?? null) : null,
-      url: sp.url ?? null,
+      url: safeExternalUrl(sp.url),
     })),
     finalRanking,
     fairplayWinnerId: idOf(t.fairplay_winner_team),

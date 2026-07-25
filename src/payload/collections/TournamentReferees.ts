@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrManager } from '../access'
+import { isAdmin, isAdminOrManager, isAdminOrManagerField } from '../access'
 import { setTenantFromTournament } from '../hooks/tenantFromTournament'
 
 export const TournamentReferees: CollectionConfig = {
@@ -30,6 +30,8 @@ export const TournamentReferees: CollectionConfig = {
       name: 'contact',
       type: 'text',
       label: 'Contact (tel / email)',
+      // Personal data: the public pages only ever show a referee's name.
+      access: { read: isAdminOrManagerField },
     },
     {
       name: 'tournament',
