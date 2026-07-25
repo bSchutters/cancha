@@ -94,20 +94,12 @@ async function upsertDemoUser(payload: Payload, tenantId: number): Promise<void>
   await payload.create({ collection: 'users', data })
 }
 
-/** Delete a tournament and everything hanging off it, if it exists. */
-async function wipeTournament(payload: Payload, slug: string): Promise<void> {
-  const found = await payload.find({
-    collection: 'tournaments',
-    where: { slug: { equals: slug } },
-    limit: 1,
-    depth: 0,
-  })
-  const t = found.docs[0] as AnyDoc | undefined
-  if (!t) return
+/** Delete one tournament and everything hanging off it. */
+async function wipeTournament(payload: Payload, tournamentId: number): Promise<void> {
   for (const collection of ['tournament-matches', 'tournament-teams', 'tournament-sponsors', 'tournament-referees'] as const) {
     const docs = await payload.find({
       collection,
-      where: { tournament: { equals: t.id } },
+      where: { tournament: { equals: tournamentId } },
       limit: 2000,
       depth: 0,
     })
@@ -115,7 +107,27 @@ async function wipeTournament(payload: Payload, slug: string): Promise<void> {
       await payload.delete({ collection, id: doc.id as number })
     }
   }
-  await payload.delete({ collection: 'tournaments', id: t.id as number })
+  await payload.delete({ collection: 'tournaments', id: tournamentId })
+}
+
+/**
+ * Empty the whole demo organization.
+ *
+ * Deliberately not limited to the two seeded slugs: visitors can create their
+ * own tournaments — which is the most telling thing they can try — and without
+ * this the demo would silently accumulate everything they ever made. Scoped to
+ * the demo tenant, so it can never reach a real club's data.
+ */
+async function wipeDemoOrganization(payload: Payload, tenantId: number): Promise<void> {
+  const tournaments = await payload.find({
+    collection: 'tournaments',
+    where: { tenant: { equals: tenantId } },
+    limit: 500,
+    depth: 0,
+  })
+  for (const t of tournaments.docs as AnyDoc[]) {
+    await wipeTournament(payload, t.id as number)
+  }
 }
 
 async function createTournament(
@@ -227,8 +239,9 @@ export async function seedDemo(payload: Payload): Promise<DemoSeedResult> {
   const tenantId = await upsertOrganization(payload)
   await upsertDemoUser(payload, tenantId)
 
-  await wipeTournament(payload, DEMO_SHOWCASE_SLUG)
-  await wipeTournament(payload, DEMO_PLAYGROUND_SLUG)
+  // Everything the demo organization holds, including tournaments a visitor
+  // created themselves.
+  await wipeDemoOrganization(payload, tenantId)
 
   // 1. Showcase: driven all the way through the real engine.
   const showcaseId = await createTournament(

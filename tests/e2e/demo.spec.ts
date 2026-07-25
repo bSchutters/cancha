@@ -1,5 +1,5 @@
 import { test, expect, request as playwrightRequest } from '@playwright/test'
-import { waitForSchema, seedGroupsKoTournament } from './db'
+import { waitForSchema, seedGroupsKoTournament, withDb } from './db'
 import { publicUrl } from './helpers'
 
 /**
@@ -70,6 +70,62 @@ test.describe('live demo', () => {
       page.getByRole('button', { name: 'Tirage des poules' }).click(),
     ])
     expect(drawResp.ok(), 'the demo account must be able to run the draw').toBeTruthy()
+  })
+
+  test('the demo account may browse the creation form but not create', async ({ page }) => {
+    await loginAsDemo(page)
+    await page.goto('/fr/manage/new')
+
+    // The form is explorable — that is the point, it shows the 18 sports and the
+    // 5 formats — but a banner says upfront that creating will not work.
+    await expect(page.getByText(/création est bloquée/i)).toBeVisible()
+    // The sport and format pickers are still there to be explored.
+    await expect(page.locator('button[role="combobox"]').first()).toBeVisible()
+
+    // Enforced server-side, not just in the UI: a crafted request is refused too.
+    const res = await page.evaluate(async () => {
+      const r = await fetch('/api/tournaments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: 'Contournement',
+          slug: `demo-bypass-${Date.now()}`,
+          status: 'registration',
+          sport: 'futsal',
+          format: 'groups_ko',
+          num_groups: 2,
+          group_size: 4,
+          qualifiers_per_group: 2,
+        }),
+      })
+      return r.status
+    })
+    expect(res, 'the demo account must not be able to create, even via the API').toBe(403)
+  })
+
+  test('reset empties the whole demo organization, not just the seeded slugs', async ({ request }) => {
+    // Anything that ends up in the demo org must be cleared, whoever put it
+    // there — otherwise the demo silently accumulates between resets. Inserted
+    // directly here, since the demo account itself is no longer allowed to create.
+    const slug = `demo-lefto ver-${Date.now()}`.replace(' ', '')
+    await withDb(async (c) => {
+      const org = await c.query(`select id from organizations where slug = 'demo'`)
+      await c.query(
+        `insert into tournaments (name, slug, sport, format, status, num_groups, group_size, qualifiers_per_group, tenant_id)
+         values ('Résidu', $1, 'futsal', 'groups_ko', 'registration', 2, 4, 2, $2)`,
+        [slug, org.rows[0].id],
+      )
+    })
+
+    const reset = await request.post('/api/demo/reset')
+    expect(reset.ok(), await reset.text()).toBeTruthy()
+
+    const left = await withDb(async (c) => {
+      const r = await c.query(`select count(*)::int as n from tournaments where slug = $1`, [slug])
+      return r.rows[0].n
+    })
+    expect(left, 'a leftover tournament in the demo org must be wiped').toBe(0)
   })
 
   test('the demo account cannot reach another organization', async ({ page, request }) => {

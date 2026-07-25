@@ -148,7 +148,16 @@ function Num({
   )
 }
 
-export function TournamentConfigForm({ initial, isOwner = false }: { initial?: ManageTournament; isOwner?: boolean }) {
+export function TournamentConfigForm({
+  initial,
+  isOwner = false,
+  demoLocked = false,
+}: {
+  initial?: ManageTournament
+  isOwner?: boolean
+  /** Demo account: the form is explorable, but creating is refused (server-enforced). */
+  demoLocked?: boolean
+}) {
   const router = useRouter()
   const t = useT()
   const [s, setS] = useState<FormState>(initialState(initial))
@@ -194,6 +203,12 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // The server refuses this anyway; saying so here turns a raw 403 into an
+    // explanation, and saves a pointless round trip.
+    if (demoLocked && !initial) {
+      toast.error(t('product.cfg.demoBlocked'))
+      return
+    }
     const configError = validateConfig(s, t)
     if (configError) {
       toast.error(configError)
@@ -259,6 +274,12 @@ export function TournamentConfigForm({ initial, isOwner = false }: { initial?: M
 
   return (
     <form onSubmit={onSubmit} className="space-y-8">
+      {/* Warn before the form is filled in, not after it is submitted. */}
+      {demoLocked && !initial && (
+        <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200">
+          {t('product.cfg.demoBlockedHint')}
+        </p>
+      )}
       <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <h2 className="text-xl font-bold">{t('product.cfg.general')}</h2>
         <div className="space-y-1">
