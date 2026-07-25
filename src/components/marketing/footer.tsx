@@ -46,7 +46,7 @@ export function MarketingFooter() {
 
         <nav className="flex flex-col gap-3">
           <span className="text-sm font-medium text-foreground">{t('footer.sports')}</span>
-          {SPORTS.slice(0, 5).map((s) => (
+          {SPORTS.slice(0, 8).map((s) => (
             <FooterLink key={s.slug} href={`/sports/${s.slug}`}>
               {t(`sports.${s.slug}.name`)}
             </FooterLink>
