@@ -1,7 +1,9 @@
 # Database migrations
 
-Schema changes go through reviewed migration files (`push: false` in
-`payload.config.ts`), applied with `pnpm migrate`.
+In development, Payload pushes the schema automatically (`push: true` in
+`payload.config.ts`). Payload disables push when `NODE_ENV=production`, so
+production schema changes go through reviewed migration files in this folder,
+applied with `pnpm migrate`.
 
 ## Bootstrapping a brand-new (empty) database
 

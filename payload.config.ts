@@ -77,8 +77,8 @@ export default buildConfig({
     multiTenantPlugin({
       tenantsSlug: 'organizations',
       // debug: makes the `tenant` field visible on each document form so the
-      // organization can be assigned/verified directly (useful while building).
-      debug: true,
+      // organization can be assigned/verified directly. Development only.
+      debug: process.env.NODE_ENV !== 'production',
       tenantField: { label: 'Organisation' },
       i18n: {
         translations: {
