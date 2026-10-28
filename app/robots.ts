@@ -10,9 +10,10 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: {
       userAgent: '*',
       allow: '/',
-      // Admin/console and data endpoints; `/*/tv` are big-screen display pages
-      // that just mirror a tournament's public page (thin duplicates).
-      disallow: ['/admin', '/manage', '/api/', '/*/tv'],
+      // Admin/console and data endpoints. The organizer dashboard lives under a
+      // locale segment (/fr/manage…), hence `/*/manage`. `/*/tv` are big-screen
+      // display pages that just mirror a tournament's public page (thin duplicates).
+      disallow: ['/admin', '/console', '/*/manage', '/api/', '/*/tv'],
     },
     sitemap: `${base}/sitemap.xml`,
   }

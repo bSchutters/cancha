@@ -1132,6 +1132,7 @@ export const en: Dictionary = {
   "product.teams.bulk.paid": "Marked paid",
   "product.teams.bulk.unpaid": "Marked unpaid",
   "product.teams.bulkDeleted": "{count} team(s) deleted",
+  "product.teams.bulkFailed": "{failed} of {total} team(s) could not be updated. They are still selected.",
   "product.teams.noMatch": "No team matches the search.",
   "product.teams.selectAll": "Select all",
   "product.teams.selectOne": "Select {name}",

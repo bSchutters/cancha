@@ -1,8 +1,9 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrManager, isAdminOrManagerField } from '../access'
+import { isAdminOrManager, isAdminOrManagerField, isAdminOrOwnTenant } from '../access'
 import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../hooks/revalidateCache'
 import { registrationCapacity } from '../hooks/registrationCapacity'
 import { setTenantFromTournament } from '../hooks/tenantFromTournament'
+import { preventDeletingScheduledTeam } from '../hooks/teamDeletion'
 
 // Revalidate the parent tournament's tag. `tournament` may be an id or a populated doc.
 const teamTags = (doc: Record<string, unknown>) => {
@@ -36,10 +37,12 @@ export const TournamentTeams: CollectionConfig = {
     // Public registration goes through /api/tournament/[slug]/register (overrideAccess server-side).
     create: isAdminOrManager,
     update: isAdminOrManager,
-    delete: isAdmin,
+    // Organizers manage their own roster (the /manage dashboard deletes teams).
+    delete: isAdminOrOwnTenant,
   },
   hooks: {
     beforeValidate: [setTenantFromTournament],
+    beforeDelete: [preventDeletingScheduledTeam],
     afterChange: [registrationCapacity, revalidateAfterChangeDynamic(teamTags)],
     afterDelete: [revalidateAfterDeleteDynamic(teamTags)],
   },

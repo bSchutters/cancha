@@ -76,7 +76,7 @@ function ScoreboardTeam({
       className={cn(
         'flex min-w-0 items-center gap-4',
         side === 'home' ? 'flex-row-reverse text-right' : '',
-        winner ? 'text-foreground' : 'text-foreground',
+        'text-foreground',
       )}
     >
       <span className={cn('relative shrink-0', logoSize)}>

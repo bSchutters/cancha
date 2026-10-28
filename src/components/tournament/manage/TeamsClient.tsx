@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDialog } from './ConfirmDialog'
 import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
 import { csvCell } from '@/lib/csv'
+import { runBulk, type BulkOutcome } from '@/lib/tournament/bulk'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import type { Id } from '@/lib/tournament/types'
@@ -135,7 +136,12 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
     }
   }
 
-  const selectedIds = useMemo(() => [...selected], [selected])
+  // Bulk actions only ever touch rows the organizer can see: a selection made
+  // before changing the search or the status filter must not delete hidden teams.
+  const selectedIds = useMemo(
+    () => view.filter((team) => selected.has(String(team.id))).map((team) => String(team.id)),
+    [view, selected],
+  )
   const allVisibleSelected = view.length > 0 && view.every((t) => selected.has(String(t.id)))
   const toggleOne = (id: string) =>
     setSelected((prev) => {
@@ -152,20 +158,33 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
       return next
     })
 
+  // Keep the failed rows selected so the organizer can retry just those.
+  const reportBulk = (outcome: BulkOutcome, successMsg: string) => {
+    setSelected(new Set(outcome.failed))
+    if (outcome.failed.length === 0) {
+      toast.success(successMsg)
+      return
+    }
+    toast.error(
+      t('product.teams.bulkFailed')
+        .replace('{failed}', String(outcome.failed.length))
+        .replace('{total}', String(outcome.ok.length + outcome.failed.length)),
+    )
+  }
+
   const bulkPatch = async (data: Record<string, unknown>, msg: string) => {
     if (selectedIds.length === 0) return
     setBusy('bulk')
     try {
-      for (const id of selectedIds) {
-        await fetch(`/api/tournament-teams/${id}`, {
+      const outcome = await runBulk(selectedIds, (id) =>
+        fetch(`/api/tournament-teams/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(data),
-        })
-      }
-      toast.success(msg)
-      setSelected(new Set())
+        }),
+      )
+      reportBulk(outcome, msg)
       router.refresh()
     } finally {
       setBusy(null)
@@ -176,11 +195,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
     if (selectedIds.length === 0) return
     setBusy('bulk')
     try {
-      for (const id of selectedIds) {
-        await fetch(`/api/tournament-teams/${id}`, { method: 'DELETE', credentials: 'include' })
-      }
-      toast.success(t('product.teams.bulkDeleted').replace('{count}', String(selectedIds.length)))
-      setSelected(new Set())
+      const outcome = await runBulk(selectedIds, (id) =>
+        fetch(`/api/tournament-teams/${id}`, { method: 'DELETE', credentials: 'include' }),
+      )
+      reportBulk(outcome, t('product.teams.bulkDeleted').replace('{count}', String(outcome.ok.length)))
       setConfirmBulkDelete(false)
       router.refresh()
     } finally {
@@ -305,7 +323,9 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
         toast.success(t('product.teams.deleted'))
         router.refresh()
       } else {
-        toast.error(t('product.toast.deleteFailed'))
+        // Payload explains a refusal (e.g. the team already plays matches).
+        const body = await res.json().catch(() => null)
+        toast.error(body?.errors?.[0]?.message ?? t('product.toast.deleteFailed'))
       }
     } finally {
       setBusy(null)
@@ -445,10 +465,10 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
             </Button>
           </div>
 
-          {selected.size > 0 && (
+          {selectedIds.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-2">
               <span className="px-1 text-sm font-semibold text-primary">
-                {t('product.teams.selectedCount').replace('{count}', String(selected.size))}
+                {t('product.teams.selectedCount').replace('{count}', String(selectedIds.length))}
               </span>
               <Button size="sm" variant="secondary" disabled={busy !== null}
                 onClick={() => bulkPatch({ registration_status: 'confirmed' }, t('product.teams.bulk.confirmed'))}>
@@ -685,7 +705,7 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
 
       <ConfirmDialog
         open={confirmBulkDelete}
-        title={t('product.teams.bulkDeleteTitle').replace('{count}', String(selected.size))}
+        title={t('product.teams.bulkDeleteTitle').replace('{count}', String(selectedIds.length))}
         description={t('product.teams.bulkDeleteDesc')}
         confirmLabel={t('product.action.delete')}
         busy={busy === 'bulk'}

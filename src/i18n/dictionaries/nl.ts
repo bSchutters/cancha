@@ -1132,6 +1132,7 @@ export const nl: Dictionary = {
   "product.teams.bulk.paid": "Gemarkeerd als betaald",
   "product.teams.bulk.unpaid": "Gemarkeerd als niet betaald",
   "product.teams.bulkDeleted": "{count} team(s) verwijderd",
+  "product.teams.bulkFailed": "{failed} van {total} team(s) konden niet worden bijgewerkt. Ze blijven geselecteerd.",
   "product.teams.noMatch": "Geen team komt overeen met de zoekopdracht.",
   "product.teams.selectAll": "Alles selecteren",
   "product.teams.selectOne": "{name} selecteren",
