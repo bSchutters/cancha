@@ -6,6 +6,7 @@ import { buildScheduleMaps } from './schedule'
 import { buildMatchCodes, buildFeederNames } from './match-code'
 import { getSessionUser, getUserTenantIds } from './session'
 import { safeExternalUrl } from './safe-url'
+import { refereePoolWhere } from './referees'
 import { computeFinalRanking as computeFinalRankingRaw, type FinalMatchInput } from './final-ranking'
 import type { Id, MatchResult, TeamRef, TournamentFormat } from './types'
 import { DEFAULT_TEAM_LOGO } from './constants'
@@ -174,7 +175,7 @@ export async function buildManageTournament(
     payload.find({ collection: 'tournament-matches', where: { tournament: { equals: t.id } }, limit: 2000, depth: 1 }),
     payload.find({
       collection: 'tournament-referees',
-      where: { or: [{ tournament: { equals: t.id } }, { tournament: { exists: false } }] },
+      where: refereePoolWhere(t.id, t.tenant),
       limit: 500,
       depth: 0,
     }),

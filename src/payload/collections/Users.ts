@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminField } from '../access'
+import { isDemoUser } from '@/lib/demo/config'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -22,6 +23,9 @@ export const Users: CollectionConfig = {
     create: isAdmin,
     update: ({ req: { user } }) => {
       if (user?.role === 'admin') return true
+      // The demo credentials are public: letting that account change its own
+      // email or password would lock every other visitor out of the demo.
+      if (isDemoUser(user as { email?: string } | null)) return false
       // Manager can only update their own account
       if (user) return { id: { equals: user.id } }
       return false

@@ -8,6 +8,7 @@ import { makeRng, shuffle } from './rng'
 import { pairSwissRound, type SwissMatchResult } from './swiss'
 import { rankAll, generateKnockout, type RankingDepth } from './bracket'
 import { generateDoubleElim as buildDoubleElim, isPowerOfTwo } from './double-elim'
+import { refereePoolWhere } from './referees'
 import type {
   CourtConfig,
   DrawnGroup,
@@ -194,7 +195,7 @@ export async function generateSchedule(payload: Payload, tournamentId: Id) {
   }
 
   if (tournament.referee_assignment === 'random') {
-    const refs = await loadReferees(payload, tournamentId)
+    const refs = await loadReferees(payload, tournament)
     if (refs.length > 0) {
       const created = await groupPhaseMatches(payload, tournamentId)
       await assignRefereesNoClash(payload, created, refs)
@@ -347,7 +348,7 @@ export async function generateKnockoutPhase(payload: Payload, tournamentId: Id) 
   }
 
   if (tournament.referee_assignment === 'random') {
-    const refs = await loadReferees(payload, tournamentId)
+    const refs = await loadReferees(payload, tournament)
     if (refs.length > 0) {
       const finals = await payload.find({
         collection: 'tournament-matches',
@@ -864,10 +865,10 @@ function shuffleInPlace<T>(arr: T[]): T[] {
   return arr
 }
 
-async function loadReferees(payload: Payload, tournamentId: Id): Promise<AnyDoc[]> {
+async function loadReferees(payload: Payload, tournament: AnyDoc): Promise<AnyDoc[]> {
   const res = await payload.find({
     collection: 'tournament-referees',
-    where: { or: [{ tournament: { equals: tournamentId } }, { tournament: { exists: false } }] },
+    where: refereePoolWhere(tournament.id, tournament.tenant),
     limit: 500,
     depth: 0,
   })
@@ -904,7 +905,7 @@ export async function assignRefereesRandomly(payload: Payload, slugOrId: Id) {
   const tournament = await resolveTournament(payload, slugOrId)
   const [matchesRes, referees] = await Promise.all([
     payload.find({ collection: 'tournament-matches', where: { tournament: { equals: tournament.id } }, limit: 2000, depth: 0 }),
-    loadReferees(payload, tournament.id),
+    loadReferees(payload, tournament),
   ])
   if (referees.length === 0) {
     throw new TournamentError('PRECONDITION_FAILED', 'Aucun arbitre à affecter')

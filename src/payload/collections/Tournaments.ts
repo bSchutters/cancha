@@ -4,6 +4,7 @@ import { revalidateAfterChangeDynamic, revalidateAfterDeleteDynamic } from '../h
 import { LOCALES, LOCALE_LABELS, DEFAULT_LOCALE } from '@/i18n/config'
 import { ALL_SPORTS, DEFAULT_SPORT } from '@/lib/sport'
 import { setTenantFromUser } from '../hooks/tenantFromUser'
+import { singleLiveTournament } from '../hooks/singleLiveTournament'
 
 const tournamentTags = (doc: Record<string, unknown>) => ['tournaments', `tournament-${doc.slug}`]
 
@@ -43,24 +44,7 @@ export const Tournaments: CollectionConfig = {
     // Assign the creator's organization: the plugin only fills `tenant` from the
     // admin-UI cookie, which the custom /manage interface never sets.
     beforeValidate: [setTenantFromUser],
-    beforeChange: [
-      async ({ data, req, originalDoc }) => {
-        // A single tournament can be "live" at a time.
-        if (data?.status === 'live') {
-          await req.payload.update({
-            collection: 'tournaments',
-            where: {
-              and: [
-                { status: { equals: 'live' } },
-                ...(originalDoc?.id ? [{ id: { not_equals: originalDoc.id } }] : []),
-              ],
-            },
-            data: { status: 'finished' },
-          })
-        }
-        return data
-      },
-    ],
+    beforeChange: [singleLiveTournament],
     afterChange: [revalidateAfterChangeDynamic(tournamentTags)],
     afterDelete: [revalidateAfterDeleteDynamic(tournamentTags)],
   },

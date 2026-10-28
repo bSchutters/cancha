@@ -10,7 +10,11 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
     create: isAdminOrManager,
-    update: isAdminOrManager,
+    // Media is a shared pool, not tenant-scoped (see payload.config.ts), so any
+    // organizer allowed to update would be allowed to update EVERY organization's
+    // logos — including replacing the file. The app never edits a media in place:
+    // a new logo is a new upload, then the owning document points at it.
+    update: isAdmin,
     delete: isAdmin,
   },
   fields: [
