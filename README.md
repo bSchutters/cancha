@@ -1,31 +1,74 @@
-# Cup Generator
+# Cancha
 
-Standalone futsal tournament management platform (extracted from the UD Asturiana club site).
-Next.js 16 + Payload CMS 3 + PostgreSQL. Multi-tenant (per-organizer branding) is being added incrementally.
+Multi-tenant platform for running amateur sports tournaments end to end: online
+registration, animated draw, multi-court scheduling, live standings and brackets,
+and a TV display for the venue.
 
-## Status
+Next.js 16 (App Router) · React 19 · Payload CMS 3 · PostgreSQL · Tailwind 4 · TypeScript.
 
-- **Phase 0 (done):** standalone single-tenant app. The tournament engine, collections, public/TV
-  views and the management dashboard run on their own (no club coupling). Routes are served at the
-  root (`/`, `/[slug]`, `/[slug]/tv`, `/manage`, `/admin`).
-- **Next:** organizations + per-tenant data isolation, host-based tenant resolution, per-org branding.
+## Features
 
-## Setup
+- **Formats:** groups + knockout (with classification matches), league (groups only), single elimination,
+  double elimination (winners/losers brackets, grand final) and Swiss rounds.
+- **15 sports** with their own scoring rules (goals, sets, points, fair-play
+  tiebreakers): futsal, padel, tennis, volleyball, basketball, handball, hockey,
+  rugby, badminton, squash, beach volley, water polo, table tennis, pétanque, darts.
+- **Multi-tenant:** each organization gets its own subdomain or custom domain,
+  branding (colors, fonts, radius, logo) and isolated data
+  (`@payloadcms/plugin-multi-tenant`).
+- **Organizer dashboard** (`/manage`): teams, payments, draw, schedule, score entry,
+  referees, sponsors, TV screens.
+- **Public views:** tournament page, "my team" view, live TV display and animated
+  draw for a screen in the venue.
+- **i18n:** French, Dutch and English (dictionary parity is unit-tested).
+- **Staff console** (`/console`): leads and client onboarding for the platform owner.
 
-1. `pnpm install`
-2. Copy `.env.example` to `.env` and fill it in (a **new** Postgres DB + Vercel Blob store, separate
-   from any other project).
-3. `pnpm dev` — app on http://localhost:3000, Payload admin on http://localhost:3000/admin.
+## Architecture
 
-## Validate (never run `pnpm build` while `pnpm dev` is running)
+```
+app/
+  (tournament)/[lang]/…   localized public site, tournament pages, /manage
+  (console)/console       staff back-office (super-admin only)
+  (payload)/admin         Payload admin UI + REST API
+  api/tournament/…        tournament actions (draw, schedule, scores…)
+proxy.ts                  redirects un-prefixed paths into a locale
+src/lib/tournament/       pure tournament engine (bracket, schedule, standings,
+                          Swiss, double-elim…) + orchestrator that persists it
+src/lib/sport/            per-sport scoring profiles
+src/payload/              collections, access control, hooks
+src/i18n/                 dictionaries and helpers
+```
 
-- `pnpm tsc --noEmit`
-- `pnpm lint`
-- `pnpm test` (tournament engine unit tests)
+The engine in `src/lib/tournament` is plain TypeScript with no framework
+dependency, so it is unit-tested in isolation. `orchestrator.ts` is the only
+layer that writes it to the database.
 
-## Routes
+## Getting started
 
-- `/` — tournaments list (public)
-- `/[slug]` — public tournament page · `/[slug]/tv` — TV display · `/[slug]/tv/draw` — animated draw
-- `/login` · `/manage` · `/manage/[slug]/...` — organizer dashboard
-- `/admin` — Payload admin
+Requirements: Node 20+, pnpm, a PostgreSQL database.
+
+```sh
+pnpm install
+cp .env.example .env    # fill in PAYLOAD_SECRET and DATABASE_URI at least
+pnpm dev                # http://localhost:3000 · admin on /admin
+```
+
+In development Payload pushes the schema automatically. For production, schema
+changes ship as migrations (see `src/migrations/README.md`).
+
+## Quality checks
+
+```sh
+pnpm tsc --noEmit
+pnpm lint
+pnpm test        # Vitest: engine, sports, i18n parity
+pnpm test:e2e    # Playwright against a throwaway local Postgres (see tests/e2e/README.md)
+```
+
+Do not run `pnpm build` while `pnpm dev` is running.
+
+## Live demo
+
+Setting `DEMO_ENABLED=true` turns on a public demo organization with published
+credentials and a reset endpoint. Only enable it on a deployment meant to be a
+public demo.
