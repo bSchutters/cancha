@@ -146,7 +146,7 @@
 
 @theme inline {
   /* Per-org fonts (set on .tournament-scope) override the defaults; otherwise fall
-     back to the Cup Generator house faces (Newsreader/Geist, loaded via next/font
+     back to the Cancha house faces (Newsreader/Geist, loaded via next/font
      in the layout), then to the bundled brand fonts. */
   --font-marjorie: var(--font-heading, var(--font-product-heading), "Marjorie", serif);
   --font-nugros: var(--font-body, var(--font-product-body), "Nugros", sans-serif);
@@ -198,7 +198,7 @@
 
 :root {
   --radius: 0.625rem;
-  /* Cup Generator house palette (cream + ink-blue), matching the landing. This is
+  /* Cancha house palette (cream + ink-blue), matching the landing. This is
      the fallback when no org theme is injected; per-org themes override it. */
   --background: #faf9f5;
   --foreground: #1a1a18;

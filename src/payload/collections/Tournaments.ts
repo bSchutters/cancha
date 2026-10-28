@@ -86,7 +86,7 @@ export const Tournaments: CollectionConfig = {
       required: true,
       unique: true,
       label: 'Slug (URL)',
-      admin: { description: 'Identifiant d’URL : cup.udasturiana.be/{slug}' },
+      admin: { description: 'Identifiant d’URL : {organisation}.cancha.be/{slug}' },
       validate: (value: unknown) =>
         typeof value === 'string' && RESERVED_SLUGS.has(value)
           ? `« ${value} » est réservé (code de langue). Choisissez un autre slug.`
