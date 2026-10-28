@@ -323,7 +323,9 @@ export function TeamsClient({ tournamentId, teams }: { tournamentId: Id; teams: 
         toast.success(t('product.teams.deleted'))
         router.refresh()
       } else {
-        toast.error(t('product.toast.deleteFailed'))
+        // Payload explains a refusal (e.g. the team already plays matches).
+        const body = await res.json().catch(() => null)
+        toast.error(body?.errors?.[0]?.message ?? t('product.toast.deleteFailed'))
       }
     } finally {
       setBusy(null)

@@ -55,3 +55,18 @@ export const userHasTenant = (
     return own != null && String(own) === String(id)
   })
 }
+
+/**
+ * Super-admins act on every document; an organizer only on documents of an
+ * organization they belong to (an organizer with none matches nothing). The
+ * multi-tenant plugin scopes these collections too, but a destructive access
+ * rule should not rely on a plugin alone to stay inside the tenant.
+ */
+export const isAdminOrOwnTenant: Access = ({ req: { user } }) => {
+  if (user?.role === 'admin') return true
+  if (user?.role !== 'manager') return false
+  const ids = ((user as { tenants?: Array<{ tenant?: TenantRef }> }).tenants ?? [])
+    .map((m) => tenantIdOf(m?.tenant))
+    .filter((id): id is number | string => id != null)
+  return ids.length > 0 ? { tenant: { in: ids } } : false
+}
