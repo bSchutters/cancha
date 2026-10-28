@@ -16,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDialog } from './ConfirmDialog'
 import { uploadMedia, validateImageFile } from '@/lib/tournament/upload-media'
+import { csvCell } from '@/lib/csv'
 import { useT } from '@/i18n/use-t'
 import type { Translate } from '@/i18n'
 import type { Id } from '@/lib/tournament/types'
@@ -24,11 +25,6 @@ import type { ManageTeam } from '@/lib/tournament/manage-view'
 type SortKey = 'name' | 'payment' | 'status'
 const STATUS_RANK: Record<string, number> = { pending: 0, confirmed: 1, waitlist: 2, rejected: 3 }
 const regStatusLabel = (status: string, t: Translate) => t(`product.teams.status.${status}`)
-
-/** Escapes a CSV cell (wraps in quotes, doubles inner quotes). */
-function csvCell(v: string): string {
-  return `"${v.replace(/"/g, '""')}"`
-}
 
 /** Validates an image file selection, surfacing a toast on rejection. */
 function pickImage(file: File | null | undefined, onValid: (f: File | null) => void) {

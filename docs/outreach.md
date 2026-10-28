@@ -11,7 +11,7 @@ Idée : envoie à chaque prospect le lien de la page qui le concerne (`/sports/p
 
 Bonjour [Prénom],
 
-J'ai vu que vous organisez [le tournoi / l'événement] [nom]. Je développe **Cup Generator**, une plateforme qui gère un tournoi de A à Z : inscriptions en ligne, tirage au sort animé, calendrier multi-terrains, classements et affichage TV en direct.
+J'ai vu que vous organisez [le tournoi / l'événement] [nom]. Je développe **Cancha**, une plateforme qui gère un tournoi de A à Z : inscriptions en ligne, tirage au sort animé, calendrier multi-terrains, classements et affichage TV en direct.
 
 L'idée : vous faire gagner des heures de logistique et offrir une vraie expérience aux équipes (page publique + écran en salle).
 
