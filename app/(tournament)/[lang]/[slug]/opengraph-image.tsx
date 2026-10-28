@@ -34,6 +34,8 @@ export default async function OpengraphImage({
     return new ImageResponse(
       (
         <div style={{ height: '100%', width: '100%', display: 'flex', position: 'relative' }}>
+          {/* next/og renders plain elements to a PNG: next/image does not apply here. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={poster}
             alt=""
