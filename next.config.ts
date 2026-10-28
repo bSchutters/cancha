@@ -16,10 +16,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "strapi.sbryan.studio",
-      },
-      {
-        protocol: "https",
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
