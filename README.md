@@ -1,5 +1,7 @@
 # Cancha
 
+[![CI](https://github.com/bSchutters/cancha/actions/workflows/ci.yml/badge.svg)](https://github.com/bSchutters/cancha/actions/workflows/ci.yml)
+
 Multi-tenant platform for running amateur sports tournaments end to end: online
 registration, animated draw, multi-court scheduling, live standings and brackets,
 and a TV display for the venue.
