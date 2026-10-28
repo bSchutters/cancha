@@ -338,7 +338,7 @@ export type Testimonial = { quote: string; name: string; role: string; org: stri
 // Testimonials section shows an honest "premiers organisateurs" offer instead.
 export const TESTIMONIALS: Testimonial[] = []
 
-// Public contact address: lead-form fallback + footer. TODO: confirm the real inbox.
+// Public contact address: lead-form fallback + footer.
 export const CONTACT_EMAIL = 'contact@cancha.be'
 
 // Pricing model: pay-per-team (no subscription, no upfront). No hard rate is shown
