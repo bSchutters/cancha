@@ -31,3 +31,42 @@ export const isAdminField: FieldAccess = ({ req: { user } }) => {
 export const isAdminOrManagerField: FieldAccess = ({ req: { user } }) => {
   return user?.role === 'admin' || user?.role === 'manager'
 }
+
+type TenantRef = number | string | { id?: number | string } | null | undefined
+
+const tenantIdOf = (t: TenantRef): number | string | null =>
+  t != null && typeof t === 'object' ? (t.id ?? null) : (t ?? null)
+
+/**
+ * May `user` write documents owned by `tenant`?
+ *
+ * Super-admins may write anywhere. Anyone else only into an organization they
+ * belong to; a missing tenant or a user without memberships never matches.
+ */
+export const userHasTenant = (
+  user: { role?: string; tenants?: Array<{ tenant?: TenantRef }> } | null | undefined,
+  tenant: TenantRef,
+): boolean => {
+  if (isSuperAdmin(user)) return true
+  const id = tenantIdOf(tenant)
+  if (id == null) return false
+  return (user?.tenants ?? []).some((m) => {
+    const own = tenantIdOf(m?.tenant)
+    return own != null && String(own) === String(id)
+  })
+}
+
+/**
+ * Super-admins act on every document; an organizer only on documents of an
+ * organization they belong to (an organizer with none matches nothing). The
+ * multi-tenant plugin scopes these collections too, but a destructive access
+ * rule should not rely on a plugin alone to stay inside the tenant.
+ */
+export const isAdminOrOwnTenant: Access = ({ req: { user } }) => {
+  if (user?.role === 'admin') return true
+  if (user?.role !== 'manager') return false
+  const ids = ((user as { tenants?: Array<{ tenant?: TenantRef }> }).tenants ?? [])
+    .map((m) => tenantIdOf(m?.tenant))
+    .filter((id): id is number | string => id != null)
+  return ids.length > 0 ? { tenant: { in: ids } } : false
+}

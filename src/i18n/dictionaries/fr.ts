@@ -1131,6 +1131,7 @@ export const fr: Record<string, string> = {
   "product.teams.bulk.paid": "Marquées payées",
   "product.teams.bulk.unpaid": "Marquées non payées",
   "product.teams.bulkDeleted": "{count} équipe(s) supprimée(s)",
+  "product.teams.bulkFailed": "{failed} sur {total} équipe(s) n’ont pas pu être modifiées. Elles restent sélectionnées.",
   "product.teams.noMatch": "Aucune équipe ne correspond à la recherche.",
   "product.teams.selectAll": "Tout sélectionner",
   "product.teams.selectOne": "Sélectionner {name}",
