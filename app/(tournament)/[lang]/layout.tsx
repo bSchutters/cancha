@@ -1,7 +1,11 @@
 import '../../globals.css'
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
-import { Newsreader, Geist } from 'next/font/google'
+// Default product faces (Cancha house style, matching the landing, self-hosted in
+// src/fonts): an editorial serif for headings + a clean grotesque for body.
+// Per-org fonts, when chosen, override these via --font-heading / --font-body
+// (see globals.css).
+import { productSerif, productSans } from '@/fonts'
 import { cn } from '@/lib/utils'
 import { getPayloadClient } from '@/lib/payload'
 import { resolveTenant, resolveLayoutTenant } from '@/lib/tournament/tenant'
@@ -12,23 +16,6 @@ import { LOCALES, LOCALE_HREFLANG, isLocale } from '@/i18n/config'
 import { localizedAlternates } from '@/i18n/alternates'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-
-// Default product faces (Cancha house style, matching the landing): an
-// editorial serif for headings + a clean grotesque for body. Per-org fonts, when
-// chosen, override these via --font-heading / --font-body (see globals.css).
-const productSerif = Newsreader({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-product-heading',
-  display: 'swap',
-})
-const productSans = Geist({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-product-body',
-  display: 'swap',
-})
 
 export const viewport: Viewport = {
   width: 'device-width',

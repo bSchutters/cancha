@@ -1,28 +1,14 @@
 import '../globals.css'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { Newsreader, Geist } from 'next/font/google'
+// Same house faces as the rest of the product (Cancha DA). The cream tokens come
+// from globals.css :root; no next-themes here, so the console stays light.
+import { productSerif as serif, productSans as sans } from '@/fonts'
 import { cn } from '@/lib/utils'
 import { getSessionUser, isSuperAdmin } from '@/lib/tournament/session'
 import { DEFAULT_LOCALE } from '@/i18n/config'
 import { ConsoleShell } from '@/components/console/console-shell'
 import { Toaster } from '@/components/ui/sonner'
-
-// Same house faces as the rest of the product (Cancha DA). The cream tokens come
-// from globals.css :root; no next-themes here, so the console stays light.
-const serif = Newsreader({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-product-heading',
-  display: 'swap',
-})
-const sans = Geist({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-product-body',
-  display: 'swap',
-})
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Console', robots: { index: false, follow: false } }
