@@ -1,22 +1,8 @@
 import type { CSSProperties } from 'react'
-import { Newsreader, Geist } from 'next/font/google'
+import { marketingSerif as serif, marketingSans as sans } from '@/fonts'
 
-// Cancha brand fonts: editorial serif for display + clean grotesque body
-// (a warm, literary "Claude-like" pairing). Shared across all marketing pages.
-const serif = Newsreader({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-newsreader',
-  display: 'swap',
-})
-const sans = Geist({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-geist-brand',
-  display: 'swap',
-})
-
+// Cancha brand fonts (self-hosted, see src/fonts): editorial serif for display +
+// clean grotesque body. Shared across all marketing pages.
 export const fontVars = `${serif.variable} ${sans.variable}`
 
 // Brand palette ("Crème + bleu encre"): warm paper bg, near-black warm ink text,
